@@ -22,7 +22,9 @@ var TSC;
                 (function (Token) {
                     Token[Token["TLBrace"] = 0] = "TLBrace";
                     Token[Token["TRBrace"] = 1] = "TRBrace";
-                    Token[Token["EOP"] = 2] = "EOP";
+                    Token[Token["Tchar"] = 2] = "Tchar";
+                    Token[Token["TSpace"] = 3] = "TSpace";
+                    Token[Token["EOP"] = 4] = "EOP";
                 })(Token || (Token = {}));
                 // Define array to return tokens in
                 var tokens_1 = [];
@@ -35,6 +37,11 @@ var TSC;
                     var rRBRACE = new RegExp('}');
                     // RegExp for EOP
                     var rEOP = new RegExp('\\$');
+                    // RegExp for Character
+                    var rCHAR = new RegExp('[a-z]');
+                    // RegExp for Space
+                    var rSPACE = new RegExp(' +');
+                    // Test for Left Brace
                     if (rLBRACE.test(sourceCode.charAt(sourceCodePtr))) {
                         console.log("LBRACE");
                         // Create a new TLBRACE token and add it to the array
@@ -49,12 +56,23 @@ var TSC;
                     }
                     else if (sourceCode.charAt(sourceCodePtr).match(rEOP)) {
                         console.log("EOP");
-                        // Create a new TRBRACE token and add it to the array
+                        // Create a new EOP token and add it to the array
                         var token = Token.EOP;
                         tokens_1.push(token);
                     }
+                    else if (sourceCode.charAt(sourceCodePtr).match(rCHAR)) {
+                        console.log("CHAR");
+                        // Create a new Tchar token and add it to the array
+                        var token = Token.Tchar;
+                        tokens_1.push(token);
+                    }
+                    else if (sourceCode.charAt(sourceCodePtr).match(rSPACE)) {
+                        console.log("SPACE");
+                        // Create a new TSPACE token and add it to the array
+                        var token = Token.TSpace;
+                        tokens_1.push(token);
+                    }
                     else {
-                        // Catch for unrecognized tokens
                         console.log("ERROR: Unrecognized token " + sourceCode.charAt(sourceCodePtr));
                     }
                     sourceCodePtr++;

@@ -21,6 +21,8 @@ module TSC
 				enum Token {
 					TLBrace,
 					TRBrace,
+					Tchar,
+					TSpace,
 					EOP
 				}
 
@@ -37,26 +39,48 @@ module TSC
 					let rRBRACE = new RegExp('}');
 					// RegExp for EOP
 					let rEOP = new RegExp('\\$');
+					// RegExp for Character
+					let rCHAR = new RegExp('[a-z]');
+					// RegExp for Space
+					let rSPACE = new RegExp(' +');
+					
+					// Test for Left Brace
 					if(rLBRACE.test(sourceCode.charAt(sourceCodePtr))){
 						console.log("LBRACE");
 						// Create a new TLBRACE token and add it to the array
 						var token: Token = Token.TLBrace
 						tokens.push(token);
 					}
+					// Test for Right Brace
 					else if(rRBRACE.test(sourceCode.charAt(sourceCodePtr))){
 						console.log("RBRACE");
 						// Create a new TRBRACE token and add it to the array
 						var token: Token = Token.TRBrace
 						tokens.push(token);
 					}
+					// Test for EOP
 					else if(sourceCode.charAt(sourceCodePtr).match(rEOP)){
 						console.log("EOP");
-						// Create a new TRBRACE token and add it to the array
+						// Create a new EOP token and add it to the array
 						var token: Token = Token.EOP
 						tokens.push(token);
 					}
+					// Test for character
+					else if(sourceCode.charAt(sourceCodePtr).match(rCHAR)){
+						console.log("CHAR");
+						// Create a new Tchar token and add it to the array
+						var token: Token = Token.Tchar
+						tokens.push(token);
+					}
+					// Test for Space
+					else if(sourceCode.charAt(sourceCodePtr).match(rSPACE)){
+						console.log("SPACE");
+						// Create a new TSPACE token and add it to the array
+						var token: Token = Token.TSpace
+						tokens.push(token);
+					}
+					// Catch for unrecognized tokens
 					else{
-						// Catch for unrecognized tokens
 						console.log("ERROR: Unrecognized token " + sourceCode.charAt(sourceCodePtr));
 					}
 					
