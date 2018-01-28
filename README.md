@@ -1,7 +1,7 @@
-TS-Compiler
+KaiCompiler
 =====================
 
-This is the Compielrs class initial project written in TypeScript.
+This is my Compilers project written TypeScript with frontend HTML.
 See http://www.labouseur.com/courses/compilers/ for details.
 
 Setup TypeScript/Gulp
