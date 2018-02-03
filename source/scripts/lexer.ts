@@ -67,8 +67,18 @@ module TSC
 				let rBOOLVALTRUE = new RegExp('true$');
 				// RegExp for BoolVal for false
 				let rBOOLVALFALSE = new RegExp('false$');
-				// RegExp for Type
-				let rTYPE = new RegExp('int|string|boolean');
+				// RegExp for While
+				let rWHILE = new RegExp('while$');
+				// RegExp for If
+				let rIF = new RegExp('if$');
+				// RegExp for Print
+				let rPRINT = new RegExp('print$');
+				// RegExp for Type Int
+				let rTYPEINT = new RegExp('int$');
+				// RegExp for Type Boolean
+				let rTYPEBOOL = new RegExp('boolean$');
+				// RegExp for Type String
+				let rTYPESTR = new RegExp('string$');
 				// // RegExp for AssignmentOp
 				// let rASSIGN = new RegExp('=$');
 				// // RegExp for BoolOp
@@ -93,6 +103,8 @@ module TSC
 						tokens.push(token);
 					}
 
+					// ------------------------ KEYWORDS START ----------------------------
+
 					// Test for Boolean Value True
 					else if(rBOOLVALTRUE.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
 						var token: Token = new Token(TSC.TokenType.TBoolval, "true");
@@ -110,6 +122,62 @@ module TSC
 						tokens = tokens.slice(0, tokens.length - ("false".length - 1));
 						tokens.push(token);
 					}
+
+					// Test for While
+					else if(rWHILE.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
+						var token: Token = new Token(TSC.TokenType.TWhile, "while");
+						// We have to remove the IDs that have been identified and added to the tokens array
+						// 4 ID tokens have been added - "w", "h", "i", "l"... remove them from the array
+						tokens = tokens.slice(0, tokens.length - ("while".length - 1));
+						tokens.push(token);
+					}
+
+					// Test for If
+					else if(rIF.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
+						var token: Token = new Token(TSC.TokenType.TIf, "if");
+						// We have to remove the IDs that have been identified and added to the tokens array
+						// 1 ID token has been added - "i"... remove them from the array
+						tokens = tokens.slice(0, tokens.length - ("if".length - 1));
+						tokens.push(token);
+					}
+
+					// Test for Type Int
+					else if(rTYPEINT.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
+						var token: Token = new Token(TSC.TokenType.TType, "int");
+						// We have to remove the IDs that have been identified and added to the tokens array
+						// 2 ID tokens have been added - "i", "n" ... remove them from the array
+						tokens = tokens.slice(0, tokens.length - ("int".length - 1));
+						tokens.push(token);
+					}
+
+					// Test for Type Bool
+					else if(rTYPEBOOL.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
+						var token: Token = new Token(TSC.TokenType.TType, "boolean");
+						// We have to remove the IDs that have been identified and added to the tokens array
+						// 6 ID tokens have been added - "b", "o", "o", "l", "e", "a" ... remove them from the array
+						tokens = tokens.slice(0, tokens.length - ("boolean".length - 1));
+						tokens.push(token);
+					}
+
+					// Test for Type Str
+					else if(rTYPESTR.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
+						var token: Token = new Token(TSC.TokenType.TType, "string");
+						// We have to remove the IDs that have been identified and added to the tokens array
+						// 5 ID tokens have been added - "s", "t", "r", "i", "n" ... remove them from the array
+						tokens = tokens.slice(0, tokens.length - ("string".length - 1));
+						tokens.push(token);
+					}
+
+					// Test for Print
+					else if(rPRINT.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
+						var token: Token = new Token(TSC.TokenType.TPrint, "print");
+						// We have to remove the IDs that have been identified and added to the tokens array
+						// 4 ID tokens have been added - "p", "r", "i", "n"... remove them from the array
+						tokens = tokens.slice(0, tokens.length - ("print".length - 1));
+						tokens.push(token);
+					}
+
+					// ------------------------ KEYWORDS END ----------------------------
 					
 					// Test for Digit
 					else if(rDIGIT.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
@@ -128,8 +196,6 @@ module TSC
 						var token: Token = new Token(TSC.TokenType.TId, sourceCode.charAt(endLexemePtr-1));
 						tokens.push(token);
 					}
-
-					
 
 					// If whitespace, "clear" the buffer, aka set startLexemePtr to endLexemePtr
 					// We ignore whitespace

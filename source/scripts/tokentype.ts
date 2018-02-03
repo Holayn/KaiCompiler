@@ -9,6 +9,9 @@ module TSC {
         TBoolval = "TBoolval",
         TType = "TType",
         TAssign = "TAssign",
-        TBoolop = "TBoolop"
+        TBoolop = "TBoolop",
+        TWhile = "TWhile",
+        TIf = "TIf",
+        TPrint = "TPrint"
     }
 }

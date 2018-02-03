@@ -12,5 +12,8 @@ var TSC;
         TokenType["TType"] = "TType";
         TokenType["TAssign"] = "TAssign";
         TokenType["TBoolop"] = "TBoolop";
+        TokenType["TWhile"] = "TWhile";
+        TokenType["TIf"] = "TIf";
+        TokenType["TPrint"] = "TPrint";
     })(TokenType = TSC.TokenType || (TSC.TokenType = {}));
 })(TSC || (TSC = {}));

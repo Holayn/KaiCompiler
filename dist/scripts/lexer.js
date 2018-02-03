@@ -63,8 +63,18 @@ var TSC;
                 var rBOOLVALTRUE = new RegExp('true$');
                 // RegExp for BoolVal for false
                 var rBOOLVALFALSE = new RegExp('false$');
-                // RegExp for Type
-                var rTYPE = new RegExp('int|string|boolean');
+                // RegExp for While
+                var rWHILE = new RegExp('while$');
+                // RegExp for If
+                var rIF = new RegExp('if$');
+                // RegExp for Print
+                var rPRINT = new RegExp('print$');
+                // RegExp for Type Int
+                var rTYPEINT = new RegExp('int$');
+                // RegExp for Type Boolean
+                var rTYPEBOOL = new RegExp('boolean$');
+                // RegExp for Type String
+                var rTYPESTR = new RegExp('string$');
                 // // RegExp for AssignmentOp
                 // let rASSIGN = new RegExp('=$');
                 // // RegExp for BoolOp
@@ -96,6 +106,48 @@ var TSC;
                         // We have to remove the IDs that have been identified and added to the tokens array
                         // 5 ID tokens have been added - "f", "a", "l", "s"... remove them from the array
                         tokens_1 = tokens_1.slice(0, tokens_1.length - ("false".length - 1));
+                        tokens_1.push(token);
+                    }
+                    else if (rWHILE.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
+                        var token = new TSC.Token(TSC.TokenType.TWhile, "while");
+                        // We have to remove the IDs that have been identified and added to the tokens array
+                        // 4 ID tokens have been added - "w", "h", "i", "l"... remove them from the array
+                        tokens_1 = tokens_1.slice(0, tokens_1.length - ("while".length - 1));
+                        tokens_1.push(token);
+                    }
+                    else if (rIF.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
+                        var token = new TSC.Token(TSC.TokenType.TIf, "if");
+                        // We have to remove the IDs that have been identified and added to the tokens array
+                        // 1 ID token has been added - "i"... remove them from the array
+                        tokens_1 = tokens_1.slice(0, tokens_1.length - ("if".length - 1));
+                        tokens_1.push(token);
+                    }
+                    else if (rTYPEINT.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
+                        var token = new TSC.Token(TSC.TokenType.TType, "int");
+                        // We have to remove the IDs that have been identified and added to the tokens array
+                        // 2 ID tokens have been added - "i", "n" ... remove them from the array
+                        tokens_1 = tokens_1.slice(0, tokens_1.length - ("int".length - 1));
+                        tokens_1.push(token);
+                    }
+                    else if (rTYPEBOOL.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
+                        var token = new TSC.Token(TSC.TokenType.TType, "boolean");
+                        // We have to remove the IDs that have been identified and added to the tokens array
+                        // 6 ID tokens have been added - "b", "o", "o", "l", "e", "a" ... remove them from the array
+                        tokens_1 = tokens_1.slice(0, tokens_1.length - ("boolean".length - 1));
+                        tokens_1.push(token);
+                    }
+                    else if (rTYPESTR.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
+                        var token = new TSC.Token(TSC.TokenType.TType, "string");
+                        // We have to remove the IDs that have been identified and added to the tokens array
+                        // 5 ID tokens have been added - "s", "t", "r", "i", "n" ... remove them from the array
+                        tokens_1 = tokens_1.slice(0, tokens_1.length - ("string".length - 1));
+                        tokens_1.push(token);
+                    }
+                    else if (rPRINT.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
+                        var token = new TSC.Token(TSC.TokenType.TPrint, "print");
+                        // We have to remove the IDs that have been identified and added to the tokens array
+                        // 4 ID tokens have been added - "p", "r", "i", "n"... remove them from the array
+                        tokens_1 = tokens_1.slice(0, tokens_1.length - ("print".length - 1));
                         tokens_1.push(token);
                     }
                     else if (rDIGIT.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
