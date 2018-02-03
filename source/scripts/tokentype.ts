@@ -3,6 +3,12 @@ module TSC {
         TId = "TId",
         TLbrace = "TLbrace",
         TRbrace = "TRbrace",
-        TEop = "TEop"
+        TEop = "TEop",
+        TDigit = "TDigit",
+        TIntop = "TIntop",
+        TBoolval = "TBoolval",
+        TType = "TType",
+        TAssign = "TAssign",
+        TBoolop = "TBoolop"
     }
 }

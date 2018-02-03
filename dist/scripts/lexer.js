@@ -55,23 +55,59 @@ var TSC;
                 var rID = new RegExp('[a-z]$');
                 // RegExp for whitespace
                 var rWHITE = new RegExp(' |\t|\n|\r');
+                // RegExp for Digit
+                var rDIGIT = new RegExp('[0-9]$');
+                // RegExp for IntOp
+                var rINTOP = new RegExp('\\+');
+                // RegExp for BoolVal for true
+                var rBOOLVALTRUE = new RegExp('true$');
+                // RegExp for BoolVal for false
+                var rBOOLVALFALSE = new RegExp('false$');
+                // RegExp for Type
+                var rTYPE = new RegExp('int|string|boolean');
+                // // RegExp for AssignmentOp
+                // let rASSIGN = new RegExp('=$');
+                // // RegExp for BoolOp
+                // let rBOOLOP = new RegExp('==$ | \\!=$');
                 // Run Regular Expression matching on the buffer of characters we have so far
+                // If the character we just "added" to the buffer we're looking at creates a match...
+                // Create a new Token for match
                 while (endLexemePtr <= sourceCode.length) {
                     console.log(sourceCode.substring(startLexemePtr, endLexemePtr));
                     console.log(endLexemePtr);
-                    // Test for ID
-                    // If the character we just "added" to the buffer we're looking at creates a match...
-                    // In this case, create a new Token for character
-                    if (rID.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
-                        var token = new TSC.Token(TSC.TokenType.TId, sourceCode.charAt(endLexemePtr - 1));
-                        tokens_1.push(token);
-                    }
-                    else if (rLBRACE.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
+                    // Test for Left Brace
+                    if (rLBRACE.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
                         var token = new TSC.Token(TSC.TokenType.TLbrace, sourceCode.charAt(endLexemePtr - 1));
                         tokens_1.push(token);
                     }
                     else if (rRBRACE.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
                         var token = new TSC.Token(TSC.TokenType.TRbrace, sourceCode.charAt(endLexemePtr - 1));
+                        tokens_1.push(token);
+                    }
+                    else if (rBOOLVALTRUE.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
+                        var token = new TSC.Token(TSC.TokenType.TBoolval, "true");
+                        // We have to remove the IDs that have been identified and added to the tokens array
+                        // 4 ID tokens have been added - "t", "r", "u", "e"... remove them from the array
+                        tokens_1 = tokens_1.slice(0, tokens_1.length - ("true".length - 1));
+                        tokens_1.push(token);
+                    }
+                    else if (rBOOLVALFALSE.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
+                        var token = new TSC.Token(TSC.TokenType.TBoolval, "false");
+                        // We have to remove the IDs that have been identified and added to the tokens array
+                        // 5 ID tokens have been added - "f", "a", "l", "s"... remove them from the array
+                        tokens_1 = tokens_1.slice(0, tokens_1.length - ("false".length - 1));
+                        tokens_1.push(token);
+                    }
+                    else if (rDIGIT.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
+                        var token = new TSC.Token(TSC.TokenType.TDigit, sourceCode.charAt(endLexemePtr - 1));
+                        tokens_1.push(token);
+                    }
+                    else if (rINTOP.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
+                        var token = new TSC.Token(TSC.TokenType.TIntop, sourceCode.charAt(endLexemePtr - 1));
+                        tokens_1.push(token);
+                    }
+                    else if (rID.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
+                        var token = new TSC.Token(TSC.TokenType.TId, sourceCode.charAt(endLexemePtr - 1));
                         tokens_1.push(token);
                     }
                     else if (rWHITE.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
@@ -88,101 +124,6 @@ var TSC;
                 }
                 console.log(tokens_1);
                 // TODO: Comments
-                // // Iterate through the input
-                // let sourceCodePtr = 0;
-                // while(sourceCodePtr < sourceCode.length){
-                // 	// RegExp for Left Brace
-                // 	let rLBRACE = new RegExp('{');
-                // 	// RegExp for Right Brace
-                // 	let rRBRACE = new RegExp('}');
-                // 	// RegExp for EOP
-                // 	let rEOP = new RegExp('\\$');
-                // 	// RegExp for Character
-                // 	let rCHAR = new RegExp('[a-z]');
-                // // RegExp for ID (same as Character)
-                // let rID = new RegExp('[a-z]');
-                // 	// RegExp for Space
-                // 	let rSPACE = new RegExp(' +');
-                // 	// RegExp for Digit
-                // 	let rDIGIT = new RegExp('[0-9]');
-                // 	// RegExp for BoolOp
-                // 	let rBOOLOP = new RegExp('== | \\!=');
-                // 	// RegExp for IntOp
-                // 	let rINTOP = new RegExp('\\+');
-                // 	// RegExp for BoolVal
-                // 	let rBOOLVAL = new RegExp('false | true');
-                // 	// RegExp for Type
-                // 	let rTYPE = new RegExp('int | string | boolean');
-                // 	// Test for Left Brace
-                // 	if(rLBRACE.test(sourceCode.charAt(sourceCodePtr))){
-                // 		console.log("LBRACE");
-                // 		// Create a new TLBrace token and add it to the array
-                // 		var token: Token = Token.TLBrace;
-                // 		tokens.push(token);
-                // 	}
-                // 	// Test for Right Brace
-                // 	else if(rRBRACE.test(sourceCode.charAt(sourceCodePtr))){
-                // 		console.log("RBRACE");
-                // 		// Create a new TRBrace token and add it to the array
-                // 		var token: Token = Token.TRBrace;
-                // 		tokens.push(token);
-                // 	}
-                // 	// Test for EOP
-                // 	else if(sourceCode.charAt(sourceCodePtr).match(rEOP)){
-                // 		console.log("EOP");
-                // 		// Create a new TEOP token and add it to the array
-                // 		var token: Token = Token.TEOP;
-                // 		tokens.push(token);
-                // 	}
-                // 	// Test for character
-                // 	else if(sourceCode.charAt(sourceCodePtr).match(rCHAR)){
-                // 		console.log("CHAR");
-                // 		// Create a new Tchar token and add it to the array
-                // 		var token: Token = Token.Tchar;
-                // 		tokens.push(token);
-                // 	}
-                // 	// Test for Space
-                // 	else if(sourceCode.charAt(sourceCodePtr).match(rSPACE)){
-                // 		console.log("SPACE");
-                // 		// Create a new Tspace token and add it to the array
-                // 		var token: Token = Token.Tspace;
-                // 		tokens.push(token);
-                // 	}
-                // 	// Test for Digit
-                // 	else if(sourceCode.charAt(sourceCodePtr).match(rDIGIT)){
-                // 		console.log("DIGIT");
-                // 		// Create a new Tdigit token and add it to the array
-                // 		var token: Token = Token.Tdigit;
-                // 		tokens.push(token);
-                // 	}
-                // 	// Test for Boolean Operation
-                // 	else if(sourceCode.charAt(sourceCodePtr).match(rBOOLOP)){
-                // 		console.log("BOOLOP");
-                // 		// Create a new Tboolop token and add it to the array
-                // 		var token: Token = Token.Tboolop;
-                // 		tokens.push(token);
-                // 	}
-                // 	// Test for Integer Operation
-                // 	else if(sourceCode.charAt(sourceCodePtr).match(rINTOP)){
-                // 		console.log("INTOP");
-                // 		// Create a new Tintop token and add it to the array
-                // 		var token: Token = Token.Tintop;
-                // 		tokens.push(token);
-                // 	}
-                // 	// Test for Boolean Value
-                // 	else if(sourceCode.charAt(sourceCodePtr).match(rBOOLVAL)){
-                // 		console.log("BOOLVAL");
-                // 		// Create a new Tboolval token and add it to the array
-                // 		var token: Token = Token.Tboolval;
-                // 		tokens.push(token);
-                // 	}
-                // 	// Test for Type
-                // 	else if(sourceCode.charAt(sourceCodePtr).match(rTYPE)){
-                // 		console.log("TYPE");
-                // 		// Create a new Ttype token and add it to the array
-                // 		var token: Token = Token.Ttype;
-                // 		tokens.push(token);
-                // 	}
                 // 	// Catch for unrecognized tokens
                 // 	else{
                 // 		console.log("ERROR: Unrecognized token " + sourceCode.charAt(sourceCodePtr));
