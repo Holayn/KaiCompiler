@@ -20,9 +20,8 @@ var TSC;
                 // Define array to return tokens in
                 var tokens_1 = [];
                 // Iterate through the input, creating tokens out of lexemes
-                var sourceCodePtr = 0;
-                var startWord = 0;
-                var endWord = 0;
+                var startLexemePtr = 0;
+                var endLexemePtr = 1;
                 // Look at each character? fill a buffer?
                 // Match regular expression to substrings?
                 // i.e. whietrue
@@ -46,17 +45,46 @@ var TSC;
                 // whil matches char/id
                 // whi   whie     whiet     whietr  whietru    whietrue <- true matches to this
                 // how to know true is keyword, not a bunch of ids put together
+                // RegExp for Left Brace
+                var rLBRACE = new RegExp('{$');
+                // RegExp for Right Brace
+                var rRBRACE = new RegExp('}$');
+                // RegExp for EOP
+                var rEOP = new RegExp('\\$$');
                 // RegExp for ID (same as Character)
                 var rID = new RegExp('[a-z]$');
-                while (sourceCodePtr < sourceCode.length) {
+                // RegExp for whitespace
+                var rWHITE = new RegExp(' |\t|\n|\r');
+                // Run Regular Expression matching on the buffer of characters we have so far
+                while (endLexemePtr <= sourceCode.length) {
+                    console.log(sourceCode.substring(startLexemePtr, endLexemePtr));
+                    console.log(endLexemePtr);
                     // Test for ID
-                    var test = TSC.TokenType.TId;
-                    console.log(test);
-                    if (rID.test(sourceCode.charAt(sourceCodePtr))) {
-                        var token = new TSC.Token(TSC.TokenType.TId, sourceCode.charAt(sourceCodePtr));
+                    // If the character we just "added" to the buffer we're looking at creates a match...
+                    // In this case, create a new Token for character
+                    if (rID.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
+                        var token = new TSC.Token(TSC.TokenType.TId, sourceCode.charAt(endLexemePtr - 1));
                         tokens_1.push(token);
                     }
-                    sourceCodePtr++;
+                    else if (rLBRACE.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
+                        var token = new TSC.Token(TSC.TokenType.TLbrace, sourceCode.charAt(endLexemePtr - 1));
+                        tokens_1.push(token);
+                    }
+                    else if (rRBRACE.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
+                        var token = new TSC.Token(TSC.TokenType.TRbrace, sourceCode.charAt(endLexemePtr - 1));
+                        tokens_1.push(token);
+                    }
+                    else if (rWHITE.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
+                        console.log("WHITESPACE");
+                        startLexemePtr = endLexemePtr;
+                    }
+                    else if (rEOP.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
+                        console.log("EOP");
+                        var token = new TSC.Token(TSC.TokenType.TEop, sourceCode.charAt(endLexemePtr - 1));
+                        tokens_1.push(token);
+                        startLexemePtr = endLexemePtr;
+                    }
+                    endLexemePtr++;
                 }
                 console.log(tokens_1);
                 // TODO: Comments

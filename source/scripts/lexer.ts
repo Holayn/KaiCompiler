@@ -22,9 +22,8 @@ module TSC
 
 
 				// Iterate through the input, creating tokens out of lexemes
-				let sourceCodePtr = 0;
-				let startWord = 0;
-				let endWord = 0;
+				let startLexemePtr = 0;
+				let endLexemePtr = 1;
 
 				// Look at each character? fill a buffer?
 				// Match regular expression to substrings?
@@ -49,19 +48,63 @@ module TSC
 				// whil matches char/id
 				// whi   whie     whiet     whietr  whietru    whietrue <- true matches to this
 				// how to know true is keyword, not a bunch of ids put together
-				
+
+				// RegExp for Left Brace
+				let rLBRACE = new RegExp('{$');
+				// RegExp for Right Brace
+				let rRBRACE = new RegExp('}$');
+				// RegExp for EOP
+				let rEOP = new RegExp('\\$$');
 				// RegExp for ID (same as Character)
 				let rID = new RegExp('[a-z]$');
+				// RegExp for whitespace
+				let rWHITE = new RegExp(' |\t|\n|\r');
 
-				while(sourceCodePtr < sourceCode.length){
+				// Run Regular Expression matching on the buffer of characters we have so far
+				while(endLexemePtr <= sourceCode.length){
+					console.log(sourceCode.substring(startLexemePtr, endLexemePtr));
+					console.log(endLexemePtr);
 					// Test for ID
-					var test = TSC.TokenType.TId;
-					console.log(test);
-					if(rID.test(sourceCode.charAt(sourceCodePtr))){
-						var token: Token = new Token(TSC.TokenType.TId, sourceCode.charAt(sourceCodePtr));
+					// If the character we just "added" to the buffer we're looking at creates a match...
+					// In this case, create a new Token for character
+					if(rID.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
+						var token: Token = new Token(TSC.TokenType.TId, sourceCode.charAt(endLexemePtr-1));
 						tokens.push(token);
 					}
-					sourceCodePtr++;
+
+					// Test for Left Brace
+					else if(rLBRACE.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
+						var token: Token = new Token(TSC.TokenType.TLbrace, sourceCode.charAt(endLexemePtr-1));
+						tokens.push(token);
+					}
+
+					// Test for Right Brace
+					else if(rRBRACE.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
+						var token: Token = new Token(TSC.TokenType.TRbrace, sourceCode.charAt(endLexemePtr-1));
+						tokens.push(token);
+					}
+
+					// If whitespace, "clear" the buffer, aka set startLexemePtr to endLexemePtr
+					// We ignore whitespace
+					else if(rWHITE.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
+						console.log("WHITESPACE");
+						startLexemePtr = endLexemePtr;
+					}
+
+					// If EOP, "clear" the buffer, aka set startLexemePtr to endLexemePtr
+					// Also, add a EOP token
+					else if(rEOP.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
+						console.log("EOP");
+						var token: Token = new Token(TSC.TokenType.TEop, sourceCode.charAt(endLexemePtr-1));
+						tokens.push(token);
+						startLexemePtr = endLexemePtr;
+					}
+
+
+
+
+
+					endLexemePtr++;
 				}
 
 				console.log(tokens);
