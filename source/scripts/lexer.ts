@@ -235,7 +235,13 @@ module TSC
 					// Catch for illegal characters
 					else{
 						if(endLexemePtr == sourceCode.length-1){
-							errors.push(new Error(TSC.ErrorType.InvalidToken, sourceCode.charAt(endLexemePtr)));
+							// If code ends with a trailling start comment, throw error
+							if(rCOMMENTSTART.test(sourceCode.substring(startLexemePtr, endLexemePtr+1))){
+								errors.push(new Error(TSC.ErrorType.MissingCommentEnd, "*/"));
+							}
+							else{
+								errors.push(new Error(TSC.ErrorType.InvalidToken, sourceCode.charAt(endLexemePtr)));
+							}
 							break;
 						}
 						// Check to see if the next character creates a match for a Boolean NotEquals
@@ -255,6 +261,7 @@ module TSC
 						// If so, we continue to ignore until we reach the end comment
 						// If we don't reach the end comment, then return error
 						else{
+							console.log("oop");
 							errors.push(new Error(TSC.ErrorType.InvalidToken, sourceCode.charAt(endLexemePtr-2)));
 							break;
 						}
