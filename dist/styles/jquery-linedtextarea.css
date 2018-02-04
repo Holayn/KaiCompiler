@@ -56,6 +56,7 @@
 
 .lined {
 	height: 485px;
+	/* width: 100% !important; */
 }
 
 .linedwrap .codelines {

@@ -17,13 +17,19 @@
 	<script type="text/javascript" src="dist/styles/js/materialize.min.js"></script>
 	<script type="text/javascript" src="dist/styles/js/jquery-linedtextarea.js"></script>
 	<script>
+		// for code input 
 		$(function() {
 			$(".lined").linedtextarea(
 			);
 		});
+		// for modal
 		$(document).ready(function(){
 			// the "href" attribute of the modal trigger must specify the modal ID that wants to be triggered
 			$('.modal').modal();
+		});
+		// for tooltip
+		$(document).ready(function(){
+			$('.tooltipped').tooltip({delay: 0});
 		});
 	</script>
 	<main>
@@ -39,14 +45,32 @@
 						<h5 class="light">Editor</h5>
 						<textarea class="lined" id="taSourceCode" rows="60">+${hellotruefalsetrueprintwhileiftruefalsestring!= stringintboolean truewhileif{hi+++==!=}}/*aaahaha*/hahahahaha/*awao*/$</textarea>
 						<br>
-						<a href="#grammarModal" class="waves-effect waves-light blue lighten-3 btn modal-trigger"/>View Language Grammar</a>
-						<a href="#casesModal" class="waves-effect waves-light blue lighten-3 btn modal-trigger"/>Test Cases</a>
+						<div class="fixed-action-btn horizontal click-to-toggle togglebutton">
+							<a class="btn-floating btn blue lighten-2">
+								<i class="material-icons">navigate_next</i>
+							</a>
+							<ul style="left: 0">
+								<!-- <li><a class="btn-floating red"><i class="material-icons">insert_chart</i></a></li>
+								<li><a class="btn-floating yellow darken-1"><i class="material-icons">format_quote</i></a></li>
+								<li><a class="btn-floating green"><i class="material-icons">publish</i></a></li>
+								<li><a class="btn-floating blue"><i class="material-icons">attach_file</i></a></li> -->
+								<li>
+									<a href="#grammarModal" class="waves-effect waves-light blue lighten-3 btn-floating modal-trigger subfloatgrammar"/>View Language Grammar</a>
+								</li>
+								<li>
+									<a href="#casesModal" class="waves-effect waves-light blue lighten-3 btn-floating modal-trigger subfloattest"/>Test Cases</a>
+								</li>
+							</ul>
+						</div>
+						<!-- <a href="#grammarModal" class="waves-effect waves-light blue lighten-3 btn modal-trigger"/>View Language Grammar</a>
+						<a href="#casesModal" class="waves-effect waves-light blue lighten-3 btn modal-trigger"/>Test Cases</a> -->
 					</div>
 				</div>
 				<div class="col s6">
 					<div class="card-panel log">
 						<h5 class="light">Log</h5>
 						<textarea id="taOutput" readonly disabled></textarea>
+						<a class="btn-floating btn waves-effect waves-light red right-align verbose tooltipped" id="verbose" data-position="bottom" data-delay="50" data-tooltip="Toggle Verbose Mode" onclick="btnVerbose_click();"><i class="material-icons">hearing</i></a>
 					</div>
 				</div>
 			</div>
@@ -120,8 +144,11 @@
 	<script type="text/javascript" src="dist/scripts/token.js"></script>
 	<script type="text/javascript" src="dist/scripts/error.js"></script>	
 	<script type="text/javascript" src="dist/scripts/warning.js"></script>	
-    <script type="text/javascript">
-		 function init() {
+	<script type="text/javascript">
+	
+		var verboseOn = true;
+
+		function init() {
 	        // Clear the message box.
 	        document.getElementById("taOutput").value = "";
 	        // Set the initial values for our globals.
@@ -129,8 +156,26 @@
 	        tokenIndex = 0;
 	        currentToken = ' ';
 	        errorCount = 0;        
-	    }
-    
+		}
+		
+		function btnVerbose_click() {
+			var element = document.getElementById('verbose');
+			if(element.style.backgroundColor == 'lightgrey'){
+				element.setAttribute('style', 'background-color: red !important');
+			}
+			else{
+				element.setAttribute('style', 'background-color: lightgrey !important');
+			}
+			if(verboseOn){
+				verboseOn = false;
+			}
+			else{
+				verboseOn = true;
+			}
+			console.log(verboseOn);
+			
+		}
+
 	    function btnCompile_click() {        
 	        // This is executed as a result of the user pressing the 
 	        // "compile" button between the two text areas, above.  
@@ -140,9 +185,11 @@
 	        // Grab the tokens from the lexer . . .
 			var lexAnalysis = _Lexer.lex();
 			console.log(lexAnalysis);
-			// For all tokens, print out their type and value
-			for(var i=0; i<lexAnalysis.tokens.length; i++){
-				putMessage("LEXER -> | " + lexAnalysis.tokens[i].type + " [ " + lexAnalysis.tokens[i].value + " ] on line " + lexAnalysis.tokens[i].lineNumber + " col " + lexAnalysis.tokens[i].colNumber);
+			// For all tokens, print out their type and value..only if verbose mode is on
+			if(verboseOn){
+				for(var i=0; i<lexAnalysis.tokens.length; i++){
+					putMessage("LEXER -> | " + lexAnalysis.tokens[i].type + " [ " + lexAnalysis.tokens[i].value + " ] on line " + lexAnalysis.tokens[i].lineNumber + " col " + lexAnalysis.tokens[i].colNumber);
+				}
 			}
 			// Print any warnings and errors
 			for(var i=0; i<lexAnalysis.warnings.length; i++){

@@ -94,3 +94,24 @@ header {
 	margin: 0 !important;
 	height: 650px;
 }
+.togglebutton {
+	position: relative !important; 
+	padding-top: 15px !important;
+}
+.fixed-action-btn.horizontal ul {
+	position: relative !important;
+	text-align: center !important;
+	transform: none !important;
+	padding-top: 9px;
+}
+.subfloatgrammar {
+	width: 200px !important;
+	border-radius: 5px !important;
+}
+.subfloattest {
+	width: 150px !important;
+	border-radius: 5px !important;
+}
+.verbose {
+	bottom: 5px !important;
+}
