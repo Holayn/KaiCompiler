@@ -75,6 +75,7 @@ main {
 	resize: none;
 	height: 85%;
 	font-size: 12px;
+	cursor: default;
 }
 
 

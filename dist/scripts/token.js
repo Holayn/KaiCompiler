@@ -17,9 +17,10 @@ var TSC;
         TokenType["TPrint"] = "TPrint";
     })(TokenType = TSC.TokenType || (TSC.TokenType = {}));
     var Token = /** @class */ (function () {
-        function Token(tokenType, value) {
+        function Token(tokenType, value, lineNumber) {
             this.type = tokenType;
             this.value = value;
+            this.lineNumber = lineNumber;
         }
         return Token;
     }());

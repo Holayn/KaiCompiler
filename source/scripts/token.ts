@@ -20,10 +20,12 @@ module TSC {
 
         type: TokenType;
         value: String;
+        lineNumber: number;
 
-        constructor(tokenType: TokenType, value: String) {
+        constructor(tokenType: TokenType, value: String, lineNumber: number) {
             this.type = tokenType;
             this.value = value;
+            this.lineNumber = lineNumber;
         }
     }
 }

@@ -20,6 +20,8 @@ module TSC
 				// Pointers that make up the buffer of characters we are matching to
 				let startLexemePtr = 0;
 				let endLexemePtr = 1;
+				// Tracker for current line number
+				let lineNumber = 1;
 
 				// We need to recognize different tokens.
 				// Thus, we need to have the different patterns for each token defined.
@@ -38,6 +40,8 @@ module TSC
 				let rID = new RegExp('[a-z]$');
 				// RegExp for whitespace
 				let rWHITE = new RegExp(' $|\t$|\n$|\r$');
+				// RegExp for newline
+				let rNEWLINE = new RegExp('\n$');
 				// RegExp for Digit
 				let rDIGIT = new RegExp('[0-9]$');
 				// RegExp for IntOp
@@ -97,13 +101,13 @@ module TSC
 
 					// Test for Left Brace
 					if(rLBRACE.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
-						var token: Token = new Token(TSC.TokenType.TLbrace, sourceCode.charAt(endLexemePtr-1));
+						var token: Token = new Token(TSC.TokenType.TLbrace, sourceCode.charAt(endLexemePtr-1), lineNumber);
 						tokens.push(token);
 					}
 
 					// Test for Right Brace
 					else if(rRBRACE.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
-						var token: Token = new Token(TSC.TokenType.TRbrace, sourceCode.charAt(endLexemePtr-1));
+						var token: Token = new Token(TSC.TokenType.TRbrace, sourceCode.charAt(endLexemePtr-1), lineNumber);
 						tokens.push(token);
 					}
 
@@ -111,7 +115,7 @@ module TSC
 
 					// Test for Boolean Value True
 					else if(rBOOLVALTRUE.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
-						var token: Token = new Token(TSC.TokenType.TBoolval, "true");
+						var token: Token = new Token(TSC.TokenType.TBoolval, "true", lineNumber);
 						// We have to remove the IDs that have been identified and added to the tokens array
 						// 4 ID tokens have been added - "t", "r", "u", "e"... remove them from the array
 						tokens = tokens.slice(0, tokens.length - ("true".length - 1));
@@ -120,7 +124,7 @@ module TSC
 
 					// Test for Boolean Value False
 					else if(rBOOLVALFALSE.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
-						var token: Token = new Token(TSC.TokenType.TBoolval, "false");
+						var token: Token = new Token(TSC.TokenType.TBoolval, "false", lineNumber);
 						// We have to remove the IDs that have been identified and added to the tokens array
 						// 5 ID tokens have been added - "f", "a", "l", "s"... remove them from the array
 						tokens = tokens.slice(0, tokens.length - ("false".length - 1));
@@ -129,7 +133,7 @@ module TSC
 
 					// Test for While
 					else if(rWHILE.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
-						var token: Token = new Token(TSC.TokenType.TWhile, "while");
+						var token: Token = new Token(TSC.TokenType.TWhile, "while", lineNumber);
 						// We have to remove the IDs that have been identified and added to the tokens array
 						// 4 ID tokens have been added - "w", "h", "i", "l"... remove them from the array
 						tokens = tokens.slice(0, tokens.length - ("while".length - 1));
@@ -138,7 +142,7 @@ module TSC
 
 					// Test for If
 					else if(rIF.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
-						var token: Token = new Token(TSC.TokenType.TIf, "if");
+						var token: Token = new Token(TSC.TokenType.TIf, "if", lineNumber);
 						// We have to remove the IDs that have been identified and added to the tokens array
 						// 1 ID token has been added - "i"... remove them from the array
 						tokens = tokens.slice(0, tokens.length - ("if".length - 1));
@@ -147,7 +151,7 @@ module TSC
 
 					// Test for Print
 					else if(rPRINT.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
-						var token: Token = new Token(TSC.TokenType.TPrint, "print");
+						var token: Token = new Token(TSC.TokenType.TPrint, "print", lineNumber);
 						// We have to remove the IDs that have been identified and added to the tokens array
 						// 4 ID tokens have been added - "p", "r", "i", "n"... remove them from the array
 						tokens = tokens.slice(0, tokens.length - ("print".length - 1));
@@ -156,7 +160,7 @@ module TSC
 
 					// Test for Type Int
 					else if(rTYPEINT.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
-						var token: Token = new Token(TSC.TokenType.TType, "int");
+						var token: Token = new Token(TSC.TokenType.TType, "int", lineNumber);
 						// We have to remove the IDs that have been identified and added to the tokens array
 						// 2 ID tokens have been added - "i", "n" ... remove them from the array
 						tokens = tokens.slice(0, tokens.length - ("int".length - 1));
@@ -165,7 +169,7 @@ module TSC
 
 					// Test for Type Bool
 					else if(rTYPEBOOL.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
-						var token: Token = new Token(TSC.TokenType.TType, "boolean");
+						var token: Token = new Token(TSC.TokenType.TType, "boolean", lineNumber);
 						// We have to remove the IDs that have been identified and added to the tokens array
 						// 6 ID tokens have been added - "b", "o", "o", "l", "e", "a" ... remove them from the array
 						tokens = tokens.slice(0, tokens.length - ("boolean".length - 1));
@@ -174,7 +178,7 @@ module TSC
 
 					// Test for Type Str
 					else if(rTYPESTR.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
-						var token: Token = new Token(TSC.TokenType.TType, "string");
+						var token: Token = new Token(TSC.TokenType.TType, "string", lineNumber);
 						// We have to remove the IDs that have been identified and added to the tokens array
 						// 5 ID tokens have been added - "s", "t", "r", "i", "n" ... remove them from the array
 						tokens = tokens.slice(0, tokens.length - ("string".length - 1));
@@ -185,25 +189,25 @@ module TSC
 					
 					// Test for Digit
 					else if(rDIGIT.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
-						var token: Token = new Token(TSC.TokenType.TDigit, sourceCode.charAt(endLexemePtr-1));
+						var token: Token = new Token(TSC.TokenType.TDigit, sourceCode.charAt(endLexemePtr-1), lineNumber);
 						tokens.push(token);
 					}
 
 					// Test for Integer Operation
 					else if(rINTOP.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
-						var token: Token = new Token(TSC.TokenType.TIntop, sourceCode.charAt(endLexemePtr-1));
+						var token: Token = new Token(TSC.TokenType.TIntop, sourceCode.charAt(endLexemePtr-1), lineNumber);
 						tokens.push(token);
 					}
 
 					// Test for Assign
 					else if(rASSIGN.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
-						var token: Token = new Token(TSC.TokenType.TAssign, sourceCode.charAt(endLexemePtr-1));
+						var token: Token = new Token(TSC.TokenType.TAssign, sourceCode.charAt(endLexemePtr-1), lineNumber);
 						tokens.push(token);
 					}
 
 					// Test for Boolean Equals
 					else if(rBOOLOPEQUALS.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
-						var token: Token = new Token(TSC.TokenType.TBoolop, "==");
+						var token: Token = new Token(TSC.TokenType.TBoolop, "==", lineNumber);
 						// We have to remove the assign that has been identified and added to the tokens array
 						tokens.pop();
 						tokens.push(token);
@@ -211,7 +215,7 @@ module TSC
 
 					// Test for ID
 					else if(rID.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
-						var token: Token = new Token(TSC.TokenType.TId, sourceCode.charAt(endLexemePtr-1));
+						var token: Token = new Token(TSC.TokenType.TId, sourceCode.charAt(endLexemePtr-1), lineNumber);
 						tokens.push(token);
 					}
 
@@ -219,6 +223,10 @@ module TSC
 					// We ignore whitespace
 					else if(rWHITE.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
 						console.log("WHITESPACE");
+						if(rNEWLINE.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
+							console.log("NEWLINE");
+							lineNumber++;
+						}
 						startLexemePtr = endLexemePtr;
 					}
 
@@ -226,7 +234,7 @@ module TSC
 					// Also, add a EOP token
 					else if(rEOP.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
 						console.log("EOP");
-						var token: Token = new Token(TSC.TokenType.TEop, sourceCode.charAt(endLexemePtr-1));
+						var token: Token = new Token(TSC.TokenType.TEop, sourceCode.charAt(endLexemePtr-1), lineNumber);
 						tokens.push(token);
 						startLexemePtr = endLexemePtr;
 						hasEOP = true;
@@ -237,17 +245,17 @@ module TSC
 						if(endLexemePtr == sourceCode.length-1){
 							// If code ends with a trailling start comment, throw error
 							if(rCOMMENTSTART.test(sourceCode.substring(startLexemePtr, endLexemePtr+1))){
-								errors.push(new Error(TSC.ErrorType.MissingCommentEnd, "*/"));
+								errors.push(new Error(TSC.ErrorType.MissingCommentEnd, "*/", lineNumber));
 							}
 							else{
-								errors.push(new Error(TSC.ErrorType.InvalidToken, sourceCode.charAt(endLexemePtr)));
+								errors.push(new Error(TSC.ErrorType.InvalidToken, sourceCode.charAt(endLexemePtr), lineNumber));
 							}
 							break;
 						}
 						// Check to see if the next character creates a match for a Boolean NotEquals
 						endLexemePtr++;
 						if(rBOOLOPNOTEQUALS.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
-							var token: Token = new Token(TSC.TokenType.TBoolop, "!=");
+							var token: Token = new Token(TSC.TokenType.TBoolop, "!=", lineNumber);
 							// "!" is not a valid character by itself, so the lexer would throw an error when it reaches !, 
 							// as if doesn't know that it is followed by an = yet. Perhaps we can fix this by
 							// when recognizing an illegal characters, perform a 1-place lookahead to see if there is a match with anything.
@@ -260,7 +268,7 @@ module TSC
 						// If so, we continue to ignore until we reach the end comment
 						// If we don't reach the end comment, then return error
 						else{
-							errors.push(new Error(TSC.ErrorType.InvalidToken, sourceCode.charAt(endLexemePtr-2)));
+							errors.push(new Error(TSC.ErrorType.InvalidToken, sourceCode.charAt(endLexemePtr-2), lineNumber));
 							break;
 						}
 					}
@@ -269,12 +277,12 @@ module TSC
 
 				// If we've reached the end of the source code, but no end comment has been found, throw an error
 				if(inComment){
-					errors.push(new Error(TSC.ErrorType.MissingCommentEnd, "*/"));
+					errors.push(new Error(TSC.ErrorType.MissingCommentEnd, "*/", lineNumber));
 				}
 
 				// If we've reached the end of the source and no EOP was detected, throw a warning
 				if(!hasEOP){
-					warnings.push(new Warning(TSC.WarningType.MissingEOP, "$"));
+					warnings.push(new Warning(TSC.WarningType.MissingEOP, "$", lineNumber));
 				}
 
 				console.log(tokens);

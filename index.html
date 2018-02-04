@@ -46,7 +46,7 @@
 				<div class="col s6">
 					<div class="card-panel log">
 						<h5 class="light">Log</h5>
-						<textarea id="taOutput" readonly></textarea>
+						<textarea id="taOutput" readonly disabled></textarea>
 					</div>
 				</div>
 			</div>
@@ -68,7 +68,20 @@
 		</div>
 		<div id="casesModal" class="modal bottom-sheet">
 			<div class="modal-content center-align">
-				
+				<ul class="collapsible" data-collapsible="accordion">
+					<li>
+						<div class="collapsible-header"><i class="material-icons">brightness_5</i>Valid Cases</div>
+						<div class="collapsible-body"><span>Lorem ipsum dolor sit amet.</span></div>
+					</li>
+					<li>
+						<div class="collapsible-header"><i class="material-icons">warning</i>Warning Cases</div>
+						<div class="collapsible-body"><span>Lorem ipsum dolor sit amet.</span></div>
+					</li>
+					<li>
+						<div class="collapsible-header"><i class="material-icons">new_releases</i>Lex Error Cases</div>
+						<div class="collapsible-body"><span>Lorem ipsum dolor sit amet.</span></div>
+					</li>
+				</ul>
 			</div>
 			<div class="modal-footer">
 				<a class="modal-action modal-close waves-effect waves-green btn-flat">Close</a>
@@ -129,7 +142,7 @@
 			console.log(lexAnalysis);
 			// For all tokens, print out their type and value
 			for(var i=0; i<lexAnalysis.tokens.length; i++){
-				putMessage("LEXER -> | " + lexAnalysis.tokens[i].type + " [ " + lexAnalysis.tokens[i].value + " ]");
+				putMessage("LEXER -> | " + lexAnalysis.tokens[i].type + " [ " + lexAnalysis.tokens[i].value + " ] on line " + lexAnalysis.tokens[i].lineNumber);
 			}
 			// Print any warnings and errors
 			for(var i=0; i<lexAnalysis.warnings.length; i++){
@@ -141,7 +154,7 @@
 			}
 			for(var i=0; i<lexAnalysis.errors.length; i++){
 				if(lexAnalysis.errors[i].type == TSC.ErrorType.InvalidToken){
-					putMessage("LEXER -> | ERROR: Unrecognized or Invalid Token [ " + lexAnalysis.errors[i].value + " ]");
+					putMessage("LEXER -> | ERROR: Unrecognized or Invalid Token [ " + lexAnalysis.errors[i].value + " ] on line " + lexAnalysis.errors[i].lineNumber);
 				}
 				else if(lexAnalysis.errors[i].type == TSC.ErrorType.MissingCommentEnd){
 					putMessage("LEXER -> | ERROR: Missing ending comment brace (*/)");
