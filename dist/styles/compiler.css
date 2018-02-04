@@ -115,3 +115,11 @@ header {
 .verbose {
 	bottom: 5px !important;
 }
+/* .collection {
+	width: 50%;
+} */
+.collapsible {
+	width: 75%;
+	margin-left: auto !important;
+    margin-right: auto !important;
+}

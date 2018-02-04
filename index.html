@@ -92,10 +92,18 @@
 		</div>
 		<div id="casesModal" class="modal bottom-sheet">
 			<div class="modal-content center-align">
-				<ul class="collapsible" data-collapsible="accordion">
+				<ul class="collapsible center-align" data-collapsible="accordion">
 					<li>
 						<div class="collapsible-header"><i class="material-icons">brightness_5</i>Valid Cases</div>
-						<div class="collapsible-body"><span>Lorem ipsum dolor sit amet.</span></div>
+						<div class="collapsible-body">
+							<div class="collection">
+								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Basic 1</a>
+								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Basic 2</a>
+								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Basic 3</a>
+								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Basic 4</a>
+								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Basic 5</a>
+							</div>
+						</div>
 					</li>
 					<li>
 						<div class="collapsible-header"><i class="material-icons">warning</i>Warning Cases</div>
@@ -144,6 +152,7 @@
 	<script type="text/javascript" src="dist/scripts/token.js"></script>
 	<script type="text/javascript" src="dist/scripts/error.js"></script>	
 	<script type="text/javascript" src="dist/scripts/warning.js"></script>	
+	<script type="text/javascript" src="dist/scripts/testcases.js"></script>
 	<script type="text/javascript">
 	
 		var verboseOn = true;
