@@ -39,6 +39,19 @@ html {
 	font-weight: 300;
 }
 
+/*
+Footer
+*/
+body {
+	display: flex;
+	min-height: 100vh;
+	flex-direction: column;
+}
+
+main {
+	flex: 1 0 auto;
+}
+
 /* #btnCompile{
 	width:200px;
 	text-align: center;

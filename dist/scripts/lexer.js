@@ -125,6 +125,13 @@ var TSC;
                         tokens_1 = tokens_1.slice(0, tokens_1.length - ("if".length - 1));
                         tokens_1.push(token);
                     }
+                    else if (rPRINT.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
+                        var token = new TSC.Token(TSC.TokenType.TPrint, "print");
+                        // We have to remove the IDs that have been identified and added to the tokens array
+                        // 4 ID tokens have been added - "p", "r", "i", "n"... remove them from the array
+                        tokens_1 = tokens_1.slice(0, tokens_1.length - ("print".length - 1));
+                        tokens_1.push(token);
+                    }
                     else if (rTYPEINT.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
                         var token = new TSC.Token(TSC.TokenType.TType, "int");
                         // We have to remove the IDs that have been identified and added to the tokens array
@@ -144,13 +151,6 @@ var TSC;
                         // We have to remove the IDs that have been identified and added to the tokens array
                         // 5 ID tokens have been added - "s", "t", "r", "i", "n" ... remove them from the array
                         tokens_1 = tokens_1.slice(0, tokens_1.length - ("string".length - 1));
-                        tokens_1.push(token);
-                    }
-                    else if (rPRINT.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
-                        var token = new TSC.Token(TSC.TokenType.TPrint, "print");
-                        // We have to remove the IDs that have been identified and added to the tokens array
-                        // 4 ID tokens have been added - "p", "r", "i", "n"... remove them from the array
-                        tokens_1 = tokens_1.slice(0, tokens_1.length - ("print".length - 1));
                         tokens_1.push(token);
                     }
                     else if (rDIGIT.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {

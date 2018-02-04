@@ -145,6 +145,15 @@ module TSC
 						tokens.push(token);
 					}
 
+					// Test for Print
+					else if(rPRINT.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
+						var token: Token = new Token(TSC.TokenType.TPrint, "print");
+						// We have to remove the IDs that have been identified and added to the tokens array
+						// 4 ID tokens have been added - "p", "r", "i", "n"... remove them from the array
+						tokens = tokens.slice(0, tokens.length - ("print".length - 1));
+						tokens.push(token);
+					}
+
 					// Test for Type Int
 					else if(rTYPEINT.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
 						var token: Token = new Token(TSC.TokenType.TType, "int");
@@ -169,15 +178,6 @@ module TSC
 						// We have to remove the IDs that have been identified and added to the tokens array
 						// 5 ID tokens have been added - "s", "t", "r", "i", "n" ... remove them from the array
 						tokens = tokens.slice(0, tokens.length - ("string".length - 1));
-						tokens.push(token);
-					}
-
-					// Test for Print
-					else if(rPRINT.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
-						var token: Token = new Token(TSC.TokenType.TPrint, "print");
-						// We have to remove the IDs that have been identified and added to the tokens array
-						// 4 ID tokens have been added - "p", "r", "i", "n"... remove them from the array
-						tokens = tokens.slice(0, tokens.length - ("print".length - 1));
 						tokens.push(token);
 					}
 

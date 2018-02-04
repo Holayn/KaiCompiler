@@ -26,55 +26,77 @@
 			$('.modal').modal();
 		});
 	</script>
-
-	<header>
-		<div class="container">
-			<h1 class="center-align">Kompailer</h1>
-		</div>
-		<div class="container">
-
-		
-		<!-- <div class="row">
-			<div class="col s6 center-align">
-				Editor:
+	<main>
+		<header>
+			<div class="container">
+				<h1 class="center-align">Kompailer</h1>
 			</div>
-			<div class="col s6 center-align">
-				Log:
-			</div>
-		</div> -->
-		<div class="row">
-			<div class="col s6">
-				<div class="card-panel input">
-					<h5 class="light">Editor</h5>
-					<textarea class="lined" id="taSourceCode" rows="60">+${hellotruefalsetrueprintwhileiftruefalsestring!= stringintboolean truewhileif{hi+++==!=}}/*aaahaha*/hahahahaha/*awao*/$</textarea>
-					<br>
-					<a href="#grammarModal" class="waves-effect waves-light blue lighten-3 btn modal-trigger"/>View Language Grammar</a>
+		</header>
+		<div class="container">
+			<div class="row">
+				<div class="col s6">
+					<div class="card-panel input">
+						<h5 class="light">Editor</h5>
+						<textarea class="lined" id="taSourceCode" rows="60">+${hellotruefalsetrueprintwhileiftruefalsestring!= stringintboolean truewhileif{hi+++==!=}}/*aaahaha*/hahahahaha/*awao*/$</textarea>
+						<br>
+						<a href="#grammarModal" class="waves-effect waves-light blue lighten-3 btn modal-trigger"/>View Language Grammar</a>
+						<a href="#casesModal" class="waves-effect waves-light blue lighten-3 btn modal-trigger"/>Test Cases</a>
+					</div>
+				</div>
+				<div class="col s6">
+					<div class="card-panel log">
+						<h5 class="light">Log</h5>
+						<textarea id="taOutput" readonly></textarea>
+					</div>
 				</div>
 			</div>
-			<div class="col s6">
-				<div class="card-panel log">
-					<h5 class="light">Log</h5>
-					<textarea id="taOutput" readonly></textarea>
+			<div class="row">
+				<div class="center-align">
+					<button type="button" id="btnCompile" value="Compile" class="waves-effect waves-light btn-large" onclick="btnCompile_click();"/>Compile</button>
 				</div>
-			</div>
+			</div>	
 		</div>
-		<div class="row">
-			<div class="center-align">
-				<button type="button" id="btnCompile" value="Compile" class="waves-effect waves-light btn-large" onclick="btnCompile_click();"/>Compile</button>
-			</div>
-		</div>	
-	</div>
-	</header>
 
-	<!-- Modal Structure -->
-	<div id="grammarModal" class="modal">
-		<div class="modal-content center-align">
-			<img class="responsive-img center-align" src="dist/images/grammar.PNG">
+		<!-- Modal Structure -->
+		<div id="grammarModal" class="modal">
+			<div class="modal-content center-align">
+				<img class="responsive-img center-align" src="dist/images/grammar.PNG">
+			</div>
+			<div class="modal-footer">
+				<a class="modal-action modal-close waves-effect waves-green btn-flat">Close</a>
+			</div>
 		</div>
-		<div class="modal-footer">
-			<a class="modal-action modal-close waves-effect waves-green btn-flat">Close</a>
+		<div id="casesModal" class="modal bottom-sheet">
+			<div class="modal-content center-align">
+				
+			</div>
+			<div class="modal-footer">
+				<a class="modal-action modal-close waves-effect waves-green btn-flat">Close</a>
+			</div>
 		</div>
+	</main>
+
+	<footer class="page-footer blue">
+		<div class="container">
+			<div class="row">
+			<div class="col l6 s12">
+				<!-- <h5 class="white-text">Footer Content</h5> -->
+				<!-- <p class="grey-text text-lighten-4">You can use rows and columns here to organize your footer content.</p> -->
+			</div>
+			<div class="col l4 offset-l2 s12">
+				<!-- <h5 class="white-text">Links</h5> -->
+				<ul>
+				</ul>
+			</div>
+			</div>
 		</div>
+		<div class="footer-copyright">
+			<div class="container">
+			© 2018 Kai Wong
+			<!-- <a class="grey-text text-lighten-4 right" href="#!">More Links</a> -->
+			</div>
+		</div>
+	</footer>
 
 
     <!-- Client-side code down here, per the YSlow advice. 
