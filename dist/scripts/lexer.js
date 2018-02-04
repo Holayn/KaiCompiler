@@ -54,11 +54,11 @@ var TSC;
                 // RegExp for ID (same as Character)
                 var rID = new RegExp('[a-z]$');
                 // RegExp for whitespace
-                var rWHITE = new RegExp(' |\t|\n|\r');
+                var rWHITE = new RegExp(' $|\t$|\n$|\r$');
                 // RegExp for Digit
                 var rDIGIT = new RegExp('[0-9]$');
                 // RegExp for IntOp
-                var rINTOP = new RegExp('\\+');
+                var rINTOP = new RegExp('\\+$');
                 // RegExp for BoolVal for true
                 var rBOOLVALTRUE = new RegExp('true$');
                 // RegExp for BoolVal for false
@@ -75,16 +75,32 @@ var TSC;
                 var rTYPEBOOL = new RegExp('boolean$');
                 // RegExp for Type String
                 var rTYPESTR = new RegExp('string$');
-                // // RegExp for AssignmentOp
-                // let rASSIGN = new RegExp('=$');
-                // // RegExp for BoolOp
-                // let rBOOLOP = new RegExp('==$ | \\!=$');
+                // RegExp for AssignmentOp
+                var rASSIGN = new RegExp('\=$');
+                // RegExp for BoolOp Equals
+                var rBOOLOPEQUALS = new RegExp('\=\=$');
+                // RegExp for BoolOp NotEquals
+                var rBOOLOPNOTEQUALS = new RegExp('\\!=$');
+                // RegExp for Comment Start
+                var rCOMMENTSTART = new RegExp('/\\*$');
+                // RegExp for Comment End
+                var rCOMMENTEND = new RegExp('\\*/$');
+                var inComment = false;
                 // Run Regular Expression matching on the buffer of characters we have so far
                 // If the character we just "added" to the buffer we're looking at creates a match...
                 // Create a new Token for match
                 while (endLexemePtr <= sourceCode.length) {
                     console.log(sourceCode.substring(startLexemePtr, endLexemePtr));
                     console.log(endLexemePtr);
+                    // If the lexer is currently looking in a comment block, just ignore input
+                    // Also perform check to see if comment end has been reached.
+                    if (inComment) {
+                        if (rCOMMENTEND.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
+                            inComment = false;
+                        }
+                        endLexemePtr++;
+                        continue;
+                    }
                     // Test for Left Brace
                     if (rLBRACE.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
                         var token = new TSC.Token(TSC.TokenType.TLbrace, sourceCode.charAt(endLexemePtr - 1));
@@ -158,6 +174,16 @@ var TSC;
                         var token = new TSC.Token(TSC.TokenType.TIntop, sourceCode.charAt(endLexemePtr - 1));
                         tokens_1.push(token);
                     }
+                    else if (rASSIGN.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
+                        var token = new TSC.Token(TSC.TokenType.TAssign, sourceCode.charAt(endLexemePtr - 1));
+                        tokens_1.push(token);
+                    }
+                    else if (rBOOLOPEQUALS.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
+                        var token = new TSC.Token(TSC.TokenType.TBoolop, "==");
+                        // We have to remove the assign that has been identified and added to the tokens array
+                        tokens_1.pop();
+                        tokens_1.push(token);
+                    }
                     else if (rID.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
                         var token = new TSC.Token(TSC.TokenType.TId, sourceCode.charAt(endLexemePtr - 1));
                         tokens_1.push(token);
@@ -172,16 +198,36 @@ var TSC;
                         tokens_1.push(token);
                         startLexemePtr = endLexemePtr;
                     }
+                    else {
+                        if (endLexemePtr == sourceCode.length - 1) {
+                            console.log("ERROR: Unrecognized token");
+                            break;
+                        }
+                        // Check to see if the next character creates a match for a Boolean NotEquals
+                        endLexemePtr++;
+                        if (rBOOLOPNOTEQUALS.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
+                            var token = new TSC.Token(TSC.TokenType.TBoolop, "!=");
+                            // "!" is not a valid character by itself, so the lexer would throw an error when it reaches !, 
+                            // as if doesn't know that it is followed by an = yet. Perhaps we can fix this by
+                            // when recognizing an illegal characters, perform a 1-place lookahead to see if there is a match with anything.
+                            tokens_1.push(token);
+                        }
+                        else if (rCOMMENTSTART.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
+                            inComment = true;
+                        }
+                        else {
+                            console.log("ERROR: Unrecognized token");
+                            break;
+                        }
+                    }
                     endLexemePtr++;
+                }
+                // If we've reached the end of the source code, but no end comment has been found, throw an error
+                if (inComment) {
+                    console.log("ERROR: Unrecognized token");
                 }
                 console.log(tokens_1);
                 // TODO: Comments
-                // 	// Catch for unrecognized tokens
-                // 	else{
-                // 		console.log("ERROR: Unrecognized token " + sourceCode.charAt(sourceCodePtr));
-                // 	}
-                // 	sourceCodePtr++;
-                // }
                 // TODO: remove all spaces in the middle; remove line breaks too.
                 return sourceCode;
             }
