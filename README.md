@@ -1,4 +1,4 @@
-KaiCompiler
+Kompailer
 =====================
 
 This is my Compilers project written TypeScript with frontend HTML.

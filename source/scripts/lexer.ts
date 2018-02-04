@@ -262,7 +262,7 @@ module TSC
 				console.log(tokens);
 
 		        // TODO: remove all spaces in the middle; remove line breaks too.
-		        return sourceCode;
+		        return tokens;
 		    }
 		}
 	}

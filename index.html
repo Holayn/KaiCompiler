@@ -1,25 +1,69 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-    <title>Compiler</title>
+    <title>Kompailer</title>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <link rel="stylesheet" type="text/css" href="dist/styles/compiler.css" />
-    <link rel="stylesheet" href="dist/styles/bootstrap.min.css">
+	<!-- <link rel="stylesheet" href="dist/styles/bootstrap.min.css"> -->
+	<!--Import Google Icon Font-->
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	<!--Import materialize.css-->
+	<link type="text/css" rel="stylesheet" href="dist/styles/materialize.min.css"  media="screen,projection"/>
+	<link href="dist/styles/jquery-linedtextarea.css" type="text/css" rel="stylesheet" />
 </head>
 <body onload="init();">
-    <h1>Project Zero Compiler</h1>
-    <hr>
-    <p>. . . <em>a simple parser for a simple grammar</em>:</p>
+	<!--Import jQuery before materialize.js-->
+	<script type="text/javascript" src="dist/styles/jquery-3.3.1.min.js"></script>
+	<script type="text/javascript" src="dist/styles/js/materialize.min.js"></script>
+	<script type="text/javascript" src="dist/styles/js/jquery-linedtextarea.js"></script>
+	<script>
+		$(function() {
+			$(".lined").linedtextarea(
+			);
+		});
+	</script>
 
-	 <pre>
-G ::== E
-E ::== D O E | D
-D ::== 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 
-O ::== + | -
-	 </pre>
+	<header>
+		<div class="container">
+			<h1 class="center-align">Kompailer</h1>
+		</div>
+		<div class="container">
 
-    <div style="text-align:center;">
-        <input type="button" id="btnCompile" value="Compile" onclick="btnCompile_click();"/>
+		
+		<!-- <div class="row">
+			<div class="col s6 center-align">
+				Editor:
+			</div>
+			<div class="col s6 center-align">
+				Log:
+			</div>
+		</div> -->
+		<div class="row">
+			<div class="col s6">
+				<div class="card-panel input">
+					<h5 class="light">Editor</h5>
+					<textarea class="lined" id="taSourceCode" rows="60">+${hellotruefalsetrueprintwhileiftruefalsestring!= stringintboolean truewhileif{hi+++==!=}}/*aaahaha*/hahahahaha/*awao*/$</textarea>
+					<br>
+					<button type="button" class="waves-effect waves-light blue lighten-3 btn"/>View Language Grammar</button>
+				</div>
+			</div>
+			<div class="col s6">
+				<div class="card-panel log">
+					<h5 class="light">Log</h5>
+					<textarea id="taOutput" readonly></textarea>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="center-align">
+				<button type="button" id="btnCompile" value="Compile" class="waves-effect waves-light btn-large" onclick="btnCompile_click();"/>Compile</button>
+			</div>
+		</div>	
+	</div>
+	</header>
+
+    <!-- <div style="text-align:center;">
+        <button type="button" id="btnCompile" value="Compile" class="waves-effect waves-light btn-large" onclick="btnCompile_click();"/>Compile</button>
     </div>
 
     <div>
@@ -27,13 +71,7 @@ O ::== + | -
             <textarea id="taSourceCode">+${hellotruefalsetrueprintwhileiftruefalsestring!= stringintboolean truewhileif{hi+++==!=}}/*aaahaha*/hahahahaha/*awao*/$</textarea>
             <textarea id="taOutput"></textarea>
         </div>        
-    </div>
-
-    <div>
-        <img style="display:block; margin-left:auto; margin-right:auto;"
-		       src="dist/images/CompilerPhases.png" 
-				 alt="Compiler Phases diagram" />
-    </div>   
+    </div> -->
 
     <!-- Client-side code down here, per the YSlow advice. 
          (http://developer.yahoo.com/performance/rules.html#js_bottom) -->
@@ -58,12 +96,15 @@ O ::== + | -
 	        // "compile" button between the two text areas, above.  
 	        // Note the <input> element's event handler: onclick="btnCompile_click();
 	        init();
-	        putMessage("Compilation Started");
+			putMessage("Lexical Analysis:");
 	        // Grab the tokens from the lexer . . .
-	        tokens = _Lexer.lex();
-	        putMessage("Lex returned [" + tokens + "]");
+			tokens = _Lexer.lex();
+			// For all tokens, print out their type and value
+			for(var i=0; i<tokens.length; i++){
+				putMessage("LEXER -> | " + tokens[i].type + " [ " + tokens[i].value + " ]");
+			}
 	        // . . . and parse!
-	        parse();
+	        // parse();
 	    }
     
 	    function putMessage(msg) {

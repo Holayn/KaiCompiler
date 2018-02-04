@@ -28,29 +28,54 @@ h2
 	font-style: normal;	
 }
 */
-h1{
-	font-weight: bold;
-	text-align: center;
+
+/* html {
+    font-family: GillSans, Calibri, Trebuchet, sans-serif;
+} */
+
+
+html {
+	font-family: "Roboto", sans serif;
+	font-weight: 300;
 }
-#btnCompile{
+
+/* #btnCompile{
 	width:200px;
 	text-align: center;
-}
-.output{
+} */
+
+/* .output{
 	float:right;
 	margin:;
 
 }
+
 .source{
 	float:left;
 	display: inline-block;
 	width:100%;
+} */
+
+#taOutput {
+	font-family: "Courier";
+	border-color: white;
+	resize: none;
+	height: 85%;
 }
-#taSourceCode, #taOutput{
-	width:48%;
-	margin: 10px;
-	height:400px;
+
+
+.header {
 }
-#taOutput{
-	float:right;
+
+header {
+
+}
+
+.log {
+	margin: 0 !important;
+	height: 650px;
+}
+.input {
+	margin: 0 !important;
+	height: 650px;
 }

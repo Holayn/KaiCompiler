@@ -67,6 +67,8 @@ var TSC;
                 // If the character we just "added" to the buffer we're looking at creates a match...
                 // Create a new Token for match
                 // Iterate through the input, creating tokens out of lexemes
+                // Runtime: O(n^2) where n is length of source code. One pass is performed over source code, 
+                // with each iteration performing an O(n) regular expression check
                 while (endLexemePtr <= sourceCode.length) {
                     console.log(sourceCode.substring(startLexemePtr, endLexemePtr));
                     console.log(endLexemePtr);
@@ -206,7 +208,7 @@ var TSC;
                 }
                 console.log(tokens_1);
                 // TODO: remove all spaces in the middle; remove line breaks too.
-                return sourceCode;
+                return tokens_1;
             }
         };
         return Lexer;
