@@ -211,7 +211,7 @@ var TSC;
                         // Check to see if the next character creates a match for a Boolean NotEquals
                         endLexemePtr++;
                         if (rBOOLOPNOTEQUALS.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
-                            var token = new TSC.Token(TSC.TokenType.TBoolop, "!=", lineNumber, colNumber - ("!=".length - 1));
+                            var token = new TSC.Token(TSC.TokenType.TBoolop, "!=", lineNumber, colNumber);
                             // "!" is not a valid character by itself, so the lexer would throw an error when it reaches !, 
                             // as if doesn't know that it is followed by an = yet. Perhaps we can fix this by
                             // when recognizing an illegal characters, perform a 1-place lookahead to see if there is a match with anything.
