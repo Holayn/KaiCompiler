@@ -24,6 +24,7 @@
 	border: 1px solid #c0c0c0;
 	padding: 3px;
 	height: 500px;
+	width: auto !important;
 }
 
 .linedtextarea {
@@ -56,6 +57,7 @@
 
 .lined {
 	height: 485px;
+	width: calc(100% - 60px) !important;
 	/* width: 100% !important; */
 }
 
