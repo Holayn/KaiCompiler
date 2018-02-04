@@ -21,11 +21,13 @@ module TSC {
         type: TokenType;
         value: String;
         lineNumber: number;
+        colNumber: number;
 
-        constructor(tokenType: TokenType, value: String, lineNumber: number) {
+        constructor(tokenType: TokenType, value: String, lineNumber: number, colNumber: number) {
             this.type = tokenType;
             this.value = value;
             this.lineNumber = lineNumber;
+            this.colNumber = colNumber;
         }
     }
 }

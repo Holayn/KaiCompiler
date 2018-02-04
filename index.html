@@ -142,7 +142,7 @@
 			console.log(lexAnalysis);
 			// For all tokens, print out their type and value
 			for(var i=0; i<lexAnalysis.tokens.length; i++){
-				putMessage("LEXER -> | " + lexAnalysis.tokens[i].type + " [ " + lexAnalysis.tokens[i].value + " ] on line " + lexAnalysis.tokens[i].lineNumber);
+				putMessage("LEXER -> | " + lexAnalysis.tokens[i].type + " [ " + lexAnalysis.tokens[i].value + " ] on line " + lexAnalysis.tokens[i].lineNumber + " col " + lexAnalysis.tokens[i].colNumber);
 			}
 			// Print any warnings and errors
 			for(var i=0; i<lexAnalysis.warnings.length; i++){
@@ -154,7 +154,7 @@
 			}
 			for(var i=0; i<lexAnalysis.errors.length; i++){
 				if(lexAnalysis.errors[i].type == TSC.ErrorType.InvalidToken){
-					putMessage("LEXER -> | ERROR: Unrecognized or Invalid Token [ " + lexAnalysis.errors[i].value + " ] on line " + lexAnalysis.errors[i].lineNumber);
+					putMessage("LEXER -> | ERROR: Unrecognized or Invalid Token [ " + lexAnalysis.errors[i].value + " ] on line " + lexAnalysis.errors[i].lineNumber + " col " + lexAnalysis.errors[i].colNumber);
 				}
 				else if(lexAnalysis.errors[i].type == TSC.ErrorType.MissingCommentEnd){
 					putMessage("LEXER -> | ERROR: Missing ending comment brace (*/)");

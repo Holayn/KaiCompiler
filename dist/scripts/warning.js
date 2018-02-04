@@ -5,10 +5,11 @@ var TSC;
         WarningType["MissingEOP"] = "MissingEOP";
     })(WarningType = TSC.WarningType || (TSC.WarningType = {}));
     var Warning = /** @class */ (function () {
-        function Warning(tokenType, value, lineNumber) {
+        function Warning(tokenType, value, lineNumber, colNumber) {
             this.type = tokenType;
             this.value = value;
             this.lineNumber = lineNumber;
+            this.colNumber = colNumber;
         }
         return Warning;
     }());

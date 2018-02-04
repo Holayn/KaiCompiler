@@ -6,10 +6,11 @@ var TSC;
         ErrorType["MissingCommentEnd"] = "MissingCommentEnd";
     })(ErrorType = TSC.ErrorType || (TSC.ErrorType = {}));
     var Error = /** @class */ (function () {
-        function Error(tokenType, value, lineNumber) {
+        function Error(tokenType, value, lineNumber, colNumber) {
             this.type = tokenType;
             this.value = value;
             this.lineNumber = lineNumber;
+            this.colNumber = colNumber;
         }
         return Error;
     }());

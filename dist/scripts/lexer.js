@@ -22,6 +22,8 @@ var TSC;
                 var endLexemePtr = 1;
                 // Tracker for current line number
                 var lineNumber = 1;
+                // Tracker for current col
+                var colNumber = 0;
                 // We need to recognize different tokens.
                 // Thus, we need to have the different patterns for each token defined.
                 // A lexeme is a sequence of characters in the source that we match to a pattern for a token.
@@ -94,89 +96,89 @@ var TSC;
                     }
                     // Test for Left Brace
                     if (rLBRACE.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
-                        var token = new TSC.Token(TSC.TokenType.TLbrace, sourceCode.charAt(endLexemePtr - 1), lineNumber);
+                        var token = new TSC.Token(TSC.TokenType.TLbrace, sourceCode.charAt(endLexemePtr - 1), lineNumber, colNumber);
                         tokens_1.push(token);
                     }
                     else if (rRBRACE.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
-                        var token = new TSC.Token(TSC.TokenType.TRbrace, sourceCode.charAt(endLexemePtr - 1), lineNumber);
+                        var token = new TSC.Token(TSC.TokenType.TRbrace, sourceCode.charAt(endLexemePtr - 1), lineNumber, colNumber);
                         tokens_1.push(token);
                     }
                     else if (rBOOLVALTRUE.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
-                        var token = new TSC.Token(TSC.TokenType.TBoolval, "true", lineNumber);
+                        var token = new TSC.Token(TSC.TokenType.TBoolval, "true", lineNumber, colNumber - ("true".length - 1));
                         // We have to remove the IDs that have been identified and added to the tokens array
                         // 4 ID tokens have been added - "t", "r", "u", "e"... remove them from the array
                         tokens_1 = tokens_1.slice(0, tokens_1.length - ("true".length - 1));
                         tokens_1.push(token);
                     }
                     else if (rBOOLVALFALSE.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
-                        var token = new TSC.Token(TSC.TokenType.TBoolval, "false", lineNumber);
+                        var token = new TSC.Token(TSC.TokenType.TBoolval, "false", lineNumber, colNumber - ("false".length - 1));
                         // We have to remove the IDs that have been identified and added to the tokens array
                         // 5 ID tokens have been added - "f", "a", "l", "s"... remove them from the array
                         tokens_1 = tokens_1.slice(0, tokens_1.length - ("false".length - 1));
                         tokens_1.push(token);
                     }
                     else if (rWHILE.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
-                        var token = new TSC.Token(TSC.TokenType.TWhile, "while", lineNumber);
+                        var token = new TSC.Token(TSC.TokenType.TWhile, "while", lineNumber, colNumber - ("while".length - 1));
                         // We have to remove the IDs that have been identified and added to the tokens array
                         // 4 ID tokens have been added - "w", "h", "i", "l"... remove them from the array
                         tokens_1 = tokens_1.slice(0, tokens_1.length - ("while".length - 1));
                         tokens_1.push(token);
                     }
                     else if (rIF.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
-                        var token = new TSC.Token(TSC.TokenType.TIf, "if", lineNumber);
+                        var token = new TSC.Token(TSC.TokenType.TIf, "if", lineNumber, colNumber - ("if".length - 1));
                         // We have to remove the IDs that have been identified and added to the tokens array
                         // 1 ID token has been added - "i"... remove them from the array
                         tokens_1 = tokens_1.slice(0, tokens_1.length - ("if".length - 1));
                         tokens_1.push(token);
                     }
                     else if (rPRINT.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
-                        var token = new TSC.Token(TSC.TokenType.TPrint, "print", lineNumber);
+                        var token = new TSC.Token(TSC.TokenType.TPrint, "print", lineNumber, colNumber - ("print".length - 1));
                         // We have to remove the IDs that have been identified and added to the tokens array
                         // 4 ID tokens have been added - "p", "r", "i", "n"... remove them from the array
                         tokens_1 = tokens_1.slice(0, tokens_1.length - ("print".length - 1));
                         tokens_1.push(token);
                     }
                     else if (rTYPEINT.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
-                        var token = new TSC.Token(TSC.TokenType.TType, "int", lineNumber);
+                        var token = new TSC.Token(TSC.TokenType.TType, "int", lineNumber, colNumber - ("int".length - 1));
                         // We have to remove the IDs that have been identified and added to the tokens array
                         // 2 ID tokens have been added - "i", "n" ... remove them from the array
                         tokens_1 = tokens_1.slice(0, tokens_1.length - ("int".length - 1));
                         tokens_1.push(token);
                     }
                     else if (rTYPEBOOL.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
-                        var token = new TSC.Token(TSC.TokenType.TType, "boolean", lineNumber);
+                        var token = new TSC.Token(TSC.TokenType.TType, "boolean", lineNumber, colNumber - ("boolean".length - 1));
                         // We have to remove the IDs that have been identified and added to the tokens array
                         // 6 ID tokens have been added - "b", "o", "o", "l", "e", "a" ... remove them from the array
                         tokens_1 = tokens_1.slice(0, tokens_1.length - ("boolean".length - 1));
                         tokens_1.push(token);
                     }
                     else if (rTYPESTR.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
-                        var token = new TSC.Token(TSC.TokenType.TType, "string", lineNumber);
+                        var token = new TSC.Token(TSC.TokenType.TType, "string", lineNumber, colNumber - ("string".length - 1));
                         // We have to remove the IDs that have been identified and added to the tokens array
                         // 5 ID tokens have been added - "s", "t", "r", "i", "n" ... remove them from the array
                         tokens_1 = tokens_1.slice(0, tokens_1.length - ("string".length - 1));
                         tokens_1.push(token);
                     }
                     else if (rDIGIT.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
-                        var token = new TSC.Token(TSC.TokenType.TDigit, sourceCode.charAt(endLexemePtr - 1), lineNumber);
+                        var token = new TSC.Token(TSC.TokenType.TDigit, sourceCode.charAt(endLexemePtr - 1), lineNumber, colNumber);
                         tokens_1.push(token);
                     }
                     else if (rINTOP.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
-                        var token = new TSC.Token(TSC.TokenType.TIntop, sourceCode.charAt(endLexemePtr - 1), lineNumber);
+                        var token = new TSC.Token(TSC.TokenType.TIntop, sourceCode.charAt(endLexemePtr - 1), lineNumber, colNumber);
                         tokens_1.push(token);
                     }
                     else if (rASSIGN.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
-                        var token = new TSC.Token(TSC.TokenType.TAssign, sourceCode.charAt(endLexemePtr - 1), lineNumber);
+                        var token = new TSC.Token(TSC.TokenType.TAssign, sourceCode.charAt(endLexemePtr - 1), lineNumber, colNumber);
                         tokens_1.push(token);
                     }
                     else if (rBOOLOPEQUALS.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
-                        var token = new TSC.Token(TSC.TokenType.TBoolop, "==", lineNumber);
+                        var token = new TSC.Token(TSC.TokenType.TBoolop, "==", lineNumber, colNumber - ("==".length - 1));
                         // We have to remove the assign that has been identified and added to the tokens array
                         tokens_1.pop();
                         tokens_1.push(token);
                     }
                     else if (rID.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
-                        var token = new TSC.Token(TSC.TokenType.TId, sourceCode.charAt(endLexemePtr - 1), lineNumber);
+                        var token = new TSC.Token(TSC.TokenType.TId, sourceCode.charAt(endLexemePtr - 1), lineNumber, colNumber);
                         tokens_1.push(token);
                     }
                     else if (rWHITE.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
@@ -184,12 +186,13 @@ var TSC;
                         if (rNEWLINE.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
                             console.log("NEWLINE");
                             lineNumber++;
+                            colNumber = -1;
                         }
                         startLexemePtr = endLexemePtr;
                     }
                     else if (rEOP.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
                         console.log("EOP");
-                        var token = new TSC.Token(TSC.TokenType.TEop, sourceCode.charAt(endLexemePtr - 1), lineNumber);
+                        var token = new TSC.Token(TSC.TokenType.TEop, sourceCode.charAt(endLexemePtr - 1), lineNumber, colNumber);
                         tokens_1.push(token);
                         startLexemePtr = endLexemePtr;
                         hasEOP = true;
@@ -198,17 +201,17 @@ var TSC;
                         if (endLexemePtr == sourceCode.length - 1) {
                             // If code ends with a trailling start comment, throw error
                             if (rCOMMENTSTART.test(sourceCode.substring(startLexemePtr, endLexemePtr + 1))) {
-                                errors.push(new TSC.Error(TSC.ErrorType.MissingCommentEnd, "*/", lineNumber));
+                                errors.push(new TSC.Error(TSC.ErrorType.MissingCommentEnd, "*/", lineNumber, colNumber - ("*/".length - 1)));
                             }
                             else {
-                                errors.push(new TSC.Error(TSC.ErrorType.InvalidToken, sourceCode.charAt(endLexemePtr), lineNumber));
+                                errors.push(new TSC.Error(TSC.ErrorType.InvalidToken, sourceCode.charAt(endLexemePtr), lineNumber, colNumber));
                             }
                             break;
                         }
                         // Check to see if the next character creates a match for a Boolean NotEquals
                         endLexemePtr++;
                         if (rBOOLOPNOTEQUALS.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
-                            var token = new TSC.Token(TSC.TokenType.TBoolop, "!=", lineNumber);
+                            var token = new TSC.Token(TSC.TokenType.TBoolop, "!=", lineNumber, colNumber - ("!=".length - 1));
                             // "!" is not a valid character by itself, so the lexer would throw an error when it reaches !, 
                             // as if doesn't know that it is followed by an = yet. Perhaps we can fix this by
                             // when recognizing an illegal characters, perform a 1-place lookahead to see if there is a match with anything.
@@ -218,19 +221,20 @@ var TSC;
                             inComment = true;
                         }
                         else {
-                            errors.push(new TSC.Error(TSC.ErrorType.InvalidToken, sourceCode.charAt(endLexemePtr - 2), lineNumber));
+                            errors.push(new TSC.Error(TSC.ErrorType.InvalidToken, sourceCode.charAt(endLexemePtr - 2), lineNumber, colNumber));
                             break;
                         }
                     }
                     endLexemePtr++;
+                    colNumber++;
                 }
                 // If we've reached the end of the source code, but no end comment has been found, throw an error
                 if (inComment) {
-                    errors.push(new TSC.Error(TSC.ErrorType.MissingCommentEnd, "*/", lineNumber));
+                    errors.push(new TSC.Error(TSC.ErrorType.MissingCommentEnd, "*/", lineNumber, colNumber));
                 }
                 // If we've reached the end of the source and no EOP was detected, throw a warning
                 if (!hasEOP) {
-                    warnings.push(new TSC.Warning(TSC.WarningType.MissingEOP, "$", lineNumber));
+                    warnings.push(new TSC.Warning(TSC.WarningType.MissingEOP, "$", lineNumber, colNumber));
                 }
                 console.log(tokens_1);
                 // Define an object to return values in
