@@ -111,8 +111,10 @@
 			}
 			// Print any warnings and errors
 			for(var i=0; i<lexAnalysis.warnings.length; i++){
-				if(lexAnalysis.warnings[i] == TSC.WarningType.MissingEOP){
+				if(lexAnalysis.warnings[i].type == TSC.WarningType.MissingEOP){
 					putMessage("LEXER -> | WARNING: No EOP [$] detected at end-of-file. Adding to end-of-file...");
+					// Insert an EOP into the tokens array
+					lexAnalysis.tokens.push(new TSC.Token(TSC.TokenType.TEop, "$"));
 				}
 			}
 			for(var i=0; i<lexAnalysis.errors.length; i++){
@@ -120,7 +122,7 @@
 					putMessage("LEXER -> | ERROR: Unrecognized or Invalid Token [ " + lexAnalysis.errors[i].value + " ]");
 				}
 				else if(lexAnalysis.errors[i].type == TSC.ErrorType.MissingCommentEnd){
-				putMessage("LEXER -> | ERROR: Missing ending comment brace (*/)");
+					putMessage("LEXER -> | ERROR: Missing ending comment brace (*/)");
 				}
 			}
 			putMessage("Lexical Analysis complete! " + lexAnalysis.warnings.length + " WARNING(S) and " + lexAnalysis.errors.length + " ERROR(S)");

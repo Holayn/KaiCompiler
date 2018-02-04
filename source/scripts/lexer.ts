@@ -254,19 +254,16 @@ module TSC
 							tokens.push(token);
 						}
 						else if(rCOMMENTSTART.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
-							console.log("COMMENT START");
 							inComment = true;
 						}
 						// Check to see if the next character creates a match for a comment
 						// If so, we continue to ignore until we reach the end comment
 						// If we don't reach the end comment, then return error
 						else{
-							console.log("oop");
 							errors.push(new Error(TSC.ErrorType.InvalidToken, sourceCode.charAt(endLexemePtr-2)));
 							break;
 						}
 					}
-
 					endLexemePtr++;
 				}	
 
@@ -275,7 +272,7 @@ module TSC
 					errors.push(new Error(TSC.ErrorType.MissingCommentEnd, "*/"));
 				}
 
-				// If we've reached the end of the source and no EOP was detected, throw a warning and insert an EOP
+				// If we've reached the end of the source and no EOP was detected, throw a warning
 				if(!hasEOP){
 					warnings.push(new Warning(TSC.WarningType.MissingEOP, "$"));
 				}
