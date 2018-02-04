@@ -13,6 +13,10 @@ var TSC;
                 console.log("Source code: " + sourceCode);
                 // Define array to return tokens in
                 var tokens_1 = [];
+                // Define array to return errors in
+                var errors = [];
+                // Define array to return warnings in
+                var warnings = [];
                 // Pointers that make up the buffer of characters we are matching to
                 var startLexemePtr = 0;
                 var endLexemePtr = 1;
@@ -62,7 +66,10 @@ var TSC;
                 var rCOMMENTSTART = new RegExp('/\\*$');
                 // RegExp for Comment End
                 var rCOMMENTEND = new RegExp('\\*/$');
+                // Keeps track of the lexer is currently in a comment block
                 var inComment = false;
+                // Keeps track if we've run into EOP
+                var hasEOP = false;
                 // Run Regular Expression matching on the buffer of characters we have so far
                 // If the character we just "added" to the buffer we're looking at creates a match...
                 // Create a new Token for match
@@ -177,10 +184,11 @@ var TSC;
                         var token = new TSC.Token(TSC.TokenType.TEop, sourceCode.charAt(endLexemePtr - 1));
                         tokens_1.push(token);
                         startLexemePtr = endLexemePtr;
+                        hasEOP = true;
                     }
                     else {
                         if (endLexemePtr == sourceCode.length - 1) {
-                            console.log("ERROR: Unrecognized token");
+                            errors.push(new TSC.Error(TSC.ErrorType.InvalidToken, sourceCode.charAt(endLexemePtr)));
                             break;
                         }
                         // Check to see if the next character creates a match for a Boolean NotEquals
@@ -193,10 +201,11 @@ var TSC;
                             tokens_1.push(token);
                         }
                         else if (rCOMMENTSTART.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
+                            console.log("COMMENT START");
                             inComment = true;
                         }
                         else {
-                            console.log("ERROR: Unrecognized token");
+                            errors.push(new TSC.Error(TSC.ErrorType.InvalidToken, sourceCode.charAt(endLexemePtr - 2)));
                             break;
                         }
                     }
@@ -204,11 +213,21 @@ var TSC;
                 }
                 // If we've reached the end of the source code, but no end comment has been found, throw an error
                 if (inComment) {
-                    console.log("ERROR: Unrecognized token");
+                    errors.push(new TSC.Error(TSC.ErrorType.MissingCommentEnd, "*/"));
+                }
+                // If we've reached the end of the source and no EOP was detected, throw a warning and insert an EOP
+                if (!hasEOP) {
+                    warnings.push(new TSC.Warning(TSC.WarningType.MissingEOP, "$"));
                 }
                 console.log(tokens_1);
+                // Define an object to return values in
+                var lexAnalysisRes = {
+                    "tokens": tokens_1,
+                    "errors": errors,
+                    "warnings": warnings
+                };
                 // TODO: remove all spaces in the middle; remove line breaks too.
-                return tokens_1;
+                return lexAnalysisRes;
             }
         };
         return Lexer;

@@ -13,6 +13,10 @@ module TSC
 				
 				// Define array to return tokens in
 				let tokens = [];
+				// Define array to return errors in
+				let errors = [];
+				// Define array to return warnings in
+				let warnings = [];
 				// Pointers that make up the buffer of characters we are matching to
 				let startLexemePtr = 0;
 				let endLexemePtr = 1;
@@ -64,8 +68,11 @@ module TSC
 				let rCOMMENTSTART = new RegExp('/\\*$');
 				// RegExp for Comment End
 				let rCOMMENTEND = new RegExp('\\*/$');
-
+				
+				// Keeps track of the lexer is currently in a comment block
 				let inComment: boolean = false;
+				// Keeps track if we've run into EOP
+				let hasEOP: boolean = false;
 
 				// Run Regular Expression matching on the buffer of characters we have so far
 				// If the character we just "added" to the buffer we're looking at creates a match...
@@ -222,12 +229,13 @@ module TSC
 						var token: Token = new Token(TSC.TokenType.TEop, sourceCode.charAt(endLexemePtr-1));
 						tokens.push(token);
 						startLexemePtr = endLexemePtr;
+						hasEOP = true;
 					}
 
 					// Catch for illegal characters
 					else{
 						if(endLexemePtr == sourceCode.length-1){
-							console.log("ERROR: Unrecognized token");
+							errors.push(new Error(TSC.ErrorType.InvalidToken, sourceCode.charAt(endLexemePtr)));
 							break;
 						}
 						// Check to see if the next character creates a match for a Boolean NotEquals
@@ -240,29 +248,42 @@ module TSC
 							tokens.push(token);
 						}
 						else if(rCOMMENTSTART.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
+							console.log("COMMENT START");
 							inComment = true;
 						}
 						// Check to see if the next character creates a match for a comment
 						// If so, we continue to ignore until we reach the end comment
 						// If we don't reach the end comment, then return error
 						else{
-							console.log("ERROR: Unrecognized token");
+							errors.push(new Error(TSC.ErrorType.InvalidToken, sourceCode.charAt(endLexemePtr-2)));
 							break;
 						}
 					}
 
 					endLexemePtr++;
-				}
+				}	
 
 				// If we've reached the end of the source code, but no end comment has been found, throw an error
 				if(inComment){
-					console.log("ERROR: Unrecognized token");
+					errors.push(new Error(TSC.ErrorType.MissingCommentEnd, "*/"));
+				}
+
+				// If we've reached the end of the source and no EOP was detected, throw a warning and insert an EOP
+				if(!hasEOP){
+					warnings.push(new Warning(TSC.WarningType.MissingEOP, "$"));
 				}
 
 				console.log(tokens);
 
+				// Define an object to return values in
+				let lexAnalysisRes = {
+					"tokens": tokens,
+					"errors": errors,
+					"warnings": warnings,
+				};
+
 		        // TODO: remove all spaces in the middle; remove line breaks too.
-		        return tokens;
+		        return lexAnalysisRes;
 		    }
 		}
 	}

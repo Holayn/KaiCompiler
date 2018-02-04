@@ -83,7 +83,8 @@
     <script type="text/javascript" src="dist/scripts/lexer.js"></script>	
 	<script type="text/javascript" src="dist/scripts/globals.js"></script>	
 	<script type="text/javascript" src="dist/scripts/token.js"></script>
-	<script type="text/javascript" src="dist/scripts/tokentype.js"></script>	
+	<script type="text/javascript" src="dist/scripts/error.js"></script>	
+	<script type="text/javascript" src="dist/scripts/warning.js"></script>	
     <script type="text/javascript">
 		 function init() {
 	        // Clear the message box.
@@ -102,13 +103,32 @@
 	        init();
 			putMessage("Lexical Analysis:");
 	        // Grab the tokens from the lexer . . .
-			tokens = _Lexer.lex();
+			var lexAnalysis = _Lexer.lex();
+			console.log(lexAnalysis);
 			// For all tokens, print out their type and value
-			for(var i=0; i<tokens.length; i++){
-				putMessage("LEXER -> | " + tokens[i].type + " [ " + tokens[i].value + " ]");
+			for(var i=0; i<lexAnalysis.tokens.length; i++){
+				putMessage("LEXER -> | " + lexAnalysis.tokens[i].type + " [ " + lexAnalysis.tokens[i].value + " ]");
 			}
+			// Print any warnings and errors
+			for(var i=0; i<lexAnalysis.warnings.length; i++){
+				if(lexAnalysis.warnings[i] == TSC.WarningType.MissingEOP){
+					putMessage("LEXER -> | WARNING: No EOP [$] detected at end-of-file. Adding to end-of-file...");
+				}
+			}
+			for(var i=0; i<lexAnalysis.errors.length; i++){
+				if(lexAnalysis.errors[i].type == TSC.ErrorType.InvalidToken){
+					putMessage("LEXER -> | ERROR: Unrecognized or Invalid Token [ " + lexAnalysis.errors[i].value + " ]");
+				}
+				else if(lexAnalysis.errors[i].type == TSC.ErrorType.MissingCommentEnd){
+				putMessage("LEXER -> | ERROR: Missing ending comment brace (*/)");
+				}
+			}
+			putMessage("Lexical Analysis complete! " + lexAnalysis.warnings.length + " WARNING(S) and " + lexAnalysis.errors.length + " ERROR(S)");
 	        // . . . and parse!
-	        // parse();
+			// parse();
+			// Scroll to bottom of the log
+			var textarea = document.getElementById('taOutput');
+			textarea.scrollTop = textarea.scrollHeight;
 	    }
     
 	    function putMessage(msg) {
