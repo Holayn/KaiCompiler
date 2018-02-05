@@ -159,8 +159,9 @@ module TSC
 							// Transform everything between beginning quote and end quote to Character Tokens
 							// First, we need to remove previous tokens added from the start quote and onwards
 							tokens = tokens.slice(0, startQuoteArrayIndex+1);
-							// Readjust colNumber
+							// Readjust colNumber and lineNumber
 							colNumber = startQuoteIndex;
+							lineNumber = tokens[tokens.length-1].lineNumber;
 							for(var i=(startQuoteIndex); i<(endLexemePtr-1); i++){
 								if(rCHAR.test(sourceCode.charAt(i))){
 									var token: Token = new Token(TSC.TokenType.TChar, sourceCode.charAt(i), lineNumber, colNumber);
@@ -170,7 +171,11 @@ module TSC
 								else{
 									// If we run into a character that does not match a Character, throw an error
 									console.log("ERROR: Invalid character in String");
-									errors.push(new Error(TSC.ErrorType.InvalidCharacterInString, sourceCode.charAt(endLexemePtr-1), lineNumber, colNumber));
+									let char = sourceCode.charAt(i)
+									if(char == "\n"){
+										char = "\\n";
+									}
+									errors.push(new Error(TSC.ErrorType.InvalidCharacterInString, char, lineNumber, colNumber));
 									break;
 								}
 							}
@@ -355,8 +360,8 @@ module TSC
 					errors.push(new Error(TSC.ErrorType.MissingCommentEnd, "*/", lineNumber, colNumber));
 				}
 
-				// If we've reached the end of the source and no EOP was detected, throw a warning
-				if(!foundEOP){
+				// If we've reached the end of the source and no EOP was detected, along with no errors, throw a warning
+				if(!foundEOP && errors.length == 0){
 					warnings.push(new Warning(TSC.WarningType.MissingEOP, "$", lineNumber, colNumber));
 				}
 

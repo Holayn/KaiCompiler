@@ -143,8 +143,9 @@ var TSC;
                             // Transform everything between beginning quote and end quote to Character Tokens
                             // First, we need to remove previous tokens added from the start quote and onwards
                             tokens_1 = tokens_1.slice(0, startQuoteArrayIndex + 1);
-                            // Readjust colNumber
+                            // Readjust colNumber and lineNumber
                             colNumber = startQuoteIndex;
+                            lineNumber = tokens_1[tokens_1.length - 1].lineNumber;
                             for (var i = (startQuoteIndex); i < (endLexemePtr - 1); i++) {
                                 if (rCHAR.test(sourceCode.charAt(i))) {
                                     var token = new TSC.Token(TSC.TokenType.TChar, sourceCode.charAt(i), lineNumber, colNumber);
@@ -154,7 +155,11 @@ var TSC;
                                 else {
                                     // If we run into a character that does not match a Character, throw an error
                                     console.log("ERROR: Invalid character in String");
-                                    errors.push(new TSC.Error(TSC.ErrorType.InvalidCharacterInString, sourceCode.charAt(endLexemePtr - 1), lineNumber, colNumber));
+                                    var char = sourceCode.charAt(i);
+                                    if (char == "\n") {
+                                        char = "\\n";
+                                    }
+                                    errors.push(new TSC.Error(TSC.ErrorType.InvalidCharacterInString, char, lineNumber, colNumber));
                                     break;
                                 }
                             }
@@ -296,8 +301,8 @@ var TSC;
                 if (inComment) {
                     errors.push(new TSC.Error(TSC.ErrorType.MissingCommentEnd, "*/", lineNumber, colNumber));
                 }
-                // If we've reached the end of the source and no EOP was detected, throw a warning
-                if (!foundEOP) {
+                // If we've reached the end of the source and no EOP was detected, along with no errors, throw a warning
+                if (!foundEOP && errors.length == 0) {
                     warnings.push(new TSC.Warning(TSC.WarningType.MissingEOP, "$", lineNumber, colNumber));
                 }
                 console.log(tokens_1);

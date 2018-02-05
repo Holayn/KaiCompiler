@@ -9,8 +9,13 @@
         export class Testcases {
     
         public static load(testcase: any){
-            if(testcase.innerHTML == "Basic 1"){
-                (<HTMLInputElement>document.getElementById("taSourceCode")).value = `/* This is a simple program with no operations */\n{}$`
+            switch(testcase){
+                case "Simple 1":
+                    (<HTMLInputElement>document.getElementById("taSourceCode")).value = `/* This is a simple program with no operations */\n{}$`;
+                    break;
+                case "Simple 2":
+                    (<HTMLInputElement>document.getElementById("taSourceCode")).value = `/* This is a simple program with no operations */\n{}$`;
+                    break;
             }
         }
     }

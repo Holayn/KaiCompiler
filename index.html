@@ -10,6 +10,7 @@
 	<!--Import materialize.css-->
 	<link type="text/css" rel="stylesheet" href="dist/styles/materialize.min.css"  media="screen,projection"/>
 	<link href="dist/styles/jquery-linedtextarea.css" type="text/css" rel="stylesheet" />
+	<link rel="shortcut icon" href="dist/images/code.png">
 </head>
 <body onload="init();">
 	<!--Import jQuery before materialize.js-->
@@ -214,6 +215,9 @@
 				}
 				else if(lexAnalysis.errors[i].type == TSC.ErrorType.MissingCommentEnd){
 					putMessage("LEXER -> | ERROR: Missing ending comment brace (*/)");
+				}
+				else if(lexAnalysis.errors[i].type == TSC.ErrorType.InvalidCharacterInString){
+					putMessage("LEXER -> | ERROR: Invalid character in String [ " + lexAnalysis.errors[i].value + " ] on line " + lexAnalysis.errors[i].lineNumber + " col " + lexAnalysis.errors[i].colNumber);
 				}
 			}
 			putMessage("Lexical Analysis complete! " + lexAnalysis.warnings.length + " WARNING(S) and " + lexAnalysis.errors.length + " ERROR(S)");

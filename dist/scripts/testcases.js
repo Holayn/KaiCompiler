@@ -9,8 +9,13 @@ var TSC;
         function Testcases() {
         }
         Testcases.load = function (testcase) {
-            if (testcase.innerHTML == "Basic 1") {
-                document.getElementById("taSourceCode").value = "/* This is a simple program with no operations */\n{}$";
+            switch (testcase) {
+                case "Simple 1":
+                    document.getElementById("taSourceCode").value = "/* This is a simple program with no operations */\n{}$";
+                    break;
+                case "Simple 2":
+                    document.getElementById("taSourceCode").value = "/* This is a simple program with no operations */\n{}$";
+                    break;
             }
         };
         return Testcases;
