@@ -40,10 +40,14 @@ module TSC
 				let rLPAREN = new RegExp('\\($');
 				// RegExp for Right Paren
 				let rRPAREN = new RegExp('\\)$');
+				// RegExp for Quote
+				let rQUOTE = new RegExp('"$');
 				// RegExp for EOP
 				let rEOP = new RegExp('\\$$');
-				// RegExp for ID (same as Character)
+				// RegExp for ID
 				let rID = new RegExp('[a-z]$');
+				// RegExp for Character
+				let rCHAR = new RegExp('[a-z]$| $');
 				// RegExp for whitespace
 				let rWHITE = new RegExp(' $|\t$|\n$|\r$');
 				// RegExp for newline
@@ -82,7 +86,13 @@ module TSC
 				// Keeps track of the lexer is currently in a comment block
 				let inComment: boolean = false;
 				// Keeps track if we've run into EOP
-				let hasEOP: boolean = false;
+				let foundEOP: boolean = false;
+				// Keeps track if we've run into a quotation mark
+				let foundQuote: boolean = false;
+				// Pointer to keep track of quotation mark
+				let startQuoteIndex: number = 0;
+				// Pointer to keep track of quotation mark in tokens array
+				let startQuoteArrayIndex: number = 0;
 
 				// Run Regular Expression matching on the buffer of characters we have so far
 				// If the character we just "added" to the buffer we're looking at creates a match...
@@ -94,6 +104,9 @@ module TSC
 				while(endLexemePtr <= sourceCode.length){
 					console.log(sourceCode.substring(startLexemePtr, endLexemePtr));
 					console.log(endLexemePtr);
+					
+					//We're iterating through the program, so that means we haven't found the EOP
+					foundEOP = false;
 
 					// If the lexer is currently looking in a comment block, just ignore input
 					// Also perform check to see if comment end has been reached.
@@ -127,6 +140,46 @@ module TSC
 					else if(rRPAREN.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
 						var token: Token = new Token(TSC.TokenType.TRparen, sourceCode.charAt(endLexemePtr-1), lineNumber, colNumber);
 						tokens.push(token);
+					}
+
+					// Test for Quote
+					else if(rQUOTE.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
+						var token: Token = new Token(TSC.TokenType.TQuote, sourceCode.charAt(endLexemePtr-1), lineNumber, colNumber);
+						tokens.push(token);
+						if(!foundQuote){
+							// We've reached the beginning quote
+							foundQuote = true;
+							// We need to keep track of where the first quote is so we if run into another quote
+							startQuoteIndex = endLexemePtr;
+							startQuoteArrayIndex = tokens.length-1;
+						}
+						else{
+							// We've reached the end quote
+							foundQuote = false;
+							// Transform everything between beginning quote and end quote to Character Tokens
+							// First, we need to remove previous tokens added from the start quote and onwards
+							tokens = tokens.slice(0, startQuoteArrayIndex+1);
+							// Readjust colNumber
+							colNumber = startQuoteIndex;
+							for(var i=(startQuoteIndex); i<(endLexemePtr-1); i++){
+								if(rCHAR.test(sourceCode.charAt(i))){
+									var token: Token = new Token(TSC.TokenType.TChar, sourceCode.charAt(i), lineNumber, colNumber);
+									tokens.push(token);
+									colNumber++;
+								}
+								else{
+									// If we run into a character that does not match a Character, throw an error
+									console.log("ERROR: Invalid character in String");
+									errors.push(new Error(TSC.ErrorType.InvalidCharacterInString, sourceCode.charAt(endLexemePtr-1), lineNumber, colNumber));
+									break;
+								}
+							}
+							if(errors.length != 0){
+								break;
+							}
+							// Add on final quote to tokens
+							tokens.push(new Token(TSC.TokenType.TQuote, '"', lineNumber, colNumber));
+						}
 					}
 
 					// ------------------------ KEYWORDS START ----------------------------
@@ -256,7 +309,9 @@ module TSC
 						var token: Token = new Token(TSC.TokenType.TEop, sourceCode.charAt(endLexemePtr-1), lineNumber, colNumber);
 						tokens.push(token);
 						startLexemePtr = endLexemePtr;
-						hasEOP = true;
+						foundEOP = true;
+						// Stop looking for an ending quote. The next quote found belongs to the next program
+						foundQuote = false;
 					}
 
 					// Catch for illegal characters
@@ -301,7 +356,7 @@ module TSC
 				}
 
 				// If we've reached the end of the source and no EOP was detected, throw a warning
-				if(!hasEOP){
+				if(!foundEOP){
 					warnings.push(new Warning(TSC.WarningType.MissingEOP, "$", lineNumber, colNumber));
 				}
 
@@ -314,8 +369,8 @@ module TSC
 					"warnings": warnings,
 				};
 
-		        // TODO: remove all spaces in the middle; remove line breaks too.
-		        return lexAnalysisRes;
+				// TODO: remove all spaces in the middle; remove line breaks too.
+				return lexAnalysisRes;
 		    }
 		}
 	}

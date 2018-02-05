@@ -4,6 +4,7 @@ var TSC;
     (function (ErrorType) {
         ErrorType["InvalidToken"] = "InvalidToken";
         ErrorType["MissingCommentEnd"] = "MissingCommentEnd";
+        ErrorType["InvalidCharacterInString"] = "InvalidCharacterInString";
     })(ErrorType = TSC.ErrorType || (TSC.ErrorType = {}));
     var Error = /** @class */ (function () {
         function Error(tokenType, value, lineNumber, colNumber) {

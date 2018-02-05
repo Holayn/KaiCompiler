@@ -38,10 +38,14 @@ var TSC;
                 var rLPAREN = new RegExp('\\($');
                 // RegExp for Right Paren
                 var rRPAREN = new RegExp('\\)$');
+                // RegExp for Quote
+                var rQUOTE = new RegExp('"$');
                 // RegExp for EOP
                 var rEOP = new RegExp('\\$$');
-                // RegExp for ID (same as Character)
+                // RegExp for ID
                 var rID = new RegExp('[a-z]$');
+                // RegExp for Character
+                var rCHAR = new RegExp('[a-z]$| $');
                 // RegExp for whitespace
                 var rWHITE = new RegExp(' $|\t$|\n$|\r$');
                 // RegExp for newline
@@ -79,7 +83,13 @@ var TSC;
                 // Keeps track of the lexer is currently in a comment block
                 var inComment = false;
                 // Keeps track if we've run into EOP
-                var hasEOP = false;
+                var foundEOP = false;
+                // Keeps track if we've run into a quotation mark
+                var foundQuote = false;
+                // Pointer to keep track of quotation mark
+                var startQuoteIndex = 0;
+                // Pointer to keep track of quotation mark in tokens array
+                var startQuoteArrayIndex = 0;
                 // Run Regular Expression matching on the buffer of characters we have so far
                 // If the character we just "added" to the buffer we're looking at creates a match...
                 // Create a new Token for match
@@ -89,6 +99,8 @@ var TSC;
                 while (endLexemePtr <= sourceCode.length) {
                     console.log(sourceCode.substring(startLexemePtr, endLexemePtr));
                     console.log(endLexemePtr);
+                    //We're iterating through the program, so that means we haven't found the EOP
+                    foundEOP = false;
                     // If the lexer is currently looking in a comment block, just ignore input
                     // Also perform check to see if comment end has been reached.
                     if (inComment) {
@@ -114,6 +126,44 @@ var TSC;
                     else if (rRPAREN.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
                         var token = new TSC.Token(TSC.TokenType.TRparen, sourceCode.charAt(endLexemePtr - 1), lineNumber, colNumber);
                         tokens_1.push(token);
+                    }
+                    else if (rQUOTE.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
+                        var token = new TSC.Token(TSC.TokenType.TQuote, sourceCode.charAt(endLexemePtr - 1), lineNumber, colNumber);
+                        tokens_1.push(token);
+                        if (!foundQuote) {
+                            // We've reached the beginning quote
+                            foundQuote = true;
+                            // We need to keep track of where the first quote is so we if run into another quote
+                            startQuoteIndex = endLexemePtr;
+                            startQuoteArrayIndex = tokens_1.length - 1;
+                        }
+                        else {
+                            // We've reached the end quote
+                            foundQuote = false;
+                            // Transform everything between beginning quote and end quote to Character Tokens
+                            // First, we need to remove previous tokens added from the start quote and onwards
+                            tokens_1 = tokens_1.slice(0, startQuoteArrayIndex + 1);
+                            // Readjust colNumber
+                            colNumber = startQuoteIndex;
+                            for (var i = (startQuoteIndex); i < (endLexemePtr - 1); i++) {
+                                if (rCHAR.test(sourceCode.charAt(i))) {
+                                    var token = new TSC.Token(TSC.TokenType.TChar, sourceCode.charAt(i), lineNumber, colNumber);
+                                    tokens_1.push(token);
+                                    colNumber++;
+                                }
+                                else {
+                                    // If we run into a character that does not match a Character, throw an error
+                                    console.log("ERROR: Invalid character in String");
+                                    errors.push(new TSC.Error(TSC.ErrorType.InvalidCharacterInString, sourceCode.charAt(endLexemePtr - 1), lineNumber, colNumber));
+                                    break;
+                                }
+                            }
+                            if (errors.length != 0) {
+                                break;
+                            }
+                            // Add on final quote to tokens
+                            tokens_1.push(new TSC.Token(TSC.TokenType.TQuote, '"', lineNumber, colNumber));
+                        }
                     }
                     else if (rBOOLVALTRUE.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
                         var token = new TSC.Token(TSC.TokenType.TBoolval, "true", lineNumber, colNumber - ("true".length - 1));
@@ -207,7 +257,9 @@ var TSC;
                         var token = new TSC.Token(TSC.TokenType.TEop, sourceCode.charAt(endLexemePtr - 1), lineNumber, colNumber);
                         tokens_1.push(token);
                         startLexemePtr = endLexemePtr;
-                        hasEOP = true;
+                        foundEOP = true;
+                        // Stop looking for an ending quote. The next quote found belongs to the next program
+                        foundQuote = false;
                     }
                     else {
                         if (endLexemePtr == sourceCode.length - 1) {
@@ -245,7 +297,7 @@ var TSC;
                     errors.push(new TSC.Error(TSC.ErrorType.MissingCommentEnd, "*/", lineNumber, colNumber));
                 }
                 // If we've reached the end of the source and no EOP was detected, throw a warning
-                if (!hasEOP) {
+                if (!foundEOP) {
                     warnings.push(new TSC.Warning(TSC.WarningType.MissingEOP, "$", lineNumber, colNumber));
                 }
                 console.log(tokens_1);
