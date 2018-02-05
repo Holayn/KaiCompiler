@@ -44,7 +44,7 @@
 				<div class="col s6">
 					<div class="card-panel input">
 						<h5 class="light">Editor</h5>
-						<textarea class="lined" id="taSourceCode">+${hellotruefalsetrueprintwhileiftruefalsestring!= stringintboolean truewhileif{hi+++==!=}}/*aaahaha*/hahahahaha/*awao*/$</textarea>
+						<textarea class="lined" id="taSourceCode"></textarea>
 						<br>
 						<div class="fixed-action-btn horizontal click-to-toggle togglebutton">
 							<a class="btn-floating btn blue lighten-2">
@@ -118,7 +118,7 @@
 						<div class="collapsible-body">
 							<div class="collection">
 								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Alan</a>
-								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Invalid String</a>
+								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Invalid String 1</a>
 								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Invalid String 2</a>
 								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Invalid String 3</a>
 								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Invalid Print</a>
@@ -230,6 +230,13 @@
 				else if(lexAnalysis.errors[i].type == TSC.ErrorType.InvalidCharacterInString){
 					putMessage("LEXER -> | ERROR: Invalid character in String [ " + lexAnalysis.errors[i].value + " ] on line " + lexAnalysis.errors[i].lineNumber + " col " + lexAnalysis.errors[i].colNumber);
 				}
+			}
+			// Display toasts for warnings and errors
+			if(lexAnalysis.warnings.length > 0){
+				Materialize.toast('Lex warning!', 4000, 'toastcolor');
+			}
+			if(lexAnalysis.errors.length > 0){
+				Materialize.toast('Lex error!', 4000, 'toastcolor');
 			}
 			putMessage("Lexical Analysis complete! " + lexAnalysis.warnings.length + " WARNING(S) and " + lexAnalysis.errors.length + " ERROR(S)");
 	        // . . . and parse!

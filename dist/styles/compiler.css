@@ -123,3 +123,6 @@ header {
 	margin-left: auto !important;
     margin-right: auto !important;
 }
+.toastcolor {
+	background-color: red !important;
+}

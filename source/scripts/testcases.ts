@@ -15,7 +15,6 @@
                     break;
                 case "Simple 2":
                     (<HTMLInputElement>document.getElementById("taSourceCode")).value = `/* Test case for print statement */
-/* Test case for print statement */
 {
     print("i love compilers")
 }$`;
@@ -130,6 +129,7 @@
 }$`;
                     break;
             }
+            (<HTMLInputElement>document.getElementById("taOutput")).value = "Inserted Program: " + testcase.innerHTML;
         }
     }
 }

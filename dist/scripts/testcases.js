@@ -14,7 +14,7 @@ var TSC;
                     document.getElementById("taSourceCode").value = "/* This is a simple program with no operations */\n{}$";
                     break;
                 case "Simple 2":
-                    document.getElementById("taSourceCode").value = "/* Test case for print statement */\n/* Test case for print statement */\n{\n    print(\"i love compilers\")\n}$";
+                    document.getElementById("taSourceCode").value = "/* Test case for print statement */\n{\n    print(\"i love compilers\")\n}$";
                     break;
                 case "Regular":
                     document.getElementById("taSourceCode").value = "/* Test case for a 'regular' program*/\n{\n    int a\n    a = 1\n    print(a)\n    boolean b\n    b = true\n    print(b)\n\n    {\n        int a\n        a = 2\n        print(a)\n    }\n\n    {\n        int a\n        a = 3\n        print(a)\n    }\n\n    string s\n    s = \"stra\"\n    print(s)\n\n    s = \"strb\"\n    print(s)\n\n    if (a != 5) {\n        print(\"true\")\n    }\n\n    if (a == 5) {\n        print(\"false\")\n    }\n}$";
@@ -44,6 +44,7 @@ var TSC;
                     document.getElementById("taSourceCode").value = "/* Test case for invalid print */\n{\n    print(\"my name is 11\")\n}$";
                     break;
             }
+            document.getElementById("taOutput").value = "Inserted Program: " + testcase.innerHTML;
         };
         return Testcases;
     }());
