@@ -36,6 +36,10 @@ module TSC
 				let rLBRACE = new RegExp('{$');
 				// RegExp for Right Brace
 				let rRBRACE = new RegExp('}$');
+				// RegExp for Left Paren
+				let rLPAREN = new RegExp('\\($');
+				// RegExp for Right Paren
+				let rRPAREN = new RegExp('\\)$');
 				// RegExp for EOP
 				let rEOP = new RegExp('\\$$');
 				// RegExp for ID (same as Character)
@@ -110,6 +114,18 @@ module TSC
 					// Test for Right Brace
 					else if(rRBRACE.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
 						var token: Token = new Token(TSC.TokenType.TRbrace, sourceCode.charAt(endLexemePtr-1), lineNumber, colNumber);
+						tokens.push(token);
+					}
+
+					// Test for Left Paren
+					else if(rLPAREN.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
+						var token: Token = new Token(TSC.TokenType.TLparen, sourceCode.charAt(endLexemePtr-1), lineNumber, colNumber);
+						tokens.push(token);
+					}
+
+					// Test for Right Paren
+					else if(rRPAREN.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
+						var token: Token = new Token(TSC.TokenType.TRparen, sourceCode.charAt(endLexemePtr-1), lineNumber, colNumber);
 						tokens.push(token);
 					}
 
@@ -258,7 +274,7 @@ module TSC
 						// Check to see if the next character creates a match for a Boolean NotEquals
 						endLexemePtr++;
 						if(rBOOLOPNOTEQUALS.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
-							var token: Token = new Token(TSC.TokenType.TBoolop, "!=", lineNumber, colNumber));
+							var token: Token = new Token(TSC.TokenType.TBoolop, "!=", lineNumber, colNumber);
 							// "!" is not a valid character by itself, so the lexer would throw an error when it reaches !, 
 							// as if doesn't know that it is followed by an = yet. Perhaps we can fix this by
 							// when recognizing an illegal characters, perform a 1-place lookahead to see if there is a match with anything.

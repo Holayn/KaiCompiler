@@ -15,6 +15,8 @@ var TSC;
         TokenType["TWhile"] = "TWhile";
         TokenType["TIf"] = "TIf";
         TokenType["TPrint"] = "TPrint";
+        TokenType["TRparen"] = "TRparen";
+        TokenType["TLparen"] = "TLparen";
     })(TokenType = TSC.TokenType || (TSC.TokenType = {}));
     var Token = /** @class */ (function () {
         function Token(tokenType, value, lineNumber, colNumber) {

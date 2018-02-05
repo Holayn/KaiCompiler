@@ -34,6 +34,10 @@ var TSC;
                 var rLBRACE = new RegExp('{$');
                 // RegExp for Right Brace
                 var rRBRACE = new RegExp('}$');
+                // RegExp for Left Paren
+                var rLPAREN = new RegExp('\\($');
+                // RegExp for Right Paren
+                var rRPAREN = new RegExp('\\)$');
                 // RegExp for EOP
                 var rEOP = new RegExp('\\$$');
                 // RegExp for ID (same as Character)
@@ -101,6 +105,14 @@ var TSC;
                     }
                     else if (rRBRACE.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
                         var token = new TSC.Token(TSC.TokenType.TRbrace, sourceCode.charAt(endLexemePtr - 1), lineNumber, colNumber);
+                        tokens_1.push(token);
+                    }
+                    else if (rLPAREN.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
+                        var token = new TSC.Token(TSC.TokenType.TLparen, sourceCode.charAt(endLexemePtr - 1), lineNumber, colNumber);
+                        tokens_1.push(token);
+                    }
+                    else if (rRPAREN.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
+                        var token = new TSC.Token(TSC.TokenType.TRparen, sourceCode.charAt(endLexemePtr - 1), lineNumber, colNumber);
                         tokens_1.push(token);
                     }
                     else if (rBOOLVALTRUE.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {

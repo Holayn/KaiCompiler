@@ -13,7 +13,9 @@ module TSC {
         TBoolop = "TBoolop",
         TWhile = "TWhile",
         TIf = "TIf",
-        TPrint = "TPrint"
+        TPrint = "TPrint",
+        TRparen = "TRparen",
+        TLparen = "TLparen"
     }
 
     export class Token {
