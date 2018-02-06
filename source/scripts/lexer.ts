@@ -92,6 +92,9 @@ module TSC
 				// Line and col to keep track of quotation mark
 				let startQuoteCol: number = 0;
 				let startQuoteLine: number = 0;
+				// Line and col to keep track of comment
+				let startCommentCol: number = 0;
+				let startCommentLine: number = 0;
 
 				// Run Regular Expression matching on the buffer of characters we have so far
 				// If the character we just "added" to the buffer we're looking at creates a match...
@@ -283,17 +286,17 @@ module TSC
 						tokens.push(token);
 					}
 
-					// Test for Assign
-					else if(rASSIGN.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
-						var token: Token = new Token(TSC.TokenType.TAssign, sourceCode.charAt(endLexemePtr-1), lineNumber, colNumber);
-						tokens.push(token);
-					}
-
 					// Test for Boolean Equals
 					else if(rBOOLOPEQUALS.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
 						var token: Token = new Token(TSC.TokenType.TBoolop, "==", lineNumber, colNumber-("==".length-1));
 						// We have to remove the assign that has been identified and added to the tokens array
 						tokens.pop();
+						tokens.push(token);
+					}
+
+					// Test for Assign
+					else if(rASSIGN.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
+						var token: Token = new Token(TSC.TokenType.TAssign, sourceCode.charAt(endLexemePtr-1), lineNumber, colNumber);
 						tokens.push(token);
 					}
 
@@ -329,12 +332,13 @@ module TSC
 
 					// Catch for illegal characters
 					else{
-						if(endLexemePtr == sourceCode.length-1){
+						if(endLexemePtr == sourceCode.length){
 							// If code ends with a trailling start comment, throw error
 							if(rCOMMENTSTART.test(sourceCode.substring(startLexemePtr, endLexemePtr+1))){
-								errors.push(new Error(TSC.ErrorType.MissingCommentEnd, "*/", lineNumber, colNumber-("*/".length-1)));
+								errors.push(new Error(TSC.ErrorType.MissingCommentEnd, "*/", startCommentLine, startCommentCol));
 							}
 							else{
+								console.log('oop')
 								errors.push(new Error(TSC.ErrorType.InvalidToken, sourceCode.charAt(endLexemePtr-1), lineNumber, colNumber));
 							}
 							break;
@@ -348,12 +352,14 @@ module TSC
 							// when recognizing an illegal characters, perform a 1-place lookahead to see if there is a match with anything.
 							tokens.push(token);
 						}
+						// Check to see if the next character creates a match for a comment
+						// If so, we continue to ignore until we reach the end comment. Keep track of start line and col of comment.
+						// If we don't reach the end comment, then return error
 						else if(rCOMMENTSTART.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
 							inComment = true;
+							startCommentCol = colNumber;
+							startCommentLine = lineNumber;
 						}
-						// Check to see if the next character creates a match for a comment
-						// If so, we continue to ignore until we reach the end comment
-						// If we don't reach the end comment, then return error
 						else{
 							errors.push(new Error(TSC.ErrorType.InvalidToken, sourceCode.charAt(endLexemePtr-2), lineNumber, colNumber));
 							break;
@@ -367,7 +373,7 @@ module TSC
 				if(errors.length == 0){
 					// If we've reached the end of the source code, but no end comment has been found, throw an error
 					if(inComment){
-						errors.push(new Error(TSC.ErrorType.MissingCommentEnd, "*/", lineNumber, colNumber));
+						errors.push(new Error(TSC.ErrorType.MissingCommentEnd, "*/", startCommentLine, startCommentCol));
 					}
 
 					// If we've reached the end of the source code, but no end quote has been found, throw an error

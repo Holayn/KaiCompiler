@@ -225,7 +225,7 @@
 					putMessage("LEXER -> | ERROR: Unrecognized or Invalid Token [ " + lexAnalysis.errors[i].value + " ] on line " + lexAnalysis.errors[i].lineNumber + " col " + lexAnalysis.errors[i].colNumber);
 				}
 				else if(lexAnalysis.errors[i].type == TSC.ErrorType.MissingCommentEnd){
-					putMessage("LEXER -> | ERROR: Missing ending comment brace (*/)");
+					putMessage("LEXER -> | ERROR: Missing ending comment brace (*/) for comment starting on line  " + lexAnalysis.errors[i].lineNumber + " col " + lexAnalysis.errors[i].colNumber);
 				}
 				else if(lexAnalysis.errors[i].type == TSC.ErrorType.InvalidCharacterInString){
 					putMessage("LEXER -> | ERROR: Invalid character in String [ " + lexAnalysis.errors[i].value + " ] on line " + lexAnalysis.errors[i].lineNumber + " col " + lexAnalysis.errors[i].colNumber);

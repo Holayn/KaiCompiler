@@ -89,6 +89,9 @@ var TSC;
                 // Line and col to keep track of quotation mark
                 var startQuoteCol = 0;
                 var startQuoteLine = 0;
+                // Line and col to keep track of comment
+                var startCommentCol = 0;
+                var startCommentLine = 0;
                 // Run Regular Expression matching on the buffer of characters we have so far
                 // If the character we just "added" to the buffer we're looking at creates a match...
                 // Create a new Token for match
@@ -241,14 +244,14 @@ var TSC;
                         var token = new TSC.Token(TSC.TokenType.TIntop, sourceCode.charAt(endLexemePtr - 1), lineNumber, colNumber);
                         tokens_1.push(token);
                     }
-                    else if (rASSIGN.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
-                        var token = new TSC.Token(TSC.TokenType.TAssign, sourceCode.charAt(endLexemePtr - 1), lineNumber, colNumber);
-                        tokens_1.push(token);
-                    }
                     else if (rBOOLOPEQUALS.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
                         var token = new TSC.Token(TSC.TokenType.TBoolop, "==", lineNumber, colNumber - ("==".length - 1));
                         // We have to remove the assign that has been identified and added to the tokens array
                         tokens_1.pop();
+                        tokens_1.push(token);
+                    }
+                    else if (rASSIGN.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
+                        var token = new TSC.Token(TSC.TokenType.TAssign, sourceCode.charAt(endLexemePtr - 1), lineNumber, colNumber);
                         tokens_1.push(token);
                     }
                     else if (rID.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
@@ -274,12 +277,13 @@ var TSC;
                         foundQuote = false;
                     }
                     else {
-                        if (endLexemePtr == sourceCode.length - 1) {
+                        if (endLexemePtr == sourceCode.length) {
                             // If code ends with a trailling start comment, throw error
                             if (rCOMMENTSTART.test(sourceCode.substring(startLexemePtr, endLexemePtr + 1))) {
-                                errors.push(new TSC.Error(TSC.ErrorType.MissingCommentEnd, "*/", lineNumber, colNumber - ("*/".length - 1)));
+                                errors.push(new TSC.Error(TSC.ErrorType.MissingCommentEnd, "*/", startCommentLine, startCommentCol));
                             }
                             else {
+                                console.log('oop');
                                 errors.push(new TSC.Error(TSC.ErrorType.InvalidToken, sourceCode.charAt(endLexemePtr - 1), lineNumber, colNumber));
                             }
                             break;
@@ -295,6 +299,8 @@ var TSC;
                         }
                         else if (rCOMMENTSTART.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
                             inComment = true;
+                            startCommentCol = colNumber;
+                            startCommentLine = lineNumber;
                         }
                         else {
                             errors.push(new TSC.Error(TSC.ErrorType.InvalidToken, sourceCode.charAt(endLexemePtr - 2), lineNumber, colNumber));
@@ -308,7 +314,7 @@ var TSC;
                 if (errors.length == 0) {
                     // If we've reached the end of the source code, but no end comment has been found, throw an error
                     if (inComment) {
-                        errors.push(new TSC.Error(TSC.ErrorType.MissingCommentEnd, "*/", lineNumber, colNumber));
+                        errors.push(new TSC.Error(TSC.ErrorType.MissingCommentEnd, "*/", startCommentLine, startCommentCol));
                     }
                     else if (foundQuote) {
                         errors.push(new TSC.Error(TSC.ErrorType.MissingStringEndQuote, "\"", startQuoteLine, startQuoteCol));
