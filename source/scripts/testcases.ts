@@ -75,7 +75,7 @@
 }$`;
                     break;
                 case "Crazy One Liner (Lex Pass)":
-                    (<HTMLInputElement>document.getElementById("taSourceCode")).value = `/* Test case for crazy one liner */\n+\${hellotruefalsetrueprinta=3b=0print(\"false true\")whi33leiftruefalsestring!= stringintbooleanaa truewhileif{hi+++==!==}}/*aaahaha*/hahahahaha/*awao*/$`;
+                    (<HTMLInputElement>document.getElementById("taSourceCode")).value = `/* Test case for crazy one liner */\n+\${hellotruefalse!======trueprinta=3b=0print(\"false true\")whi33leiftruefalsestring!= stringintbooleanaa truewhileif{hi+++==!==}}/*aaahaha*/hahahahaha/*awao*/$`;
                     break;
                 case "Missing EOP":
                     (<HTMLInputElement>document.getElementById("taSourceCode")).value = `/* Missing EOP */
