@@ -134,6 +134,12 @@ s = "hey there`;
     print("my name is 11")
 }$`;
                     break;
+                case "Missing End Comment Brace":
+                    (<HTMLInputElement>document.getElementById("taSourceCode")).value = `/* Test case for missing end comment brace */
+{
+    print("my name is eleven")
+    /* hey i love compilers
+}$`;
             }
             (<HTMLInputElement>document.getElementById("taOutput")).value = "Inserted Program: " + testcase.innerHTML;
         }

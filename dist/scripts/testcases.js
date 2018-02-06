@@ -46,6 +46,8 @@ var TSC;
                 case "Invalid Print":
                     document.getElementById("taSourceCode").value = "/* Test case for invalid print */\n{\n    print(\"my name is 11\")\n}$";
                     break;
+                case "Missing End Comment Brace":
+                    document.getElementById("taSourceCode").value = "/* Test case for missing end comment brace */\n{\n    print(\"my name is eleven\")\n    /* hey i love compilers\n}$";
             }
             document.getElementById("taOutput").value = "Inserted Program: " + testcase.innerHTML;
         };
