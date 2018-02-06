@@ -110,6 +110,12 @@ module TSC
 					// If the lexer is currently looking in a comment block, just ignore input
 					// Also perform check to see if comment end has been reached.
 					if(inComment){
+						// We have to keep track of newlines
+						if(rNEWLINE.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
+							console.log("NEWLINE");
+							lineNumber++;
+							colNumber = 0;
+						}
 						if(rCOMMENTEND.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
 							inComment = false;
 						}

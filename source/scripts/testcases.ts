@@ -65,7 +65,6 @@
     a = 2
     string s
     s = "ha"
-    "
 }$
 
 {
@@ -121,6 +120,13 @@
     "hey
     there"
 }$`;
+                    break;
+                case "Invalid String 4":
+                    (<HTMLInputElement>document.getElementById("taSourceCode")).value =`/* Test case for missing ending quote */
+int a
+a = 4
+string s
+s = "hey there`;
                     break;
                 case "Invalid Print":
                     (<HTMLInputElement>document.getElementById("taSourceCode")).value = `/* Test case for invalid print */

@@ -20,7 +20,7 @@ var TSC;
                     document.getElementById("taSourceCode").value = "/* Test case for a 'regular' program*/\n{\n    int a\n    a = 1\n    print(a)\n    boolean b\n    b = true\n    print(b)\n\n    {\n        int a\n        a = 2\n        print(a)\n    }\n\n    {\n        int a\n        a = 3\n        print(a)\n    }\n\n    string s\n    s = \"stra\"\n    print(s)\n\n    s = \"strb\"\n    print(s)\n\n    if (a != 5) {\n        print(\"true\")\n    }\n\n    if (a == 5) {\n        print(\"false\")\n    }\n}$";
                     break;
                 case "Multiple":
-                    document.getElementById("taSourceCode").value = "/* Test case for multiple programs */\n{\n    print(\"i love compilers\")\n    int a\n    a = 2\n    string s\n    s = \"ha\"\n    \"\n}$\n\n{\n    int b\n    b = 4\n    string s\n    s = \"hey\"\n}$";
+                    document.getElementById("taSourceCode").value = "/* Test case for multiple programs */\n{\n    print(\"i love compilers\")\n    int a\n    a = 2\n    string s\n    s = \"ha\"\n}$\n\n{\n    int b\n    b = 4\n    string s\n    s = \"hey\"\n}$";
                     break;
                 case "Crazy One Liner (Lex Pass)":
                     document.getElementById("taSourceCode").value = "/* Test case for crazy one liner */\n+${hellotruefalsetrueprinta=3b=0print(\"false true\")whi33leiftruefalsestring!= stringintbooleanaa truewhileif{hi+++==!==}}/*aaahaha*/hahahahaha/*awao*/$";
@@ -39,6 +39,9 @@ var TSC;
                     break;
                 case "Invalid String 3":
                     document.getElementById("taSourceCode").value = "/* Test case for placing \\n in quotes */\n{\n    \"hey\n    there\"\n}$";
+                    break;
+                case "Invalid String 4":
+                    document.getElementById("taSourceCode").value = "/* Test case for missing ending quote */\nint a\na = 4\nstring s\ns = \"hey there";
                     break;
                 case "Invalid Print":
                     document.getElementById("taSourceCode").value = "/* Test case for invalid print */\n{\n    print(\"my name is 11\")\n}$";
