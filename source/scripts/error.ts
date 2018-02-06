@@ -2,7 +2,8 @@ module TSC {
     export enum ErrorType {
         InvalidToken = "InvalidToken",
         MissingCommentEnd = "MissingCommentEnd",
-        InvalidCharacterInString = "InvalidCharacterInString"
+        InvalidCharacterInString = "InvalidCharacterInString",
+        MissingStringEndQuote = "MissingStringEndQuote"
     }
     export class Error {
         type: ErrorType;

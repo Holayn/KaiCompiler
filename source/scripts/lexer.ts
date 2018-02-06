@@ -89,10 +89,9 @@ module TSC
 				let foundEOP: boolean = false;
 				// Keeps track if we've run into a quotation mark
 				let foundQuote: boolean = false;
-				// Pointer to keep track of quotation mark
-				let startQuoteIndex: number = 0;
-				// Pointer to keep track of quotation mark in tokens array
-				let startQuoteArrayIndex: number = 0;
+				// Line and col to keep track of quotation mark
+				let startQuoteCol: number = 0;
+				let startQuoteLine: number = 0;
 
 				// Run Regular Expression matching on the buffer of characters we have so far
 				// If the character we just "added" to the buffer we're looking at creates a match...
@@ -113,6 +112,41 @@ module TSC
 					if(inComment){
 						if(rCOMMENTEND.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
 							inComment = false;
+						}
+						endLexemePtr++;
+						continue;
+					}
+
+					// If the lexer is currently in a String literal, only test for Characters.
+					// If we reach another quote, we have reached the end of the String literal.
+					if(foundQuote){
+						console.log("HELP" + sourceCode.charAt(endLexemePtr-1));
+						if(rCHAR.test(sourceCode.charAt(endLexemePtr-1))){
+							var token: Token = new Token(TSC.TokenType.TChar, sourceCode.charAt(endLexemePtr-1), lineNumber, colNumber);
+							tokens.push(token);
+							colNumber++;
+						}
+						else if(rQUOTE.test(sourceCode.charAt(endLexemePtr-1))){
+							var token: Token = new Token(TSC.TokenType.TQuote, sourceCode.charAt(endLexemePtr-1), lineNumber, colNumber);
+							tokens.push(token);
+							colNumber++;
+							foundQuote = false;
+						}
+						else{
+							// If we run into a character that does not match a Character, throw an error
+							console.log("ERROR: Invalid character in String");
+							let char = sourceCode.charAt(endLexemePtr-1)
+							if(char == "\n"){
+								char = "\\n";
+							}
+							else if(char == "\r"){
+								char = "\\r";
+							}
+							else if(char == "\t"){
+								char = "\\t";
+							}
+							errors.push(new Error(TSC.ErrorType.InvalidCharacterInString, char, lineNumber, colNumber));
+							break;
 						}
 						endLexemePtr++;
 						continue;
@@ -147,43 +181,11 @@ module TSC
 						var token: Token = new Token(TSC.TokenType.TQuote, sourceCode.charAt(endLexemePtr-1), lineNumber, colNumber);
 						tokens.push(token);
 						if(!foundQuote){
-							// We've reached the beginning quote
+							// We've reached the beginning quote, start treating characters afterwards as ones inside a String
 							foundQuote = true;
-							// We need to keep track of where the first quote is so we if run into another quote
-							startQuoteIndex = endLexemePtr;
-							startQuoteArrayIndex = tokens.length-1;
-						}
-						else{
-							// We've reached the end quote
-							foundQuote = false;
-							// Transform everything between beginning quote and end quote to Character Tokens
-							// First, we need to remove previous tokens added from the start quote and onwards
-							tokens = tokens.slice(0, startQuoteArrayIndex+1);
-							// Readjust colNumber and lineNumber
-							colNumber = startQuoteIndex;
-							lineNumber = tokens[tokens.length-1].lineNumber;
-							for(var i=(startQuoteIndex); i<(endLexemePtr-1); i++){
-								if(rCHAR.test(sourceCode.charAt(i))){
-									var token: Token = new Token(TSC.TokenType.TChar, sourceCode.charAt(i), lineNumber, colNumber);
-									tokens.push(token);
-									colNumber++;
-								}
-								else{
-									// If we run into a character that does not match a Character, throw an error
-									console.log("ERROR: Invalid character in String");
-									let char = sourceCode.charAt(i)
-									if(char == "\n"){
-										char = "\\n";
-									}
-									errors.push(new Error(TSC.ErrorType.InvalidCharacterInString, char, lineNumber, colNumber));
-									break;
-								}
-							}
-							if(errors.length != 0){
-								break;
-							}
-							// Add on final quote to tokens
-							tokens.push(new Token(TSC.TokenType.TQuote, '"', lineNumber, colNumber));
+							// Keep track of the index of this quote so we can report an error later if there is on
+							startQuoteCol = colNumber;
+							startQuoteLine = lineNumber;
 						}
 					}
 
@@ -355,14 +357,22 @@ module TSC
 					colNumber++;
 				}	
 
-				// If we've reached the end of the source code, but no end comment has been found, throw an error
-				if(inComment){
-					errors.push(new Error(TSC.ErrorType.MissingCommentEnd, "*/", lineNumber, colNumber));
-				}
+				// If no errors were thrown during lex, check for more errors and warnings
+				if(errors.length == 0){
+					// If we've reached the end of the source code, but no end comment has been found, throw an error
+					if(inComment){
+						errors.push(new Error(TSC.ErrorType.MissingCommentEnd, "*/", lineNumber, colNumber));
+					}
 
-				// If we've reached the end of the source and no EOP was detected, along with no errors, throw a warning
-				if(!foundEOP && errors.length == 0){
-					warnings.push(new Warning(TSC.WarningType.MissingEOP, "$", lineNumber, colNumber));
+					// If we've reached the end of the source code, but no end quote has been found, throw an error
+					else if(foundQuote){
+						errors.push(new Error(TSC.ErrorType.MissingStringEndQuote, "\"", startQuoteLine, startQuoteCol));
+					}
+
+					// If we've reached the end of the source and no EOP was detected, along with no errors, throw a warning
+					else if(!foundEOP && errors.length == 0){
+						warnings.push(new Warning(TSC.WarningType.MissingEOP, "$", lineNumber, colNumber));
+					}
 				}
 
 				console.log(tokens);

@@ -230,6 +230,9 @@
 				else if(lexAnalysis.errors[i].type == TSC.ErrorType.InvalidCharacterInString){
 					putMessage("LEXER -> | ERROR: Invalid character in String [ " + lexAnalysis.errors[i].value + " ] on line " + lexAnalysis.errors[i].lineNumber + " col " + lexAnalysis.errors[i].colNumber);
 				}
+				else if(lexAnalysis.errors[i].type == TSC.ErrorType.MissingStringEndQuote){
+					putMessage("LEXER -> | ERROR: Missing ending quote for String literal starting on line  " + lexAnalysis.errors[i].lineNumber + " col " + lexAnalysis.errors[i].colNumber);
+				}
 			}
 			// Display toasts for warnings and errors
 			if(lexAnalysis.warnings.length > 0){
