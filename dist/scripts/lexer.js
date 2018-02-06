@@ -1,4 +1,8 @@
-/* lexer.ts  */
+/**
+ * This is the lexer, which performs lexical analysis on a source code
+ * input with lex(), which returns an object which contains tokens,
+ * errors, and warnings generated during lexing.
+ */
 var TSC;
 (function (TSC) {
     var Lexer = /** @class */ (function () {

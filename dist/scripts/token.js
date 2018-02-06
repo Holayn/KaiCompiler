@@ -1,3 +1,8 @@
+/**
+ * This is the Token class and TokenType enumeration, which represents
+ * the Token object that is used to store information about the tokens
+ * generated during lexical analysis.
+ */
 var TSC;
 (function (TSC) {
     var TokenType;

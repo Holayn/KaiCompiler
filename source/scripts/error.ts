@@ -1,3 +1,7 @@
+/**
+ * This is the Error class and the ErrorType enumeration, used to
+ * hold information about an error.
+ */
 module TSC {
     export enum ErrorType {
         InvalidToken = "InvalidToken",

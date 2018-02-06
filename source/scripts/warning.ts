@@ -1,3 +1,8 @@
+/**
+ * Class and Enumeration for Warning that holds information
+ * about different types of warnings that may be generated when
+ * compiling source code.
+ */
 module TSC {
     export enum WarningType {
         MissingEOP = "MissingEOP"
