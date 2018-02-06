@@ -327,7 +327,7 @@ module TSC
 								errors.push(new Error(TSC.ErrorType.MissingCommentEnd, "*/", lineNumber, colNumber-("*/".length-1)));
 							}
 							else{
-								errors.push(new Error(TSC.ErrorType.InvalidToken, sourceCode.charAt(endLexemePtr), lineNumber, colNumber));
+								errors.push(new Error(TSC.ErrorType.InvalidToken, sourceCode.charAt(endLexemePtr-1), lineNumber, colNumber));
 							}
 							break;
 						}

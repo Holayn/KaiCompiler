@@ -273,7 +273,7 @@ var TSC;
                                 errors.push(new TSC.Error(TSC.ErrorType.MissingCommentEnd, "*/", lineNumber, colNumber - ("*/".length - 1)));
                             }
                             else {
-                                errors.push(new TSC.Error(TSC.ErrorType.InvalidToken, sourceCode.charAt(endLexemePtr), lineNumber, colNumber));
+                                errors.push(new TSC.Error(TSC.ErrorType.InvalidToken, sourceCode.charAt(endLexemePtr - 1), lineNumber, colNumber));
                             }
                             break;
                         }
