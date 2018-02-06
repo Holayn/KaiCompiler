@@ -75,7 +75,7 @@ var TSC;
                 // RegExp for BoolOp Equals
                 var rBOOLOPEQUALS = new RegExp('\=\=$');
                 // RegExp for BoolOp NotEquals
-                var rBOOLOPNOTEQUALS = new RegExp('\\!=$');
+                var rBOOLOPNOTEQUALS = new RegExp('\\!\=$');
                 // RegExp for Comment Start
                 var rCOMMENTSTART = new RegExp('/\\*$');
                 // RegExp for Comment End
@@ -245,10 +245,18 @@ var TSC;
                         tokens_1.push(token);
                     }
                     else if (rBOOLOPEQUALS.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
-                        var token = new TSC.Token(TSC.TokenType.TBoolop, "==", lineNumber, colNumber - ("==".length - 1));
                         // We have to remove the assign that has been identified and added to the tokens array
-                        tokens_1.pop();
-                        tokens_1.push(token);
+                        // If say the previous token was !=, then we don't actually place this Boolop. Instead, 
+                        // we place an Assign, as !== -> != and =.
+                        if (tokens_1[tokens_1.length - 1].type == TSC.TokenType.TAssign) {
+                            var token = new TSC.Token(TSC.TokenType.TBoolop, "==", lineNumber, colNumber);
+                            tokens_1.pop();
+                            tokens_1.push(token);
+                        }
+                        else {
+                            var token = new TSC.Token(TSC.TokenType.TAssign, sourceCode.charAt(endLexemePtr - 1), lineNumber, colNumber);
+                            tokens_1.push(token);
+                        }
                     }
                     else if (rASSIGN.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
                         var token = new TSC.Token(TSC.TokenType.TAssign, sourceCode.charAt(endLexemePtr - 1), lineNumber, colNumber);
@@ -283,14 +291,16 @@ var TSC;
                                 errors.push(new TSC.Error(TSC.ErrorType.MissingCommentEnd, "*/", startCommentLine, startCommentCol));
                             }
                             else {
-                                console.log('oop');
                                 errors.push(new TSC.Error(TSC.ErrorType.InvalidToken, sourceCode.charAt(endLexemePtr - 1), lineNumber, colNumber));
                             }
                             break;
                         }
                         // Check to see if the next character creates a match for a Boolean NotEquals
                         endLexemePtr++;
+                        console.log(endLexemePtr + "yo");
+                        console.log(sourceCode.substring(startLexemePtr, endLexemePtr) + "substr");
                         if (rBOOLOPNOTEQUALS.test(sourceCode.substring(startLexemePtr, endLexemePtr))) {
+                            console.log("EYYY");
                             var token = new TSC.Token(TSC.TokenType.TBoolop, "!=", lineNumber, colNumber);
                             // "!" is not a valid character by itself, so the lexer would throw an error when it reaches !, 
                             // as if doesn't know that it is followed by an = yet. Perhaps we can fix this by

@@ -77,7 +77,7 @@ module TSC
 				// RegExp for BoolOp Equals
 				let rBOOLOPEQUALS = new RegExp('\=\=$');
 				// RegExp for BoolOp NotEquals
-				let rBOOLOPNOTEQUALS = new RegExp('\\!=$');
+				let rBOOLOPNOTEQUALS = new RegExp('\\!\=$');
 				// RegExp for Comment Start
 				let rCOMMENTSTART = new RegExp('/\\*$');
 				// RegExp for Comment End
@@ -288,10 +288,18 @@ module TSC
 
 					// Test for Boolean Equals
 					else if(rBOOLOPEQUALS.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
-						var token: Token = new Token(TSC.TokenType.TBoolop, "==", lineNumber, colNumber-("==".length-1));
 						// We have to remove the assign that has been identified and added to the tokens array
-						tokens.pop();
-						tokens.push(token);
+						// If say the previous token was !=, then we don't actually place this Boolop. Instead, 
+						// we place an Assign, as !== -> != and =.
+						if(tokens[tokens.length - 1].type == TokenType.TAssign){
+							var token: Token = new Token(TSC.TokenType.TBoolop, "==", lineNumber, colNumber);
+							tokens.pop();
+							tokens.push(token);
+						}
+						else{
+							var token: Token = new Token(TSC.TokenType.TAssign, sourceCode.charAt(endLexemePtr-1), lineNumber, colNumber);
+							tokens.push(token);
+						}
 					}
 
 					// Test for Assign
@@ -338,14 +346,16 @@ module TSC
 								errors.push(new Error(TSC.ErrorType.MissingCommentEnd, "*/", startCommentLine, startCommentCol));
 							}
 							else{
-								console.log('oop')
 								errors.push(new Error(TSC.ErrorType.InvalidToken, sourceCode.charAt(endLexemePtr-1), lineNumber, colNumber));
 							}
 							break;
 						}
 						// Check to see if the next character creates a match for a Boolean NotEquals
 						endLexemePtr++;
+						console.log(endLexemePtr + "yo");
+						console.log(sourceCode.substring(startLexemePtr, endLexemePtr) + "substr");
 						if(rBOOLOPNOTEQUALS.test(sourceCode.substring(startLexemePtr, endLexemePtr))){
+							console.log("EYYY");
 							var token: Token = new Token(TSC.TokenType.TBoolop, "!=", lineNumber, colNumber);
 							// "!" is not a valid character by itself, so the lexer would throw an error when it reaches !, 
 							// as if doesn't know that it is followed by an = yet. Perhaps we can fix this by
