@@ -10,23 +10,43 @@ var TSC;
     var Parser = /** @class */ (function () {
         function Parser() {
         }
+        Parser.prototype.init = function (tokens) {
+            this.tokenList = tokens;
+            // Set current token to the first token in the list
+            this.currentToken = 0;
+        };
         // ---------------------------- NON-TERMINALS -------------------------------- //
+        // Due to the brilliance of JavaScript's short-circuit evaluation, our
+        // lives are made way easier. i.e. false && (anything) is false, JS
+        // will not eval anything after the first expression if it is false. Bless
         Parser.prototype.parse = function (tokens) {
             console.log(tokens);
-            this.parseProgram();
+            this.init(tokens);
+            if (this.parseProgram()) {
+                // do something
+            }
         };
         Parser.prototype.parseProgram = function () {
-            this.parseBlock();
-            this.matchEOP();
+            if (this.parseBlock() && this.matchEOP) {
+                return true;
+            }
+            return false;
         };
         Parser.prototype.parseBlock = function () {
-            this.matchLBracket();
-            this.parseStatementList();
-            this.matchRBracket();
+            if (this.matchLbrace() && this.parseStatementList() && this.matchRbrace()) {
+                return true;
+            }
+            return false;
         };
         Parser.prototype.parseStatementList = function () {
-            this.parseStatement();
-            this.parseStatementList();
+            if (this.parseStatement() && this.parseStatementList()) {
+                console.log("jesus christ it's jesus christ");
+                return true;
+            }
+            else {
+                console.log("jesus christ it's jason bourne");
+                return true;
+            }
         };
         Parser.prototype.parseStatement = function () {
             this.parsePrintStatement();
@@ -55,25 +75,41 @@ var TSC;
         Parser.prototype.parseCharList = function () {
         };
         // ---------------------------- TERMINALS -------------------------------- //
+        // if next token we're looking at match to a terminal symbol, advance the current token
+        // if error, break out of parse
         Parser.prototype.matchEOP = function () {
         };
-        Parser.prototype.matchLBracket = function () {
+        Parser.prototype.matchLbrace = function () {
+            if (this.tokenList[this.currentToken].type == TSC.TokenType.TLbrace) {
+                this.currentToken++;
+                return true;
+            }
+            else {
+                return false;
+            }
         };
-        Parser.prototype.matchRBracked = function () {
+        Parser.prototype.matchRbrace = function () {
+            if (this.tokenList[this.currentToken].type == TSC.TokenType.TRbrace) {
+                this.currentToken++;
+                return true;
+            }
+            else {
+                return false;
+            }
         };
         Parser.prototype.matchPrint = function () {
         };
-        Parser.prototype.matchLParen = function () {
+        Parser.prototype.matchLparen = function () {
         };
-        Parser.prototype.matchRParen = function () {
+        Parser.prototype.matchRparen = function () {
+        };
+        Parser.prototype.matchAssign = function () {
         };
         Parser.prototype.matchWhile = function () {
         };
         Parser.prototype.matchIf = function () {
         };
-        Parser.prototype.matchLQuote = function () {
-        };
-        Parser.prototype.matchRQuote = function () {
+        Parser.prototype.matchQuote = function () {
         };
         Parser.prototype.matchType = function () {
         };
@@ -83,11 +119,11 @@ var TSC;
         };
         Parser.prototype.matchDigit = function () {
         };
-        Parser.prototype.matchBoolOp = function () {
+        Parser.prototype.matchBoolop = function () {
         };
-        Parser.prototype.matchBoolVal = function () {
+        Parser.prototype.matchBoolval = function () {
         };
-        Parser.prototype.matchIntOp = function () {
+        Parser.prototype.matchIntop = function () {
         };
         return Parser;
     }());

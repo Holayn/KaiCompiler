@@ -8,29 +8,55 @@
 
 module TSC {
     export class Parser {
+
+        currentToken: number; // the index of the current token we're looking at
+        tokenList;
+
         constructor() {}
 
+        public init(tokens) {
+            this.tokenList = tokens;
+            // Set current token to the first token in the list
+            this.currentToken = 0;
+        }
+
         // ---------------------------- NON-TERMINALS -------------------------------- //
+        // Due to the brilliance of JavaScript's short-circuit evaluation, our
+        // lives are made way easier. i.e. false && (anything) is false, JS
+        // will not eval anything after the first expression if it is false. Bless
         
         public parse(tokens) {
             console.log(tokens);
-            this.parseProgram();
+            this.init(tokens);
+            if(this.parseProgram()){
+                // do something
+            }
         }
 
-        public parseProgram() {
-            this.parseBlock();
-            this.matchEOP();
+        public parseProgram(): boolean {
+            if(this.parseBlock() && this.matchEOP){
+                return true;
+            }
+            return false;
         }
 
-        public parseBlock() {
-            this.matchLBracket();
-            this.parseStatementList();
-            this.matchRBracket();
+        public parseBlock(): boolean {
+            if(this.matchLbrace() && this.parseStatementList() && this.matchRbrace()){
+                return true;
+            }
+            return false;
         }
 
         public parseStatementList() {
-            this.parseStatement();
-            this.parseStatementList();
+            if(this.parseStatement() && this.parseStatementList()){
+                console.log("jesus christ it's jesus christ");
+                return true;
+            }
+            // epsilon... return to parseBlock
+            else{
+                console.log("jesus christ it's jason bourne");
+                return true;
+            }
         }
 
         public parseStatement() {
@@ -85,28 +111,46 @@ module TSC {
 
 
         // ---------------------------- TERMINALS -------------------------------- //
+        // if next token we're looking at match to a terminal symbol, advance the current token
+        // if error, break out of parse
 
         public matchEOP() {
 
         }
 
-        public matchLBracket() {
-
+        public matchLbrace(): boolean {
+            if(this.tokenList[this.currentToken].type == TokenType.TLbrace){
+                this.currentToken++;
+                return true;
+            }
+            else{
+                return false;
+            }
         }
 
-        public matchRBracked() {
-
+        public matchRbrace() {
+            if(this.tokenList[this.currentToken].type == TokenType.TRbrace){
+                this.currentToken++;
+                return true;
+            }
+            else{
+                return false;
+            }
         }
 
         public matchPrint() {
 
         }
 
-        public matchLParen() {
+        public matchLparen() {
 
         }
 
-        public matchRParen() {
+        public matchRparen() {
+
+        }
+
+        public matchAssign() {
 
         }
 
@@ -118,11 +162,7 @@ module TSC {
 
         }
 
-        public matchLQuote() {
-
-        }
-
-        public matchRQuote() {
+        public matchQuote() {
 
         }
 
@@ -142,15 +182,15 @@ module TSC {
 
         }
 
-        public matchBoolOp() {
+        public matchBoolop() {
 
         }
 
-        public matchBoolVal() {
+        public matchBoolval() {
 
         }
 
-        public matchIntOp() {
+        public matchIntop() {
 
         }
 
