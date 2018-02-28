@@ -49,10 +49,14 @@ var TSC;
             }
         };
         Parser.prototype.parseStatement = function () {
-            this.parsePrintStatement();
-            this.parseAssignmentStatement();
+            if (this.parsePrintStatement()) {
+                return true;
+            }
         };
         Parser.prototype.parsePrintStatement = function () {
+            if (this.matchPrint() && this.matchLparen() && this.parseExpr() && this.matchRparen()) {
+                return true;
+            }
         };
         Parser.prototype.parseAssignmentStatement = function () {
         };
@@ -63,6 +67,9 @@ var TSC;
         Parser.prototype.parseIfStatement = function () {
         };
         Parser.prototype.parseExpr = function () {
+            if (this.matchPrint()) {
+                return true;
+            }
         };
         Parser.prototype.parseIntExpr = function () {
         };
@@ -98,10 +105,31 @@ var TSC;
             }
         };
         Parser.prototype.matchPrint = function () {
+            if (this.tokenList[this.currentToken].type == TSC.TokenType.TPrint) {
+                this.currentToken++;
+                return true;
+            }
+            else {
+                return false;
+            }
         };
         Parser.prototype.matchLparen = function () {
+            if (this.tokenList[this.currentToken].type == TSC.TokenType.TLparen) {
+                this.currentToken++;
+                return true;
+            }
+            else {
+                return false;
+            }
         };
         Parser.prototype.matchRparen = function () {
+            if (this.tokenList[this.currentToken].type == TSC.TokenType.TRparen) {
+                this.currentToken++;
+                return true;
+            }
+            else {
+                return false;
+            }
         };
         Parser.prototype.matchAssign = function () {
         };

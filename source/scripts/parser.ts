@@ -60,12 +60,15 @@ module TSC {
         }
 
         public parseStatement() {
-            this.parsePrintStatement();
-            this.parseAssignmentStatement();
+            if(this.parsePrintStatement()){
+                return true;
+            }
         }
 
         public parsePrintStatement() {
-
+            if(this.matchPrint() && this.matchLparen() && this.parseExpr() && this.matchRparen()){
+                return true;
+            }
         }
 
         public parseAssignmentStatement() {
@@ -85,6 +88,9 @@ module TSC {
         }
 
         public parseExpr() {
+            if(this.matchPrint()){
+                return true;
+            }
 
         }
 
@@ -139,15 +145,33 @@ module TSC {
         }
 
         public matchPrint() {
-
+            if(this.tokenList[this.currentToken].type == TokenType.TPrint){
+                this.currentToken++;
+                return true;
+            }
+            else{
+                return false;
+            }
         }
 
         public matchLparen() {
-
+            if(this.tokenList[this.currentToken].type == TokenType.TLparen){
+                this.currentToken++;
+                return true;
+            }
+            else{
+                return false;
+            }
         }
 
         public matchRparen() {
-
+            if(this.tokenList[this.currentToken].type == TokenType.TRparen){
+                this.currentToken++;
+                return true;
+            }
+            else{
+                return false;
+            }
         }
 
         public matchAssign() {
