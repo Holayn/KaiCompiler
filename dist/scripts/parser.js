@@ -85,16 +85,34 @@ var TSC;
             return false;
         };
         Parser.prototype.parseExpr = function () {
-            if (this.matchPrint()) {
+            if (this.parseIntExpr() || this.parseStringExpr() || this.parseBooleanExpr() || this.parseId()) {
                 return true;
             }
             return false;
         };
         Parser.prototype.parseIntExpr = function () {
+            if (this.matchDigit() && this.matchIntop() && this.parseExpr()) {
+                return true;
+            }
+            else if (this.matchDigit()) {
+                return true;
+            }
+            return false;
         };
         Parser.prototype.parseStringExpr = function () {
+            if (this.matchQuote() && this.parseCharList() && this.matchQuote()) {
+                return true;
+            }
+            return false;
         };
         Parser.prototype.parseBooleanExpr = function () {
+            if (this.matchLparen() && this.parseExpr() && this.matchBoolop() && this.parseExpr() && this.matchRparen()) {
+                return true;
+            }
+            else if (this.matchBoolval()) {
+                return true;
+            }
+            return false;
         };
         Parser.prototype.parseId = function () {
         };

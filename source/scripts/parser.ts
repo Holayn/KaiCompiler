@@ -102,22 +102,37 @@ module TSC {
         }
 
         public parseExpr() {
-            if(this.matchPrint()){
+            if(this.parseIntExpr() || this.parseStringExpr() || this.parseBooleanExpr() || this.parseId()){
                 return true;
             }
             return false;
         }
 
         public parseIntExpr() {
-
+            if(this.matchDigit() && this.matchIntop() && this.parseExpr()){
+                return true;
+            }
+            else if(this.matchDigit()){
+                return true;
+            }
+            return false;
         }
 
         public parseStringExpr() {
-
+            if(this.matchQuote() && this.parseCharList() && this.matchQuote()){
+                return true;
+            }
+            return false;
         }
 
         public parseBooleanExpr() {
-
+            if(this.matchLparen() && this.parseExpr() && this.matchBoolop() && this.parseExpr() && this.matchRparen()){
+                return true;
+            }
+            else if(this.matchBoolval()){
+                return true;
+            }
+            return false;
         }
 
         public parseId() {
