@@ -49,27 +49,46 @@ var TSC;
             }
         };
         Parser.prototype.parseStatement = function () {
-            if (this.parsePrintStatement()) {
+            if (this.parsePrintStatement() || this.parseAssignmentStatement() || this.parseVarDecl() || this.parseWhileStatement() || this.parseIfStatement() || this.parseBlock()) {
                 return true;
             }
+            return false;
         };
         Parser.prototype.parsePrintStatement = function () {
             if (this.matchPrint() && this.matchLparen() && this.parseExpr() && this.matchRparen()) {
                 return true;
             }
+            return false;
         };
         Parser.prototype.parseAssignmentStatement = function () {
+            if (this.parseId() && this.matchAssign() && this.parseExpr()) {
+                return true;
+            }
+            return false;
         };
         Parser.prototype.parseVarDecl = function () {
+            if (this.matchType() && this.parseId()) {
+                return true;
+            }
+            return false;
         };
         Parser.prototype.parseWhileStatement = function () {
+            if (this.matchWhile() && this.parseBooleanExpr() && this.parseBlock()) {
+                return true;
+            }
+            return false;
         };
         Parser.prototype.parseIfStatement = function () {
+            if (this.matchIf() && this.parseBooleanExpr() && this.parseBlock()) {
+                return true;
+            }
+            return false;
         };
         Parser.prototype.parseExpr = function () {
             if (this.matchPrint()) {
                 return true;
             }
+            return false;
         };
         Parser.prototype.parseIntExpr = function () {
         };

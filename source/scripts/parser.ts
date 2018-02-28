@@ -60,38 +60,52 @@ module TSC {
         }
 
         public parseStatement() {
-            if(this.parsePrintStatement()){
+            if(this.parsePrintStatement() || this.parseAssignmentStatement() || this.parseVarDecl() || this.parseWhileStatement() || this.parseIfStatement() || this.parseBlock()){
                 return true;
             }
+            return false;
         }
 
         public parsePrintStatement() {
             if(this.matchPrint() && this.matchLparen() && this.parseExpr() && this.matchRparen()){
                 return true;
             }
+            return false;
         }
 
         public parseAssignmentStatement() {
-
+            if(this.parseId() && this.matchAssign() && this.parseExpr()){
+                return true;
+            }
+            return false;
         }
 
         public parseVarDecl() {
-
+            if(this.matchType() && this.parseId()){
+                return true;
+            }
+            return false;
         }
 
         public parseWhileStatement() {
-
+            if(this.matchWhile() && this.parseBooleanExpr() && this.parseBlock()){
+                return true;
+            }
+            return false;
         }
 
         public parseIfStatement() {
-
+            if(this.matchIf() && this.parseBooleanExpr() && this.parseBlock()){
+                return true;
+            }
+            return false;
         }
 
         public parseExpr() {
             if(this.matchPrint()){
                 return true;
             }
-
+            return false;
         }
 
         public parseIntExpr() {
