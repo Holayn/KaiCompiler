@@ -23,13 +23,19 @@ module TSC {
         // ---------------------------- NON-TERMINALS -------------------------------- //
         // Due to the brilliance of JavaScript's short-circuit evaluation, our
         // lives are made way easier. i.e. false && (anything) is false, JS
-        // will not eval anything after the first expression if it is false. Bless
+        // will not eval anything after the first expression if it is false. Praise!
+        // Top-down recursive descent left->right leftmost derivation parser.
+        // I think the logic of the code is self-documenting if one refers to 
+        // the grammar of the language.
         
         public parse(tokens) {
             console.log(tokens);
             this.init(tokens);
             if(this.parseProgram()){
-                // do something
+                console.log("PARSER: success!");
+            }
+            else{
+                console.log("PARSER: error");
             }
         }
 
@@ -49,102 +55,129 @@ module TSC {
 
         public parseStatementList() {
             if(this.parseStatement() && this.parseStatementList()){
-                console.log("jesus christ it's jesus christ");
                 return true;
             }
             // epsilon... return to parseBlock
             else{
-                console.log("jesus christ it's jason bourne");
                 return true;
             }
         }
 
         public parseStatement() {
+            console.log("PARSER: parsing a statement");
             if(this.parsePrintStatement() || this.parseAssignmentStatement() || this.parseVarDecl() || this.parseWhileStatement() || this.parseIfStatement() || this.parseBlock()){
+                console.log("PARSER: statement found");
                 return true;
             }
             return false;
         }
 
         public parsePrintStatement() {
+            console.log("PARSER: parsing a print");
             if(this.matchToken(TokenType.TPrint) && this.matchToken(TokenType.TLparen) && this.parseExpr() && this.matchToken(TokenType.TRparen)){
+                console.log("PARSER: print found");
                 return true;
             }
             return false;
         }
 
         public parseAssignmentStatement() {
+            console.log("PARSER: parsing a assignmentstatement");
             if(this.parseId() && this.matchToken(TokenType.TAssign) && this.parseExpr()){
+                console.log("PARSER: assignmentstatement found");
                 return true;
             }
             return false;
         }
 
         public parseVarDecl() {
+            console.log("PARSER: parsing a vardecl");
             if(this.matchToken(TokenType.TType) && this.parseId()){
+                console.log("PARSER: vardecl found");
                 return true;
             }
             return false;
         }
 
         public parseWhileStatement() {
+            console.log("PARSER: parsing a whilestatement");
             if(this.matchToken(TokenType.TWhile) && this.parseBooleanExpr() && this.parseBlock()){
+                console.log("PARSER: whilestatement found");
                 return true;
             }
             return false;
         }
 
         public parseIfStatement() {
+            console.log("PARSER: parsing an ifstatement");
             if(this.matchToken(TokenType.TIf) && this.parseBooleanExpr() && this.parseBlock()){
+                console.log("PARSER: ifstatement found");
                 return true;
             }
             return false;
         }
 
         public parseExpr() {
+            console.log("PARSER: parsing an expr");
             if(this.parseIntExpr() || this.parseStringExpr() || this.parseBooleanExpr() || this.parseId()){
+                console.log("PARSER: expr found");
                 return true;
             }
             return false;
         }
 
         public parseIntExpr() {
-            if(this.matchToken(TokenType.TDigit) && this.matchToken(TokenType.TIntop) && this.parseExpr()){
-                return true;
-            }
-            else if(this.matchToken(TokenType.TDigit)){
-                return true;
+            console.log("PARSER: parsing an intexpr");
+            // in case after a digit an intop is not found, we accept the digit
+            if(this.matchToken(TokenType.TDigit)){
+                if(this.matchToken(TokenType.TIntop) && this.parseExpr()){
+                    console.log("PARSER: intexpr (digit op expr) found");
+                    return true;
+                }
+                else{
+                    console.log("PARSER: intexpr (digit) found");
+                    return true;
+                }
             }
             return false;
         }
 
         public parseStringExpr() {
+            console.log("PARSER: parsing a stringexpr");
             if(this.matchToken(TokenType.TQuote) && this.parseCharList() && this.matchToken(TokenType.TQuote)){
+                console.log("PARSER: stringexpr found");
                 return true;
             }
             return false;
         }
 
         public parseBooleanExpr() {
+            console.log("PARSER: parsing a booleanexpr");
             if(this.matchToken(TokenType.TLparen) && this.parseExpr() && this.matchToken(TokenType.TBoolop) && this.parseExpr() && this.matchToken(TokenType.TRparen)){
+                console.log("PARSER: booleanexpr found");
                 return true;
             }
             else if(this.matchToken(TokenType.TBoolval)){
+                console.log("PARSER: booleanexpr found");
                 return true;
             }
             return false;
         }
 
         public parseId() {
-            if(this.matchToken(TokenType.TChar)){
+            console.log("PARSER: parsing an id");
+            if(this.matchToken(TokenType.TId)){
+                console.log("PARSER: id found");
                 return true;
             }
             return false;
         }
 
         public parseCharList() {
+            console.log("PARSER: parsing a charlist");
             // spaces are treated as chars for me
             if(this.matchToken(TokenType.TChar) && this.parseCharList()){
+                console.log("PARSER: charlist found");
                 return true;
             }
             else{
@@ -160,8 +193,11 @@ module TSC {
         // if error, break out of parse
 
         // Screw duplicated code
+        // Matches to passed token type
         public matchToken(token: TokenType) {
+            console.log("PARSER: matching to token: " + token);
             if(this.tokenList[this.currentToken].type == token){
+                console.log("PARSER: " + token + " found");
                 this.currentToken++;
                 return true;
             }
