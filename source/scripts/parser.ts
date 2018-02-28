@@ -8,6 +8,151 @@
 
 module TSC {
     export class Parser {
+        constructor() {}
+
+        // ---------------------------- NON-TERMINALS -------------------------------- //
+        
+        public parse(tokens) {
+            console.log(tokens);
+            this.parseProgram();
+        }
+
+        public parseProgram() {
+            this.parseBlock();
+            this.matchEOP();
+        }
+
+        public parseBlock() {
+            this.matchLBracket();
+            this.parseStatementList();
+            this.matchRBracket();
+        }
+
+        public parseStatementList() {
+            this.parseStatement();
+            this.parseStatementList();
+        }
+
+        public parseStatement() {
+            this.parsePrintStatement();
+            this.parseAssignmentStatement();
+        }
+
+        public parsePrintStatement() {
+
+        }
+
+        public parseAssignmentStatement() {
+
+        }
+
+        public parseVarDecl() {
+
+        }
+
+        public parseWhileStatement() {
+
+        }
+
+        public parseIfStatement() {
+
+        }
+
+        public parseExpr() {
+
+        }
+
+        public parseIntExpr() {
+
+        }
+
+        public parseStringExpr() {
+
+        }
+
+        public parseBooleanExpr() {
+
+        }
+
+        public parseId() {
+
+        }
+
+        public parseCharList() {
+
+        }
+
+
+
+        // ---------------------------- TERMINALS -------------------------------- //
+
+        public matchEOP() {
+
+        }
+
+        public matchLBracket() {
+
+        }
+
+        public matchRBracked() {
+
+        }
+
+        public matchPrint() {
+
+        }
+
+        public matchLParen() {
+
+        }
+
+        public matchRParen() {
+
+        }
+
+        public matchWhile() {
+
+        }
+
+        public matchIf() {
+
+        }
+
+        public matchLQuote() {
+
+        }
+
+        public matchRQuote() {
+
+        }
+
+        public matchType() {
+
+        }
+
+        public matchChar() {
+
+        }
+
+        public matchSpace() {
+
+        }
+        
+        public matchDigit() {
+
+        }
+
+        public matchBoolOp() {
+
+        }
+
+        public matchBoolVal() {
+
+        }
+
+        public matchIntOp() {
+
+        }
 
     }
 }

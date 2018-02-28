@@ -125,7 +125,7 @@ var TSC;
                     // If the lexer is currently in a String literal, only test for Characters.
                     // If we reach another quote, we have reached the end of the String literal.
                     if (foundQuote) {
-                        console.log("HELP" + sourceCode.charAt(endLexemePtr - 1));
+                        // console.log("HELP" + sourceCode.charAt(endLexemePtr-1));
                         if (rCHAR.test(sourceCode.charAt(endLexemePtr - 1))) {
                             var token = new TSC.Token(TSC.TokenType.TChar, sourceCode.charAt(endLexemePtr - 1), lineNumber, colNumber);
                             tokens_1.push(token);
