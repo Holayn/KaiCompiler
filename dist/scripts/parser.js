@@ -115,8 +115,22 @@ var TSC;
             return false;
         };
         Parser.prototype.parseId = function () {
+            if (this.matchChar()) {
+                return true;
+            }
+            return false;
         };
         Parser.prototype.parseCharList = function () {
+            if (this.matchChar() && this.parseCharList()) {
+                return true;
+            }
+            else if (this.matchSpace() && this.parseCharList()) {
+                return true;
+            }
+            else {
+                // epsilon
+                return true;
+            }
         };
         // ---------------------------- TERMINALS -------------------------------- //
         // if next token we're looking at match to a terminal symbol, advance the current token

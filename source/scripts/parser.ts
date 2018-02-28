@@ -136,11 +136,23 @@ module TSC {
         }
 
         public parseId() {
-
+            if(this.matchChar()){
+                return true;
+            }
+            return false;
         }
 
         public parseCharList() {
-
+            if(this.matchChar() && this.parseCharList()){
+                return true;
+            }
+            else if(this.matchSpace() && this.parseCharList()){
+                return true;
+            }
+            else{
+                // epsilon
+                return true;
+            }
         }
 
 
@@ -150,7 +162,6 @@ module TSC {
         // if error, break out of parse
 
         public matchEOP() {
-
         }
 
         public matchLbrace(): boolean {
