@@ -27,13 +27,13 @@ var TSC;
             }
         };
         Parser.prototype.parseProgram = function () {
-            if (this.parseBlock() && this.matchEOP) {
+            if (this.parseBlock() && this.matchToken(TSC.TokenType.TEop)) {
                 return true;
             }
             return false;
         };
         Parser.prototype.parseBlock = function () {
-            if (this.matchLbrace() && this.parseStatementList() && this.matchRbrace()) {
+            if (this.matchToken(TSC.TokenType.TLbrace) && this.parseStatementList() && this.matchToken(TSC.TokenType.TRbrace)) {
                 return true;
             }
             return false;
@@ -55,31 +55,31 @@ var TSC;
             return false;
         };
         Parser.prototype.parsePrintStatement = function () {
-            if (this.matchPrint() && this.matchLparen() && this.parseExpr() && this.matchRparen()) {
+            if (this.matchToken(TSC.TokenType.TPrint) && this.matchToken(TSC.TokenType.TLparen) && this.parseExpr() && this.matchToken(TSC.TokenType.TRparen)) {
                 return true;
             }
             return false;
         };
         Parser.prototype.parseAssignmentStatement = function () {
-            if (this.parseId() && this.matchAssign() && this.parseExpr()) {
+            if (this.parseId() && this.matchToken(TSC.TokenType.TAssign) && this.parseExpr()) {
                 return true;
             }
             return false;
         };
         Parser.prototype.parseVarDecl = function () {
-            if (this.matchType() && this.parseId()) {
+            if (this.matchToken(TSC.TokenType.TType) && this.parseId()) {
                 return true;
             }
             return false;
         };
         Parser.prototype.parseWhileStatement = function () {
-            if (this.matchWhile() && this.parseBooleanExpr() && this.parseBlock()) {
+            if (this.matchToken(TSC.TokenType.TWhile) && this.parseBooleanExpr() && this.parseBlock()) {
                 return true;
             }
             return false;
         };
         Parser.prototype.parseIfStatement = function () {
-            if (this.matchIf() && this.parseBooleanExpr() && this.parseBlock()) {
+            if (this.matchToken(TSC.TokenType.TIf) && this.parseBooleanExpr() && this.parseBlock()) {
                 return true;
             }
             return false;
@@ -91,40 +91,38 @@ var TSC;
             return false;
         };
         Parser.prototype.parseIntExpr = function () {
-            if (this.matchDigit() && this.matchIntop() && this.parseExpr()) {
+            if (this.matchToken(TSC.TokenType.TDigit) && this.matchToken(TSC.TokenType.TIntop) && this.parseExpr()) {
                 return true;
             }
-            else if (this.matchDigit()) {
+            else if (this.matchToken(TSC.TokenType.TDigit)) {
                 return true;
             }
             return false;
         };
         Parser.prototype.parseStringExpr = function () {
-            if (this.matchQuote() && this.parseCharList() && this.matchQuote()) {
+            if (this.matchToken(TSC.TokenType.TQuote) && this.parseCharList() && this.matchToken(TSC.TokenType.TQuote)) {
                 return true;
             }
             return false;
         };
         Parser.prototype.parseBooleanExpr = function () {
-            if (this.matchLparen() && this.parseExpr() && this.matchBoolop() && this.parseExpr() && this.matchRparen()) {
+            if (this.matchToken(TSC.TokenType.TLparen) && this.parseExpr() && this.matchToken(TSC.TokenType.TBoolop) && this.parseExpr() && this.matchToken(TSC.TokenType.TRparen)) {
                 return true;
             }
-            else if (this.matchBoolval()) {
+            else if (this.matchToken(TSC.TokenType.TBoolval)) {
                 return true;
             }
             return false;
         };
         Parser.prototype.parseId = function () {
-            if (this.matchChar()) {
+            if (this.matchToken(TSC.TokenType.TChar)) {
                 return true;
             }
             return false;
         };
         Parser.prototype.parseCharList = function () {
-            if (this.matchChar() && this.parseCharList()) {
-                return true;
-            }
-            else if (this.matchSpace() && this.parseCharList()) {
+            // spaces are treated as chars for me
+            if (this.matchToken(TSC.TokenType.TChar) && this.parseCharList()) {
                 return true;
             }
             else {
@@ -135,74 +133,13 @@ var TSC;
         // ---------------------------- TERMINALS -------------------------------- //
         // if next token we're looking at match to a terminal symbol, advance the current token
         // if error, break out of parse
-        Parser.prototype.matchEOP = function () {
-        };
-        Parser.prototype.matchLbrace = function () {
-            if (this.tokenList[this.currentToken].type == TSC.TokenType.TLbrace) {
+        // Screw duplicated code
+        Parser.prototype.matchToken = function (token) {
+            if (this.tokenList[this.currentToken].type == token) {
                 this.currentToken++;
                 return true;
             }
-            else {
-                return false;
-            }
-        };
-        Parser.prototype.matchRbrace = function () {
-            if (this.tokenList[this.currentToken].type == TSC.TokenType.TRbrace) {
-                this.currentToken++;
-                return true;
-            }
-            else {
-                return false;
-            }
-        };
-        Parser.prototype.matchPrint = function () {
-            if (this.tokenList[this.currentToken].type == TSC.TokenType.TPrint) {
-                this.currentToken++;
-                return true;
-            }
-            else {
-                return false;
-            }
-        };
-        Parser.prototype.matchLparen = function () {
-            if (this.tokenList[this.currentToken].type == TSC.TokenType.TLparen) {
-                this.currentToken++;
-                return true;
-            }
-            else {
-                return false;
-            }
-        };
-        Parser.prototype.matchRparen = function () {
-            if (this.tokenList[this.currentToken].type == TSC.TokenType.TRparen) {
-                this.currentToken++;
-                return true;
-            }
-            else {
-                return false;
-            }
-        };
-        Parser.prototype.matchAssign = function () {
-        };
-        Parser.prototype.matchWhile = function () {
-        };
-        Parser.prototype.matchIf = function () {
-        };
-        Parser.prototype.matchQuote = function () {
-        };
-        Parser.prototype.matchType = function () {
-        };
-        Parser.prototype.matchChar = function () {
-        };
-        Parser.prototype.matchSpace = function () {
-        };
-        Parser.prototype.matchDigit = function () {
-        };
-        Parser.prototype.matchBoolop = function () {
-        };
-        Parser.prototype.matchBoolval = function () {
-        };
-        Parser.prototype.matchIntop = function () {
+            return false;
         };
         return Parser;
     }());

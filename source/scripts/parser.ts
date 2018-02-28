@@ -34,14 +34,14 @@ module TSC {
         }
 
         public parseProgram(): boolean {
-            if(this.parseBlock() && this.matchEOP){
+            if(this.parseBlock() && this.matchToken(TokenType.TEop)){
                 return true;
             }
             return false;
         }
 
         public parseBlock(): boolean {
-            if(this.matchLbrace() && this.parseStatementList() && this.matchRbrace()){
+            if(this.matchToken(TokenType.TLbrace) && this.parseStatementList() && this.matchToken(TokenType.TRbrace)){
                 return true;
             }
             return false;
@@ -67,35 +67,35 @@ module TSC {
         }
 
         public parsePrintStatement() {
-            if(this.matchPrint() && this.matchLparen() && this.parseExpr() && this.matchRparen()){
+            if(this.matchToken(TokenType.TPrint) && this.matchToken(TokenType.TLparen) && this.parseExpr() && this.matchToken(TokenType.TRparen)){
                 return true;
             }
             return false;
         }
 
         public parseAssignmentStatement() {
-            if(this.parseId() && this.matchAssign() && this.parseExpr()){
+            if(this.parseId() && this.matchToken(TokenType.TAssign) && this.parseExpr()){
                 return true;
             }
             return false;
         }
 
         public parseVarDecl() {
-            if(this.matchType() && this.parseId()){
+            if(this.matchToken(TokenType.TType) && this.parseId()){
                 return true;
             }
             return false;
         }
 
         public parseWhileStatement() {
-            if(this.matchWhile() && this.parseBooleanExpr() && this.parseBlock()){
+            if(this.matchToken(TokenType.TWhile) && this.parseBooleanExpr() && this.parseBlock()){
                 return true;
             }
             return false;
         }
 
         public parseIfStatement() {
-            if(this.matchIf() && this.parseBooleanExpr() && this.parseBlock()){
+            if(this.matchToken(TokenType.TIf) && this.parseBooleanExpr() && this.parseBlock()){
                 return true;
             }
             return false;
@@ -109,44 +109,42 @@ module TSC {
         }
 
         public parseIntExpr() {
-            if(this.matchDigit() && this.matchIntop() && this.parseExpr()){
+            if(this.matchToken(TokenType.TDigit) && this.matchToken(TokenType.TIntop) && this.parseExpr()){
                 return true;
             }
-            else if(this.matchDigit()){
+            else if(this.matchToken(TokenType.TDigit)){
                 return true;
             }
             return false;
         }
 
         public parseStringExpr() {
-            if(this.matchQuote() && this.parseCharList() && this.matchQuote()){
+            if(this.matchToken(TokenType.TQuote) && this.parseCharList() && this.matchToken(TokenType.TQuote)){
                 return true;
             }
             return false;
         }
 
         public parseBooleanExpr() {
-            if(this.matchLparen() && this.parseExpr() && this.matchBoolop() && this.parseExpr() && this.matchRparen()){
+            if(this.matchToken(TokenType.TLparen) && this.parseExpr() && this.matchToken(TokenType.TBoolop) && this.parseExpr() && this.matchToken(TokenType.TRparen)){
                 return true;
             }
-            else if(this.matchBoolval()){
+            else if(this.matchToken(TokenType.TBoolval)){
                 return true;
             }
             return false;
         }
 
         public parseId() {
-            if(this.matchChar()){
+            if(this.matchToken(TokenType.TChar)){
                 return true;
             }
             return false;
         }
 
         public parseCharList() {
-            if(this.matchChar() && this.parseCharList()){
-                return true;
-            }
-            else if(this.matchSpace() && this.parseCharList()){
+            // spaces are treated as chars for me
+            if(this.matchToken(TokenType.TChar) && this.parseCharList()){
                 return true;
             }
             else{
@@ -161,102 +159,13 @@ module TSC {
         // if next token we're looking at match to a terminal symbol, advance the current token
         // if error, break out of parse
 
-        public matchEOP() {
-        }
-
-        public matchLbrace(): boolean {
-            if(this.tokenList[this.currentToken].type == TokenType.TLbrace){
+        // Screw duplicated code
+        public matchToken(token: TokenType) {
+            if(this.tokenList[this.currentToken].type == token){
                 this.currentToken++;
                 return true;
             }
-            else{
-                return false;
-            }
+            return false;
         }
-
-        public matchRbrace() {
-            if(this.tokenList[this.currentToken].type == TokenType.TRbrace){
-                this.currentToken++;
-                return true;
-            }
-            else{
-                return false;
-            }
-        }
-
-        public matchPrint() {
-            if(this.tokenList[this.currentToken].type == TokenType.TPrint){
-                this.currentToken++;
-                return true;
-            }
-            else{
-                return false;
-            }
-        }
-
-        public matchLparen() {
-            if(this.tokenList[this.currentToken].type == TokenType.TLparen){
-                this.currentToken++;
-                return true;
-            }
-            else{
-                return false;
-            }
-        }
-
-        public matchRparen() {
-            if(this.tokenList[this.currentToken].type == TokenType.TRparen){
-                this.currentToken++;
-                return true;
-            }
-            else{
-                return false;
-            }
-        }
-
-        public matchAssign() {
-
-        }
-
-        public matchWhile() {
-
-        }
-
-        public matchIf() {
-
-        }
-
-        public matchQuote() {
-
-        }
-
-        public matchType() {
-
-        }
-
-        public matchChar() {
-
-        }
-
-        public matchSpace() {
-
-        }
-        
-        public matchDigit() {
-
-        }
-
-        public matchBoolop() {
-
-        }
-
-        public matchBoolval() {
-
-        }
-
-        public matchIntop() {
-
-        }
-
     }
 }
