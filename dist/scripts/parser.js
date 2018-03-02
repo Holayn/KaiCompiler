@@ -14,6 +14,8 @@ var TSC;
             this.tokenList = tokens;
             // Set current token to the first token in the list
             this.currentToken = 0;
+            this.log = [];
+            this.error = false;
         };
         // ---------------------------- NON-TERMINALS -------------------------------- //
         // Due to the brilliance of JavaScript's short-circuit evaluation, our
@@ -31,21 +33,36 @@ var TSC;
             else {
                 console.log("PARSER: error");
             }
+            console.log(this.log);
         };
         Parser.prototype.parseProgram = function () {
-            if (this.parseBlock() && this.matchToken(TSC.TokenType.TEop)) {
-                return true;
+            if (this.parseBlock()) {
+                if (this.matchToken(TSC.TokenType.TEop)) {
+                    return true;
+                }
             }
             return false;
         };
         Parser.prototype.parseBlock = function () {
-            if (this.matchToken(TSC.TokenType.TLbrace) && this.parseStatementList() && this.matchToken(TSC.TokenType.TRbrace)) {
-                return true;
+            // if(this.error){
+            //     return false;
+            // }
+            if (this.matchToken(TSC.TokenType.TLbrace)) {
+                this.log.push("VALID - Expecting Block, found Block");
+                this.consumeToken(TSC.TokenType.TLbrace);
+                if (this.parseStatementList()) {
+                    if (this.matchToken(TSC.TokenType.TRbrace)) {
+                        this.consumeToken(TSC.TokenType.TRbrace);
+                        return true;
+                    }
+                }
             }
             return false;
         };
         Parser.prototype.parseStatementList = function () {
+            console.log("DEPREPRPERPER");
             if (this.parseStatement() && this.parseStatementList()) {
+                console.log("hahaDEPREPRPERPER");
                 return true;
             }
             else {
@@ -55,40 +72,69 @@ var TSC;
         Parser.prototype.parseStatement = function () {
             console.log("PARSER: parsing a statement");
             if (this.parsePrintStatement() || this.parseAssignmentStatement() || this.parseVarDecl() || this.parseWhileStatement() || this.parseIfStatement() || this.parseBlock()) {
-                console.log("PARSER: statement found");
                 return true;
             }
             return false;
         };
         Parser.prototype.parsePrintStatement = function () {
             console.log("PARSER: parsing a print");
-            if (this.matchToken(TSC.TokenType.TPrint) && this.matchToken(TSC.TokenType.TLparen) && this.parseExpr() && this.matchToken(TSC.TokenType.TRparen)) {
-                console.log("PARSER: print found");
-                return true;
+            // this is why we need to sep match and consume
+            if (this.matchToken(TSC.TokenType.TPrint)) {
+                console.log("PARSER: printstatement found");
+                this.log.push("VALID - Expecting Statement, found PrintStatement");
+                this.consumeToken(TSC.TokenType.TPrint);
+                if (this.matchToken(TSC.TokenType.TLparen)) {
+                    this.consumeToken(TSC.TokenType.TLparen);
+                    if (this.parseExpr()) {
+                        if (this.matchToken(TSC.TokenType.TRparen)) {
+                            this.consumeToken(TSC.TokenType.TRparen);
+                        }
+                    }
+                    return true;
+                }
             }
             return false;
         };
         Parser.prototype.parseAssignmentStatement = function () {
             console.log("PARSER: parsing a assignmentstatement");
-            if (this.parseId() && this.matchToken(TSC.TokenType.TAssign) && this.parseExpr()) {
-                console.log("PARSER: assignmentstatement found");
-                return true;
+            if (this.matchToken(TSC.TokenType.TId)) {
+                this.log.push("VALID - Expecting Statement, found AssignmentStatement");
+                this.consumeToken(TSC.TokenType.TId);
+                if (this.matchToken(TSC.TokenType.TAssign)) {
+                    this.consumeToken(TSC.TokenType.TAssign);
+                    this.parseExpr();
+                    return true;
+                }
             }
             return false;
         };
         Parser.prototype.parseVarDecl = function () {
             console.log("PARSER: parsing a vardecl");
-            if (this.matchToken(TSC.TokenType.TType) && this.parseId()) {
+            if (this.matchToken(TSC.TokenType.TType)) {
                 console.log("PARSER: vardecl found");
-                return true;
+                this.log.push("VALID - Expecting Statement, found VarDecl");
+                this.consumeToken(TSC.TokenType.TType);
+                if (this.parseId()) {
+                    return true;
+                }
             }
             return false;
         };
         Parser.prototype.parseWhileStatement = function () {
             console.log("PARSER: parsing a whilestatement");
-            if (this.matchToken(TSC.TokenType.TWhile) && this.parseBooleanExpr() && this.parseBlock()) {
+            if (this.matchToken(TSC.TokenType.TWhile)) {
                 console.log("PARSER: whilestatement found");
-                return true;
+                this.log.push("VALID - Expecting Statement, found VarDecl");
+                this.consumeToken(TSC.TokenType.TWhile);
+                if (this.parseBooleanExpr()) {
+                    if (this.parseBlock()) {
+                        return true;
+                    }
+                    else {
+                        this.error = true;
+                        this.log.push("ERROR - Expecting TLbrace, found " + this.tokenList[this.currentToken].type);
+                    }
+                }
             }
             return false;
         };
@@ -102,7 +148,12 @@ var TSC;
         };
         Parser.prototype.parseExpr = function () {
             console.log("PARSER: parsing an expr");
-            if (this.parseIntExpr() || this.parseStringExpr() || this.parseBooleanExpr() || this.parseId()) {
+            // if(this.parseIntExpr() || this.parseStringExpr() || this.parseBooleanExpr() || this.parseId()){
+            if (this.parseBooleanExpr()) {
+                console.log("PARSER: expr found");
+                return true;
+            }
+            if (this.parseIntExpr()) {
                 console.log("PARSER: expr found");
                 return true;
             }
@@ -112,14 +163,16 @@ var TSC;
             console.log("PARSER: parsing an intexpr");
             // in case after a digit an intop is not found, we accept the digit
             if (this.matchToken(TSC.TokenType.TDigit)) {
-                if (this.matchToken(TSC.TokenType.TIntop) && this.parseExpr()) {
-                    console.log("PARSER: intexpr (digit op expr) found");
-                    return true;
-                }
-                else {
-                    console.log("PARSER: intexpr (digit) found");
-                    return true;
-                }
+                this.consumeToken(TSC.TokenType.TDigit);
+                // if(this.matchToken(TokenType.TIntop) && this.parseExpr()){
+                //     console.log("PARSER: intexpr (digit op expr) found");
+                //     return true;
+                // }
+                // else{
+                //     console.log("PARSER: intexpr (digit) found");
+                //     return true;
+                // }
+                return true;
             }
             return false;
         };
@@ -132,12 +185,24 @@ var TSC;
             return false;
         };
         Parser.prototype.parseBooleanExpr = function () {
+            // console.log("PARSER: parsing a booleanexpr");
+            // if(this.matchToken(TokenType.TLparen) && this.parseExpr() && this.matchToken(TokenType.TBoolop) && this.parseExpr() && this.matchToken(TokenType.TRparen)){
+            //     console.log("PARSER: booleanexpr found");
+            //     return true;
+            // }
+            // else if(this.matchToken(TokenType.TBoolval)){
+            //     console.log("PARSER: booleanexpr found");
+            //     return true;
+            // }
+            // return false;
             console.log("PARSER: parsing a booleanexpr");
-            if (this.matchToken(TSC.TokenType.TLparen) && this.parseExpr() && this.matchToken(TSC.TokenType.TBoolop) && this.parseExpr() && this.matchToken(TSC.TokenType.TRparen)) {
-                console.log("PARSER: booleanexpr found");
-                return true;
-            }
-            else if (this.matchToken(TSC.TokenType.TBoolval)) {
+            // if(this.matchToken(TokenType.TLparen) && this.parseExpr() && this.matchToken(TokenType.TBoolop) && this.parseExpr() && this.matchToken(TokenType.TRparen)){
+            //     console.log("PARSER: booleanexpr found");
+            //     return true;
+            // }
+            if (this.matchToken(TSC.TokenType.TBoolval)) {
+                this.log.push("VALID - Expecting Expr, found BooleanExpr");
+                this.consumeToken(TSC.TokenType.TBoolval);
                 console.log("PARSER: booleanexpr found");
                 return true;
             }
@@ -146,6 +211,7 @@ var TSC;
         Parser.prototype.parseId = function () {
             console.log("PARSER: parsing an id");
             if (this.matchToken(TSC.TokenType.TId)) {
+                this.consumeToken(TSC.TokenType.TId);
                 console.log("PARSER: id found");
                 return true;
             }
@@ -166,16 +232,28 @@ var TSC;
         // ---------------------------- TERMINALS -------------------------------- //
         // if next token we're looking at match to a terminal symbol, advance the current token
         // if error, break out of parse
-        // Screw duplicated code
         // Matches to passed token type
         Parser.prototype.matchToken = function (token) {
-            console.log("PARSER: matching to token: " + token);
+            // Check if there has been an error. If so, stop
+            if (this.error) {
+                return false;
+            }
+            console.log("PARSER: testing match of " + this.tokenList[this.currentToken].type + " to token: " + token);
             if (this.tokenList[this.currentToken].type == token) {
-                console.log("PARSER: " + token + " found");
-                this.currentToken++;
+                console.log("PARSER: TOKEN " + token + " found");
                 return true;
             }
+            // maybe don't have invalid here?
+            // this.log.push("INVALID - Expecting " + token + ", found " + this.tokenList[this.currentToken].type);
             return false;
+        };
+        // Consumes a token
+        Parser.prototype.consumeToken = function (token) {
+            if (this.tokenList[this.currentToken].type == token) {
+                console.log("PARSER: CONSUME TOKEN " + token);
+                this.log.push("VALID - Expecting " + token + ", found " + this.tokenList[this.currentToken].type);
+                this.currentToken++;
+            }
         };
         return Parser;
     }());
