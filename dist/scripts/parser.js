@@ -130,10 +130,12 @@ var TSC;
                     if (this.parseBlock()) {
                         return true;
                     }
-                    else {
-                        this.error = true;
-                        this.log.push("ERROR - Expecting TLbrace, found " + this.tokenList[this.currentToken].type);
-                    }
+                    this.error = true;
+                    this.log.push("ERROR - Expecting TLbrace, found " + this.tokenList[this.currentToken].type);
+                }
+                else {
+                    this.error = true;
+                    this.log.push("ERROR - Expecting BooleanExpr, found " + this.tokenList[this.currentToken].type);
                 }
             }
             return false;
@@ -185,22 +187,30 @@ var TSC;
             return false;
         };
         Parser.prototype.parseBooleanExpr = function () {
-            // console.log("PARSER: parsing a booleanexpr");
-            // if(this.matchToken(TokenType.TLparen) && this.parseExpr() && this.matchToken(TokenType.TBoolop) && this.parseExpr() && this.matchToken(TokenType.TRparen)){
-            //     console.log("PARSER: booleanexpr found");
-            //     return true;
-            // }
-            // else if(this.matchToken(TokenType.TBoolval)){
-            //     console.log("PARSER: booleanexpr found");
-            //     return true;
-            // }
-            // return false;
             console.log("PARSER: parsing a booleanexpr");
-            // if(this.matchToken(TokenType.TLparen) && this.parseExpr() && this.matchToken(TokenType.TBoolop) && this.parseExpr() && this.matchToken(TokenType.TRparen)){
-            //     console.log("PARSER: booleanexpr found");
-            //     return true;
-            // }
-            if (this.matchToken(TSC.TokenType.TBoolval)) {
+            if (this.matchToken(TSC.TokenType.TLparen)) {
+                this.log.push("VALID - Expecting Expr, found BooleanExpr");
+                console.log("PARSER: booleanexpr found");
+                this.consumeToken(TSC.TokenType.TBoolval);
+                if (this.parseExpr()) {
+                    if (this.matchToken(TSC.TokenType.TBoolop)) {
+                        this.consumeToken(TSC.TokenType.TBoolval);
+                        if (this.parseExpr()) {
+                            if (this.matchToken(TSC.TokenType.TRparen)) {
+                                return true;
+                            }
+                            else {
+                                this.log.push("ERROR - Expecting TBoolval, found " + this.tokenList[this.currentToken].type);
+                            }
+                        }
+                    }
+                    else {
+                        this.log.push("ERROR - Expecting TBoolop, found " + this.tokenList[this.currentToken].type);
+                        return false;
+                    }
+                }
+            }
+            else if (this.matchToken(TSC.TokenType.TBoolval)) {
                 this.log.push("VALID - Expecting Expr, found BooleanExpr");
                 this.consumeToken(TSC.TokenType.TBoolval);
                 console.log("PARSER: booleanexpr found");
@@ -235,9 +245,9 @@ var TSC;
         // Matches to passed token type
         Parser.prototype.matchToken = function (token) {
             // Check if there has been an error. If so, stop
-            if (this.error) {
-                return false;
-            }
+            // if(this.error){
+            //     return false;
+            // }
             console.log("PARSER: testing match of " + this.tokenList[this.currentToken].type + " to token: " + token);
             if (this.tokenList[this.currentToken].type == token) {
                 console.log("PARSER: TOKEN " + token + " found");
