@@ -7,6 +7,12 @@
  */
 var TSC;
 (function (TSC) {
+    var Production;
+    (function (Production) {
+        Production["Expr"] = "Expr";
+        Production["If"] = "If";
+        Production["While"] = "While";
+    })(Production = TSC.Production || (TSC.Production = {}));
     var Parser = /** @class */ (function () {
         function Parser() {
         }
@@ -82,6 +88,7 @@ var TSC;
             if (this.matchToken(TSC.TokenType.TPrint)) {
                 console.log("PARSER: printstatement found");
                 this.log.push("VALID - Expecting Statement, found PrintStatement");
+                this.log.push("VALID - Expecting Print, found " + this.tokenList[this.currentToken].type);
                 this.consumeToken(TSC.TokenType.TPrint);
                 if (this.matchToken(TSC.TokenType.TLparen)) {
                     this.consumeToken(TSC.TokenType.TLparen);
@@ -126,6 +133,10 @@ var TSC;
                 if (this.parseId()) {
                     return true;
                 }
+                else {
+                    this.error = true;
+                    this.log.push("ERROR - Expecting TId, found " + this.tokenList[this.currentToken].type);
+                }
             }
             return false;
         };
@@ -135,12 +146,12 @@ var TSC;
                 console.log("PARSER: whilestatement found");
                 this.log.push("VALID - Expecting Statement, found VarDecl");
                 this.consumeToken(TSC.TokenType.TWhile);
-                if (this.parseBooleanExpr()) {
+                if (this.parseBooleanExpr(Production.While)) {
                     if (this.parseBlock()) {
                         return true;
                     }
                     this.error = true;
-                    this.log.push("ERROR - Expecting TLbrace, found " + this.tokenList[this.currentToken].type);
+                    this.log.push("ERROR - Expecting Block, found " + this.tokenList[this.currentToken].type);
                 }
                 else {
                     this.error = true;
@@ -151,7 +162,17 @@ var TSC;
         };
         Parser.prototype.parseIfStatement = function () {
             console.log("PARSER: parsing an ifstatement");
-            if (this.matchToken(TSC.TokenType.TIf) && this.parseBooleanExpr() && this.parseBlock()) {
+            if (this.matchToken(TSC.TokenType.TIf)) {
+                this.log.push("VALID - Expecting Statement, found IfStatement");
+                this.consumeToken(TSC.TokenType.TIf);
+                if (this.parseBooleanExpr(Production.If)) {
+                    console.log("adfasd");
+                    return true;
+                    // && this.parseBlock()){
+                }
+                else {
+                    this.log.push("ERROR - Expecting BooleanExpr, found " + this.tokenList[this.currentToken].type);
+                }
                 console.log("PARSER: ifstatement found");
                 return true;
             }
@@ -159,8 +180,7 @@ var TSC;
         };
         Parser.prototype.parseExpr = function () {
             console.log("PARSER: parsing an expr");
-            // if(this.parseIntExpr() || this.parseStringExpr() || this.parseBooleanExpr() || this.parseId()){
-            if (this.parseBooleanExpr()) {
+            if (this.parseBooleanExpr(Production.Expr)) {
                 console.log("PARSER: expr found");
                 return true;
             }
@@ -178,42 +198,23 @@ var TSC;
             }
             return false;
         };
-        Parser.prototype.parseIntExpr = function () {
-            console.log("PARSER: parsing an intexpr");
-            // in case after a digit an intop is not found, we accept the digit
-            if (this.matchToken(TSC.TokenType.TDigit)) {
-                this.consumeToken(TSC.TokenType.TDigit);
-                // if(this.matchToken(TokenType.TIntop) && this.parseExpr()){
-                //     console.log("PARSER: intexpr (digit op expr) found");
-                //     return true;
-                // }
-                // else{
-                //     console.log("PARSER: intexpr (digit) found");
-                //     return true;
-                // }
-                return true;
+        Parser.prototype.parseBooleanExpr = function (production) {
+            if (typeof production === 'undefined') {
+                production = 'default';
             }
-            return false;
-        };
-        Parser.prototype.parseStringExpr = function () {
-            console.log("PARSER: parsing a stringexpr");
-            if (this.matchToken(TSC.TokenType.TQuote) && this.parseCharList() && this.matchToken(TSC.TokenType.TQuote)) {
-                console.log("PARSER: stringexpr found");
-                return true;
-            }
-            return false;
-        };
-        Parser.prototype.parseBooleanExpr = function () {
             console.log("PARSER: parsing a booleanexpr");
             if (this.matchToken(TSC.TokenType.TLparen)) {
-                this.log.push("VALID - Expecting Expr, found BooleanExpr");
+                if (production == Production.Expr) {
+                    this.log.push("VALID - Expecting Expr, found BooleanExpr");
+                }
                 console.log("PARSER: booleanexpr found");
-                this.consumeToken(TSC.TokenType.TBoolval);
+                this.consumeToken(TSC.TokenType.TLparen);
                 if (this.parseExpr()) {
                     if (this.matchToken(TSC.TokenType.TBoolop)) {
-                        this.consumeToken(TSC.TokenType.TBoolval);
+                        this.consumeToken(TSC.TokenType.TBoolop);
                         if (this.parseExpr()) {
                             if (this.matchToken(TSC.TokenType.TRparen)) {
+                                this.consumeToken(TSC.TokenType.TRparen);
                                 return true;
                             }
                             else {
@@ -228,9 +229,38 @@ var TSC;
                 }
             }
             else if (this.matchToken(TSC.TokenType.TBoolval)) {
-                this.log.push("VALID - Expecting Expr, found BooleanExpr");
+                if (production == Production.Expr) {
+                    this.log.push("VALID - Expecting Expr, found BooleanExpr");
+                }
                 this.consumeToken(TSC.TokenType.TBoolval);
                 console.log("PARSER: booleanexpr found");
+                return true;
+            }
+            return false;
+        };
+        Parser.prototype.parseIntExpr = function () {
+            console.log("PARSER: parsing an intexpr");
+            // in case after a digit an intop is not found, we accept the digit
+            if (this.matchToken(TSC.TokenType.TDigit)) {
+                this.log.push("VALID - Expecting Expr, found IntExpr");
+                this.log.push("VALID - Expecting Digit, found " + this.tokenList[this.currentToken].type);
+                this.consumeToken(TSC.TokenType.TDigit);
+                if (this.matchToken(TSC.TokenType.TIntop) && this.parseExpr()) {
+                    this.log.push("VALID - Expecting Intop, found " + this.tokenList[this.currentToken].type);
+                    console.log("PARSER: intexpr (digit op expr) found");
+                    return true;
+                }
+                else {
+                    console.log("PARSER: intexpr (digit) found");
+                    return true;
+                }
+            }
+            return false;
+        };
+        Parser.prototype.parseStringExpr = function () {
+            console.log("PARSER: parsing a stringexpr");
+            if (this.matchToken(TSC.TokenType.TQuote) && this.parseCharList() && this.matchToken(TSC.TokenType.TQuote)) {
+                console.log("PARSER: stringexpr found");
                 return true;
             }
             return false;
