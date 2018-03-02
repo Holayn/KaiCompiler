@@ -102,8 +102,17 @@ var TSC;
                 this.consumeToken(TSC.TokenType.TId);
                 if (this.matchToken(TSC.TokenType.TAssign)) {
                     this.consumeToken(TSC.TokenType.TAssign);
-                    this.parseExpr();
-                    return true;
+                    if (this.parseExpr()) {
+                        return true;
+                    }
+                    else {
+                        this.error = true;
+                        this.log.push("ERROR - Expecting Expr, found " + this.tokenList[this.currentToken].type);
+                    }
+                }
+                else {
+                    this.error = true;
+                    this.log.push("ERROR - Expecting TAssign, found " + this.tokenList[this.currentToken].type);
                 }
             }
             return false;
@@ -155,7 +164,15 @@ var TSC;
                 console.log("PARSER: expr found");
                 return true;
             }
-            if (this.parseIntExpr()) {
+            else if (this.parseIntExpr()) {
+                console.log("PARSER: expr found");
+                return true;
+            }
+            else if (this.parseId()) {
+                console.log("PARSER: expr found");
+                return true;
+            }
+            else if (this.parseStringExpr()) {
                 console.log("PARSER: expr found");
                 return true;
             }
