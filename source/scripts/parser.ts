@@ -322,8 +322,8 @@ module TSC {
         public parseBoolVal(production: Array<Production>, expected: boolean) {
             // we add a BooleanExpr to the list of productions rewritten, as Expr is rewritten to BooleanExpr, which is then rewritten to Boolval
             if(this.matchToken(TokenType.TBoolval, production.concat([Production.BooleanExpr]), Production.BoolVal, false)){
-                // // ascend the tree after we've derived a boolval statement
-                // this.cst.ascendTree();
+                // ascend the tree after we've derived a boolval statement
+                this.cst.ascendTree();
                 return true;
             }
             if(expected && !this.error){
@@ -358,6 +358,8 @@ module TSC {
          */
         public parseType(production: Array<Production>, expected: boolean) {
             if(this.matchToken(TokenType.TType, production, Production.Type, false)){
+                // ascend the tree after we've derived a type
+                this.cst.ascendTree();
                 return true;
             }
             if(expected && !this.error){
@@ -460,7 +462,6 @@ module TSC {
             }
             if(this.tokenList[this.currentToken].type == token){
                 if(start != null) {
-                    // this.log.push("VALID - Expecting " + start + ", found " + rewrite); // fix this
                     // add all productions in start
                     for(var i=0; i<start.length; i++){
                         this.cst.addNTNode(start[i]);
@@ -471,14 +472,12 @@ module TSC {
                     // add final production that was rewritten
                     this.cst.addNTNode(rewrite);
                     this.log.push("VALID - Expecting " + start[start.length-1] + ", found " + rewrite);
-                    // console.log("add node");
-                    // console.log(start + "->" + rewrite);
                 }
                 else if(rewrite != null){
                     this.cst.addNTNode(rewrite);
                     this.log.push("VALID - Expecting " + rewrite + ", found " + rewrite);
                 }
-                this.log.push("VALID - Expecting " + token + ", found " + this.tokenList[this.currentToken].type + " " + this.tokenList[this.currentToken].value);
+                this.log.push("VALID - Expecting " + token + ", found " + this.tokenList[this.currentToken].value);
                 // Add token to tree
                 this.cst.addTNode(this.tokenList[this.currentToken]);
                 console.log("Adding " + this.tokenList[this.currentToken].value + " to the tree");

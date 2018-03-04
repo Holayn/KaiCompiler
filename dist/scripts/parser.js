@@ -297,8 +297,8 @@ var TSC;
         Parser.prototype.parseBoolVal = function (production, expected) {
             // we add a BooleanExpr to the list of productions rewritten, as Expr is rewritten to BooleanExpr, which is then rewritten to Boolval
             if (this.matchToken(TSC.TokenType.TBoolval, production.concat([Production.BooleanExpr]), Production.BoolVal, false)) {
-                // // ascend the tree after we've derived a boolval statement
-                // this.cst.ascendTree();
+                // ascend the tree after we've derived a boolval statement
+                this.cst.ascendTree();
                 return true;
             }
             if (expected && !this.error) {
@@ -331,6 +331,8 @@ var TSC;
          */
         Parser.prototype.parseType = function (production, expected) {
             if (this.matchToken(TSC.TokenType.TType, production, Production.Type, false)) {
+                // ascend the tree after we've derived a type
+                this.cst.ascendTree();
                 return true;
             }
             if (expected && !this.error) {
@@ -427,7 +429,6 @@ var TSC;
             }
             if (this.tokenList[this.currentToken].type == token) {
                 if (start != null) {
-                    // this.log.push("VALID - Expecting " + start + ", found " + rewrite); // fix this
                     // add all productions in start
                     for (var i = 0; i < start.length; i++) {
                         this.cst.addNTNode(start[i]);
@@ -445,7 +446,7 @@ var TSC;
                     this.cst.addNTNode(rewrite);
                     this.log.push("VALID - Expecting " + rewrite + ", found " + rewrite);
                 }
-                this.log.push("VALID - Expecting " + token + ", found " + this.tokenList[this.currentToken].type + " " + this.tokenList[this.currentToken].value);
+                this.log.push("VALID - Expecting " + token + ", found " + this.tokenList[this.currentToken].value);
                 // Add token to tree
                 this.cst.addTNode(this.tokenList[this.currentToken]);
                 console.log("Adding " + this.tokenList[this.currentToken].value + " to the tree");
