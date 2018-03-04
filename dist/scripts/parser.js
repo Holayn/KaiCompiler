@@ -202,79 +202,38 @@ var TSC;
             }
             return false;
         };
-        Parser.prototype.parseBooleanExpr = function (production) {
-            if (typeof production === 'undefined') {
-                production = 'default';
-            }
-            console.log("PARSER: parsing a booleanexpr");
-            if (this.matchToken(TSC.TokenType.TLparen)) {
-                if (production == Production.Expr) {
-                    this.log.push("VALID - Expecting Expr, found BooleanExpr");
-                }
-                console.log("PARSER: booleanexpr found");
-                this.consumeToken(TSC.TokenType.TLparen);
-                if (this.parseExpr()) {
-                    if (this.matchToken(TSC.TokenType.TBoolop)) {
-                        this.consumeToken(TSC.TokenType.TBoolop);
-                        if (this.parseExpr()) {
-                            if (this.matchToken(TSC.TokenType.TRparen)) {
-                                this.consumeToken(TSC.TokenType.TRparen);
-                                return true;
-                            }
-                            else {
-                                this.log.push("ERROR - Expecting TBoolval, found " + this.tokenList[this.currentToken].type);
-                            }
-                        }
-                    }
-                    else {
-                        this.log.push("ERROR - Expecting TBoolop, found " + this.tokenList[this.currentToken].type);
-                        return false;
-                    }
-                }
-            }
-            else if (this.matchToken(TSC.TokenType.TBoolval)) {
-                if (production == Production.Expr) {
-                    this.log.push("VALID - Expecting Expr, found BooleanExpr");
-                }
-                this.consumeToken(TSC.TokenType.TBoolval);
-                console.log("PARSER: booleanexpr found");
-                return true;
-            }
-            return false;
-        };
-        Parser.prototype.parseIntExpr = function () {
-            console.log("PARSER: parsing an intexpr");
-            // in case after a digit an intop is not found, we accept the digit
-            if (this.matchToken(TSC.TokenType.TDigit)) {
-                this.log.push("VALID - Expecting Expr, found IntExpr");
-                this.log.push("VALID - Expecting Digit, found " + this.tokenList[this.currentToken].type);
-                this.consumeToken(TSC.TokenType.TDigit);
-                if (this.matchToken(TSC.TokenType.TIntop) && this.parseExpr()) {
-                    this.log.push("VALID - Expecting Intop, found " + this.tokenList[this.currentToken].type);
-                    console.log("PARSER: intexpr (digit op expr) found");
+        /**
+         * Parses the tokens to see if they make up an IntExpr, or a Digit, or Digit Intop Expr
+         * @param production the production that is being rewritten
+         * @param expected flag for if nonterminal is expected in rewrite rule
+         */
+        Parser.prototype.parseIntExpr = function (production, expected) {
+            if (this.matchToken(TSC.TokenType.TDigit, production, Production.IntExpr, false)) {
+                if (this.matchToken(TSC.TokenType.TIntop, null, null, false) && this.parseExpr(Production.Expr, true)) {
                     return true;
                 }
                 else {
-                    console.log("PARSER: intexpr (digit) found");
                     return true;
                 }
             }
-            return false;
-        };
-        Parser.prototype.parseStringExpr = function () {
-            console.log("PARSER: parsing a stringexpr");
-            if (this.matchToken(TSC.TokenType.TQuote) && this.parseCharList() && this.matchToken(TSC.TokenType.TQuote)) {
-                console.log("PARSER: stringexpr found");
-                return true;
+            if (expected && !this.error) {
+                this.error = true;
+                this.log.push("ERROR - Expecting IntExpr, found " + this.tokenList[this.currentToken].type);
             }
             return false;
         };
-        Parser.prototype.parseId = function () {
-            console.log("PARSER: parsing an id");
-            if (this.matchToken(TSC.TokenType.TId)) {
-                this.consumeToken(TSC.TokenType.TId);
-                console.log("PARSER: id found");
+        /**
+         * Parses the tokens to see if they make up a StringExpr, or a " CharList "
+         * @param production the production that is being rewritten
+         * @param expected flag for if nonterminal is expected in rewrite rule
+         */
+        Parser.prototype.parseStringExpr = function (production, expected) {
+            if (this.matchToken(TSC.TokenType.TQuote, production, Production.StringExpr, false) && this.parseCharList(Production.CharList, true) && this.matchToken(TSC.TokenType.TQuote, null, null, true)) {
                 return true;
+            }
+            if (expected && !this.error) {
+                this.error = true;
+                this.log.push("ERROR - Expecting StringExpr, found " + this.tokenList[this.currentToken].type);
             }
             return false;
         };
