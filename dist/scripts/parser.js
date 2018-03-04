@@ -82,19 +82,27 @@ var TSC;
             }
             return false;
         };
-        Parser.prototype.parseStatementList = function () {
-            console.log("DEPREPRPERPER");
-            if (this.parseStatement() && this.parseStatementList()) {
-                console.log("hahaDEPREPRPERPER");
+        /**
+         * Parses the tokens to see if they make up a StatementList, or a Statement StatementList, or epsilon
+         * @param production the production that is being rewritten
+         * @param expected flag for if nonterminal is expected in rewrite rule
+         */
+        Parser.prototype.parseStatementList = function (production, expected) {
+            if (this.parseStatement(Production.StmtList, false) && this.parseStatementList(Production.StmtList, false)) {
                 return true;
             }
             else {
                 return true;
             }
         };
-        Parser.prototype.parseStatement = function () {
-            console.log("PARSER: parsing a statement");
-            if (this.parsePrintStatement() || this.parseAssignmentStatement() || this.parseVarDecl() || this.parseWhileStatement() || this.parseIfStatement() || this.parseBlock()) {
+        /**
+         * Parses the tokens to see if they make up a Statement, or a PrintStatement, AssignStatement, WhileStatement, VarDecl, IfStatement, or Block
+         * @param production the production that is being rewritten
+         * @param expected flag for if nonterminal is expected in rewrite rule
+         */
+        Parser.prototype.parseStatement = function (production, expected) {
+            if (this.parsePrintStatement(Production.Stmt, false) || this.parseAssignmentStatement(Production.Stmt, false) || this.parseWhileStatement(Production.Stmt, false) ||
+                this.parseVarDecl(Production.Stmt, false) || this.parseIfStatement(Production.Stmt, false) || this.parseBlock(Production.Stmt, false)) {
                 return true;
             }
             return false;
