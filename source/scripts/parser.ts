@@ -173,42 +173,35 @@ module TSC {
             return false;
         }
 
-        public parseWhileStatement() {
-            console.log("PARSER: parsing a whilestatement");
-            if(this.matchToken(TokenType.TWhile)){
-                console.log("PARSER: whilestatement found");
-                this.log.push("VALID - Expecting Statement, found VarDecl");
-                this.consumeToken(TokenType.TWhile);
-                if(this.parseBooleanExpr(Production.While)){
-                    if(this.parseBlock()){
-                        return true;
-                    }
-                    this.error = true;
-                    this.log.push("ERROR - Expecting Block, found " + this.tokenList[this.currentToken].type);
-                }
-                else{
-                    this.error = true;
-                    this.log.push("ERROR - Expecting BooleanExpr, found " + this.tokenList[this.currentToken].type);
-                }
+        /**
+         * Parses the tokens to see if they make up a WhileStatement, or a While BooleanExpr Block
+         * @param production the production that is being rewritten
+         * @param expected flag for if nonterminal is expected in rewrite rule
+         */
+        public parseWhileStatement(production: Production, expected: boolean) {
+            if(this.matchToken(TokenType.TWhile, production, Production.WhileStmt, false) && this.parseBooleanExpr(Production.BooleanExpr, true) && this.parseBlock(null, true)){
+                return true;
+            }
+            if(expected && !this.error){
+                this.error = true;
+                this.log.push("ERROR - Expecting WhileStatement, found " + this.tokenList[this.currentToken].type);
             }
             return false;
         }
 
-        public parseIfStatement() {
-            console.log("PARSER: parsing an ifstatement");
-            if(this.matchToken(TokenType.TIf)){
-                this.log.push("VALID - Expecting Statement, found IfStatement");
-                this.consumeToken(TokenType.TIf);
-                if(this.parseBooleanExpr(Production.If)){
-                    console.log("adfasd");
-                    return true;
-                    // && this.parseBlock()){
-                }
-                else{
-                    this.log.push("ERROR - Expecting BooleanExpr, found " + this.tokenList[this.currentToken].type);
-                }
-                console.log("PARSER: ifstatement found");
+        /**
+         * Parses the tokens to see if they make up an IfStatement, or an If BooleanExpr Block
+         * @param production the production that is being rewritten
+         * @param expected flag for if nonterminal is expected in rewrite rule
+         */
+        public parseIfStatement(production: Production, expected: boolean) {
+            if(this.matchToken(TokenType.TIf, production, Production.IfStmt, false) && this.parseBooleanExpr(Production.BooleanExpr, true) &&
+            this.parseBlock(null, true)){
                 return true;
+            }
+            if(expected && !this.error){
+                this.error = true;
+                this.log.push("ERROR - Expecting IfStatement, found " + this.tokenList[this.currentToken].type);
             }
             return false;
         }
