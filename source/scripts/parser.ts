@@ -490,19 +490,20 @@ module TSC {
                     for(var i=0; i<start.length; i++){
                         this.cst.addNTNode(start[i]);
                         if(i != 0){
-                            this.log.push("VALID - Expecting [" + start[i-1] + "], found [" + start[i] + "]");
+                            this.log.push("VALID - Expecting [" + start[i-1] + "], found [" + start[i] + "] on line " + this.tokenList[this.currentToken].lineNumber);
                         }
                     }
                     // add final production that was rewritten
                     this.cst.addNTNode(rewrite);
-                    this.log.push("VALID - Expecting [" + start[start.length-1] + "], found [" + rewrite + "]");
+                    this.log.push("VALID - Expecting [" + start[start.length-1] + "], found [" + rewrite + "] on line " + this.tokenList[this.currentToken].lineNumber);
                 }
                 // If rewriting to some non-terminal only, display it in tree and log
                 else if(rewrite != null){
                     this.cst.addNTNode(rewrite);
-                    this.log.push("VALID - Expecting [" + rewrite + "], found [" + rewrite + "]");
+                    this.log.push("VALID - Expecting [" + rewrite + "], found [" + rewrite + "] on line " + this.tokenList[this.currentToken].lineNumber);
                 }
-                this.log.push("VALID - Expecting [" + token + "], found [" + this.tokenList[this.currentToken].value + "]");
+                // Add terminal to log
+                this.log.push("VALID - Expecting [" + token + "], found [" + this.tokenList[this.currentToken].value + "] on line " + this.tokenList[this.currentToken].lineNumber);
                 // Add token to tree
                 this.cst.addTNode(this.tokenList[this.currentToken]);
                 console.log("Adding " + this.tokenList[this.currentToken].value + " to the tree");
@@ -514,7 +515,7 @@ module TSC {
             // if token was expected and was not present, throw an error
             if(expected){
                 this.error = true;
-                this.log.push("ERROR - Expecting [" + token + "], found [" + this.tokenList[this.currentToken].type + "]");
+                this.log.push("ERROR - Expecting [" + token + "], found [" + this.tokenList[this.currentToken].type + "] on line " + this.tokenList[this.currentToken].lineNumber);
             }
             return false;
         }

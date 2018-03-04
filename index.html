@@ -88,9 +88,13 @@
 						<li class="tab col s3"><a class="active" href="#cst">CST</a></li>
 						<li class="tab col s3"><a href="#ast">AST</a></li>
 					</ul>
-					<div class="card-panel log">
+					<div id="cst" class="card-panel log">
 						<h5 class="light">CST</h5>
 						<textarea id="taCST" readonly disabled></textarea>
+					</div>
+					<div id="ast" class="card-panel log">
+						<h5 class="light">AST</h5>
+						<textarea id="taAST" readonly disabled></textarea>
 					</div>
 				</div>
 				<div class="col s6">
@@ -191,8 +195,9 @@
 		var verboseOn = true;
 
 		function init() {
-	        // Clear the message box.
-	        document.getElementById("taOutput").value = "";
+	        // Clear the log and the CST.
+			document.getElementById("taOutput").value = "";
+			document.getElementById("taCST").value = "";
 	        // Set the initial values for our globals.
 	        tokens = "";
 	        tokenIndex = 0;
