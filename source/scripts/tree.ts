@@ -13,6 +13,42 @@ module TSC {
                 this.curr = null;
                 this.root = null;
             }
+
+            /**
+             * Adds non-terminal node
+             */
+            public addNTNode(production: Production){
+                let node = new NonTerminalTreeNode(production);
+                console.log(node);
+                console.log(production);
+                if(this.root == null){
+                    this.root = node;
+                    this.curr = node;
+                    return;
+                }
+                // set parent
+                node.parent = this.curr;
+                // add to children of curr node
+                this.curr.children.push(node);
+                // this.descendTree();
+            }
+
+            /**
+             * Adds terminal node
+             */
+            public addTNode(token: Token){
+                let node = new TerminalTreeNode(token);
+                if(this.root == null){
+                    this.root = node;
+                    this.curr = node;
+                    return;
+                }
+                // set parent
+                node.parent = this.curr;
+                // add to children of curr node
+                this.curr.children.push(node);
+                // this.descendTree();
+            }
         }
     
         /**
