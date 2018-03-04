@@ -79,19 +79,18 @@ module TSC {
             return false;
         }
 
-        public parseBlock(): boolean {
-            // if(this.error){
-            //     return false;
-            // }
-            if(this.matchToken(TokenType.TLbrace)){
-                this.log.push("VALID - Expecting Block, found Block");
-                this.consumeToken(TokenType.TLbrace);
-                if(this.parseStatementList()){
-                    if(this.matchToken(TokenType.TRbrace)){
-                        this.consumeToken(TokenType.TRbrace);
-                        return true;
-                    }
-                }
+        /**
+         * Parses the tokens to see if they make up a Block, or a ( StatementList )
+         * @param production the production that is being rewritten
+         * @param expected flag for if nonterminal is expected in rewrite rule
+         */
+        public parseBlock(production: Production, expected: boolean): boolean {
+            if(this.matchToken(TokenType.TLbrace, production, Production.Block, false) && this.parseStatementList(null, false) && this.matchToken(TokenType.TRbrace, null, null, true)){
+                return true;
+            }
+            if(expected && !this.error){
+                this.error = true;
+                this.log.push("ERROR - Expecting Block, found " + this.tokenList[this.currentToken].type);
             }
             return false;
         }

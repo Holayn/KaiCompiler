@@ -67,19 +67,18 @@ var TSC;
             }
             return false;
         };
-        Parser.prototype.parseBlock = function () {
-            // if(this.error){
-            //     return false;
-            // }
-            if (this.matchToken(TSC.TokenType.TLbrace)) {
-                this.log.push("VALID - Expecting Block, found Block");
-                this.consumeToken(TSC.TokenType.TLbrace);
-                if (this.parseStatementList()) {
-                    if (this.matchToken(TSC.TokenType.TRbrace)) {
-                        this.consumeToken(TSC.TokenType.TRbrace);
-                        return true;
-                    }
-                }
+        /**
+         * Parses the tokens to see if they make up a Block, or a ( StatementList )
+         * @param production the production that is being rewritten
+         * @param expected flag for if nonterminal is expected in rewrite rule
+         */
+        Parser.prototype.parseBlock = function (production, expected) {
+            if (this.matchToken(TSC.TokenType.TLbrace, production, Production.Block, false) && this.parseStatementList(null, false) && this.matchToken(TSC.TokenType.TRbrace, null, null, true)) {
+                return true;
+            }
+            if (expected && !this.error) {
+                this.error = true;
+                this.log.push("ERROR - Expecting Block, found " + this.tokenList[this.currentToken].type);
             }
             return false;
         };
