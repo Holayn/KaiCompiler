@@ -9,9 +9,21 @@
 module TSC {
 
     export enum Production {
-        Expr = "Expr",
-        If = "If",
-        While = "While"
+        Program = "Program",
+        Block = "Block",
+        Expr = "Expression",
+        Stmt = "Statement",
+        StmtList = "StatementList",
+        AssignStmt = "AssignmentStatement",
+        PrintStmt = "PrintStatement",
+        WhileStmt = "WhileStatement",
+        VarDecl = "VarDecl",
+        IfStmt = "IfStatement",
+        BooleanExpr = "BooleanExpression",
+        IntExpr = "IntegerExpression",
+        StringExpr = "StringExpression",
+        CharList = "CharList",
+        Id = "Id"
     }
 
     export class Parser {

@@ -9,9 +9,21 @@ var TSC;
 (function (TSC) {
     var Production;
     (function (Production) {
-        Production["Expr"] = "Expr";
-        Production["If"] = "If";
-        Production["While"] = "While";
+        Production["Program"] = "Program";
+        Production["Block"] = "Block";
+        Production["Expr"] = "Expression";
+        Production["Stmt"] = "Statement";
+        Production["StmtList"] = "StatementList";
+        Production["AssignStmt"] = "AssignmentStatement";
+        Production["PrintStmt"] = "PrintStatement";
+        Production["WhileStmt"] = "WhileStatement";
+        Production["VarDecl"] = "VarDecl";
+        Production["IfStmt"] = "IfStatement";
+        Production["BooleanExpr"] = "BooleanExpression";
+        Production["IntExpr"] = "IntegerExpression";
+        Production["StringExpr"] = "StringExpression";
+        Production["CharList"] = "CharList";
+        Production["Id"] = "Id";
     })(Production = TSC.Production || (TSC.Production = {}));
     var Parser = /** @class */ (function () {
         function Parser() {
