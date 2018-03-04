@@ -26,7 +26,8 @@ module TSC {
         Id = "Id",
         BoolVal = "BoolVal",
         Type = "Type",
-        Char = "Char"
+        Char = "Char",
+        Digit = "Digit"
     }
 
     export class Parser {
@@ -250,10 +251,11 @@ module TSC {
          * @param expected flag for if nonterminal is expected in rewrite rule
          */
         public parseIntExpr(production: Array<Production>, expected: boolean) {
-            if(this.matchToken(TokenType.TDigit, production, Production.IntExpr, false)){
+            // if(this.matchToken(TokenType.TDigit, production, Production.IntExpr, false)){
+            if(this.parseDigit(production.concat([Production.IntExpr]), false)){
+                // ascend the tree after we've derived an intexpr
+                this.cst.ascendTree();
                 if(this.matchToken(TokenType.TIntop, null, null, false) && this.parseExpr([Production.Expr], true)){
-                    // ascend the tree after we've derived an intexpr
-                    this.cst.ascendTree();
                     return true;
                 }
                 else{
@@ -375,6 +377,23 @@ module TSC {
             if(expected && !this.error){
                 this.error = true;
                 this.log.push("ERROR - Expecting Char, found " + this.tokenList[this.currentToken].type);
+            }
+            return false;
+        }
+
+        /**
+         * Parses the tokens to see if they make up a Digit, or 0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+         * @param production the productions being rewritten
+         * @param expected flag for if nonterminal is expected in rewrite rule
+         */
+        public parseDigit(production: Array<Production>, expected: boolean) {
+            if(this.matchToken(TokenType.TDigit, production, Production.Digit, false)){
+                this.cst.ascendTree();
+                return true;
+            }
+            if(expected && !this.error){
+                this.error = true;
+                this.log.push("ERROR - Expecting Digit, found " + this.tokenList[this.currentToken].type);
             }
             return false;
         }

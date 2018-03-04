@@ -27,6 +27,7 @@ var TSC;
         Production["BoolVal"] = "BoolVal";
         Production["Type"] = "Type";
         Production["Char"] = "Char";
+        Production["Digit"] = "Digit";
     })(Production = TSC.Production || (TSC.Production = {}));
     var Parser = /** @class */ (function () {
         // Constructor for parser, passed tokens from lexer. Inits values.
@@ -228,10 +229,11 @@ var TSC;
          * @param expected flag for if nonterminal is expected in rewrite rule
          */
         Parser.prototype.parseIntExpr = function (production, expected) {
-            if (this.matchToken(TSC.TokenType.TDigit, production, Production.IntExpr, false)) {
+            // if(this.matchToken(TokenType.TDigit, production, Production.IntExpr, false)){
+            if (this.parseDigit(production.concat([Production.IntExpr]), false)) {
+                // ascend the tree after we've derived an intexpr
+                this.cst.ascendTree();
                 if (this.matchToken(TSC.TokenType.TIntop, null, null, false) && this.parseExpr([Production.Expr], true)) {
-                    // ascend the tree after we've derived an intexpr
-                    this.cst.ascendTree();
                     return true;
                 }
                 else {
@@ -347,6 +349,22 @@ var TSC;
             if (expected && !this.error) {
                 this.error = true;
                 this.log.push("ERROR - Expecting Char, found " + this.tokenList[this.currentToken].type);
+            }
+            return false;
+        };
+        /**
+         * Parses the tokens to see if they make up a Digit, or 0, 1, 2, 3, 4, 5, 6, 7, 8, 9
+         * @param production the productions being rewritten
+         * @param expected flag for if nonterminal is expected in rewrite rule
+         */
+        Parser.prototype.parseDigit = function (production, expected) {
+            if (this.matchToken(TSC.TokenType.TDigit, production, Production.Digit, false)) {
+                this.cst.ascendTree();
+                return true;
+            }
+            if (expected && !this.error) {
+                this.error = true;
+                this.log.push("ERROR - Expecting Digit, found " + this.tokenList[this.currentToken].type);
             }
             return false;
         };
