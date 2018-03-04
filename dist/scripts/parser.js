@@ -271,15 +271,18 @@ var TSC;
             }
             return false;
         };
-        Parser.prototype.parseCharList = function () {
-            console.log("PARSER: parsing a charlist");
+        /**
+         * Parses the tokens to see if they make up a CharList, or a Char Charlist, or epsilon
+         * @param production the production that is being rewritten
+         * @param expected flag for if nonterminal is expected in rewrite rule
+         */
+        Parser.prototype.parseCharList = function (production, expected) {
             // spaces are treated as chars for me
-            if (this.matchToken(TSC.TokenType.TChar) && this.parseCharList()) {
-                console.log("PARSER: charlist found");
+            if (this.matchToken(TSC.TokenType.TChar, production, Production.CharList, false) && this.parseCharList(Production.CharList, false)) {
                 return true;
             }
             else {
-                // epsilon
+                // epsilon... accept empty
                 return true;
             }
         };

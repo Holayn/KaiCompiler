@@ -297,15 +297,18 @@ module TSC {
             return false;
         }
 
-        public parseCharList() {
-            console.log("PARSER: parsing a charlist");
+        /**
+         * Parses the tokens to see if they make up a CharList, or a Char Charlist, or epsilon
+         * @param production the production that is being rewritten
+         * @param expected flag for if nonterminal is expected in rewrite rule
+         */
+        public parseCharList(production: Production, expected: boolean) {
             // spaces are treated as chars for me
-            if(this.matchToken(TokenType.TChar) && this.parseCharList()){
-                console.log("PARSER: charlist found");
+            if(this.matchToken(TokenType.TChar, production, Production.CharList, false) && this.parseCharList(Production.CharList, false)){
                 return true;
             }
             else{
-                // epsilon
+                // epsilon... accept empty
                 return true;
             }
         }
