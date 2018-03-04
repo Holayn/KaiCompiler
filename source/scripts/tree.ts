@@ -72,25 +72,29 @@ module TSC {
              * Prints the tree in dfs
              */
             public traverseTree(){
+                let tree: Array<String> = [];
                 let level: number = 0;
                 if(this.root != null){
-                    this.DFS(this.root, level);
+                    this.DFS(this.root, level, tree, "");
                 }
+                return tree;
             }
             
             /**
              * Helper for traverseTree
              */
-            private DFS(node, level){
+            private DFS(node, level, tree, dash){
                 if(node.value instanceof Token){
                     console.log("CST: " + node.value.value + " Level: " + level);
+                    tree.push(dash + "[" + node.value.value + "]")
                 }
                 else{
                     console.log("CST: " + node.value + " Level: " + level);
+                    tree.push(dash + "<" + node.value + ">")
                 }
                 if(node.children.length != 0){
                     for(var i=0; i<node.children.length; i++){
-                        this.DFS(node.children[i], level + 1);
+                        this.DFS(node.children[i], level + 1, tree, dash + "-");
                     }
                 }
             }

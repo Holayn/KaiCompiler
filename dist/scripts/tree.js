@@ -72,24 +72,28 @@ var TSC;
          * Prints the tree in dfs
          */
         Tree.prototype.traverseTree = function () {
+            var tree = [];
             var level = 0;
             if (this.root != null) {
-                this.DFS(this.root, level);
+                this.DFS(this.root, level, tree, "");
             }
+            return tree;
         };
         /**
          * Helper for traverseTree
          */
-        Tree.prototype.DFS = function (node, level) {
+        Tree.prototype.DFS = function (node, level, tree, dash) {
             if (node.value instanceof TSC.Token) {
                 console.log("CST: " + node.value.value + " Level: " + level);
+                tree.push(dash + "[" + node.value.value + "]");
             }
             else {
                 console.log("CST: " + node.value + " Level: " + level);
+                tree.push(dash + "<" + node.value + ">");
             }
             if (node.children.length != 0) {
                 for (var i = 0; i < node.children.length; i++) {
-                    this.DFS(node.children[i], level + 1);
+                    this.DFS(node.children[i], level + 1, tree, dash + "-");
                 }
             }
         };

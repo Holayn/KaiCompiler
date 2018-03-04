@@ -64,7 +64,10 @@ var TSC;
             }
             // Return the parser log
             console.log(this.log);
-            return this.log;
+            return {
+                "log": this.log,
+                "cst": this.cst
+            };
         };
         /**
          * Parses the tokens to see if they make up a Program, or a Block appended with an EOP marker

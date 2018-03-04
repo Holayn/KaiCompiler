@@ -74,7 +74,10 @@ module TSC {
             }
             // Return the parser log
             console.log(this.log);
-            return this.log;
+            return {
+                "log": this.log,
+                "cst": this.cst
+            }
         }
 
         /**
