@@ -206,23 +206,20 @@ module TSC {
             return false;
         }
 
-        public parseExpr() {
-            console.log("PARSER: parsing an expr");
-            if(this.parseBooleanExpr(Production.Expr)){
-                console.log("PARSER: expr found");
+        /**
+         * Parses the tokens to see if they make up an Expr, or an IntExpr, StringExpr, BooleanExpr, or Id
+         * @param production the production that is being rewritten
+         * @param expected flag for if nonterminal is expected in rewrite rule
+         */
+        public parseExpr(production: Production, expected: boolean) {
+            if(this.parseIntExpr(production, false) || this.parseStringExpr(production, false) || this.parseBooleanExpr(production, false) || 
+            this.parseId(production, false)){
                 return true;
             }
-            else if(this.parseIntExpr()){
-                console.log("PARSER: expr found");
-                return true;
-            }
-            else if(this.parseId()){
-                console.log("PARSER: expr found");
-                return true;
-            }
-            else if(this.parseStringExpr()){
-                console.log("PARSER: expr found");
-                return true;
+            // return error if expression not found
+            if(!this.error){
+                this.error = true;
+                this.log.push("ERROR - Expecting Expr, found " + this.tokenList[this.currentToken].type);
             }
             return false;
         }
