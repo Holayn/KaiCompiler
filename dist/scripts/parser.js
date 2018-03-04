@@ -139,7 +139,7 @@ var TSC;
          * @param expected flag for if nonterminal is expected in rewrite rule
          */
         Parser.prototype.parseAssignmentStatement = function (production, expected) {
-            if (this.matchToken(TSC.TokenType.TId, production, Production.AssignStmt, false) &&
+            if (this.parseId(production.concat([Production.AssignStmt]), false) &&
                 this.matchToken(TSC.TokenType.TAssign, null, null, true) && this.parseExpr([Production.Expr], true)) {
                 // ascend the tree after we've derived a assignstmt
                 this.cst.ascendTree();
@@ -162,12 +162,6 @@ var TSC;
                 this.cst.ascendTree();
                 return true;
             }
-            // if(this.matchToken(TokenType.TType, production, Production.VarDecl, false) && 
-            // this.parseId(null, true)){
-            //     // ascend the tree after we've derived a vardecl
-            //     this.cst.ascendTree();
-            //     return true;
-            // }
             if (expected && !this.error) {
                 this.error = true;
                 this.log.push("ERROR - Expecting VarDecl, found " + this.tokenList[this.currentToken].type);
