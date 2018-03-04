@@ -50,7 +50,7 @@ var TSC;
             node.parent = this.curr;
             // add to children of curr node
             this.curr.children.push(node);
-            this.descendTree();
+            // Once we add a terminal to the tree, ascend the tree
         };
         /**
          * Sets current node to look at as the latest child
@@ -66,29 +66,31 @@ var TSC;
          * Sets current node to look at as the parent of the current node
          */
         Tree.prototype.ascendTree = function () {
+            console.log("we ascended boyz");
             this.curr = this.curr.parent;
         };
         /**
          * Prints the tree in dfs
          */
         Tree.prototype.traverseTree = function () {
+            var level = 0;
             if (this.root != null) {
-                this.DFS(this.root);
+                this.DFS(this.root, level);
             }
         };
         /**
          * Helper for traverseTree
          */
-        Tree.prototype.DFS = function (node) {
+        Tree.prototype.DFS = function (node, level) {
             if (node.value instanceof TSC.Token) {
-                console.log("CST: " + node.value.value);
+                console.log("CST: " + node.value.value + " Level: " + level);
             }
             else {
-                console.log("CST: " + node.value);
+                console.log("CST: " + node.value + " Level: " + level);
             }
             if (node.children.length != 0) {
                 for (var i = 0; i < node.children.length; i++) {
-                    this.DFS(node.children[i]);
+                    this.DFS(node.children[i], level + 1);
                 }
             }
         };

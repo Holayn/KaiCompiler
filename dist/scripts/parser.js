@@ -74,6 +74,7 @@ var TSC;
          */
         Parser.prototype.parseBlock = function (production, expected) {
             if (this.matchToken(TSC.TokenType.TLbrace, production, Production.Block, false) && this.parseStatementList(null, false) && this.matchToken(TSC.TokenType.TRbrace, null, null, true)) {
+                this.cst.ascendTree();
                 return true;
             }
             if (expected && !this.error) {
@@ -89,6 +90,7 @@ var TSC;
          */
         Parser.prototype.parseStatementList = function (production, expected) {
             if (this.parseStatement(Production.StmtList, false) && this.parseStatementList(Production.StmtList, false)) {
+                this.cst.ascendTree();
                 return true;
             }
             else {
@@ -103,6 +105,7 @@ var TSC;
         Parser.prototype.parseStatement = function (production, expected) {
             if (this.parsePrintStatement(Production.Stmt, false) || this.parseAssignmentStatement(Production.Stmt, false) || this.parseWhileStatement(Production.Stmt, false) ||
                 this.parseVarDecl(Production.Stmt, false) || this.parseIfStatement(Production.Stmt, false) || this.parseBlock(Production.Stmt, false)) {
+                this.cst.ascendTree();
                 return true;
             }
             return false;
@@ -115,6 +118,8 @@ var TSC;
         Parser.prototype.parsePrintStatement = function (production, expected) {
             if (this.matchToken(TSC.TokenType.TPrint, production, Production.PrintStmt, false) && this.matchToken(TSC.TokenType.TLparen, null, null, true) &&
                 this.parseExpr(Production.Expr, true) && this.matchToken(TSC.TokenType.TRparen, null, null, true)) {
+                // ascend the tree after we've derived a print statement
+                this.cst.ascendTree();
                 return true;
             }
             if (expected && !this.error) {
@@ -130,6 +135,8 @@ var TSC;
         Parser.prototype.parseAssignmentStatement = function (production, expected) {
             if (this.matchToken(TSC.TokenType.TId, production, Production.AssignStmt, false) &&
                 this.matchToken(TSC.TokenType.TAssign, null, null, true) && this.parseExpr(Production.Expr, true)) {
+                // ascend the tree after we've derived a print statement
+                this.cst.ascendTree();
                 return true;
             }
             if (expected && this.error) {
@@ -146,6 +153,8 @@ var TSC;
         Parser.prototype.parseVarDecl = function (production, expected) {
             if (this.matchToken(TSC.TokenType.TType, production, Production.VarDecl, false) &&
                 this.parseId(null, true)) {
+                // ascend the tree after we've derived a print statement
+                this.cst.ascendTree();
                 return true;
             }
             if (expected && !this.error) {
@@ -161,6 +170,8 @@ var TSC;
          */
         Parser.prototype.parseWhileStatement = function (production, expected) {
             if (this.matchToken(TSC.TokenType.TWhile, production, Production.WhileStmt, false) && this.parseBooleanExpr(Production.BooleanExpr, true) && this.parseBlock(null, true)) {
+                // ascend the tree after we've derived a print statement
+                this.cst.ascendTree();
                 return true;
             }
             if (expected && !this.error) {
@@ -177,6 +188,8 @@ var TSC;
         Parser.prototype.parseIfStatement = function (production, expected) {
             if (this.matchToken(TSC.TokenType.TIf, production, Production.IfStmt, false) && this.parseBooleanExpr(Production.BooleanExpr, true) &&
                 this.parseBlock(null, true)) {
+                // ascend the tree after we've derived a print statement
+                this.cst.ascendTree();
                 return true;
             }
             if (expected && !this.error) {
@@ -193,6 +206,8 @@ var TSC;
         Parser.prototype.parseExpr = function (production, expected) {
             if (this.parseIntExpr(production, false) || this.parseStringExpr(production, false) || this.parseBooleanExpr(production, false) ||
                 this.parseId(production, false)) {
+                // ascend the tree after we've derived a print statement
+                this.cst.ascendTree();
                 return true;
             }
             // return error if expression not found
@@ -210,6 +225,8 @@ var TSC;
         Parser.prototype.parseIntExpr = function (production, expected) {
             if (this.matchToken(TSC.TokenType.TDigit, production, Production.IntExpr, false)) {
                 if (this.matchToken(TSC.TokenType.TIntop, null, null, false) && this.parseExpr(Production.Expr, true)) {
+                    // ascend the tree after we've derived a print statement
+                    this.cst.ascendTree();
                     return true;
                 }
                 else {
@@ -229,6 +246,8 @@ var TSC;
          */
         Parser.prototype.parseStringExpr = function (production, expected) {
             if (this.matchToken(TSC.TokenType.TQuote, production, Production.StringExpr, false) && this.parseCharList(Production.CharList, true) && this.matchToken(TSC.TokenType.TQuote, null, null, true)) {
+                // ascend the tree after we've derived a print statement
+                this.cst.ascendTree();
                 return true;
             }
             if (expected && !this.error) {
@@ -244,10 +263,14 @@ var TSC;
          */
         Parser.prototype.parseBooleanExpr = function (production, expected) {
             if (this.matchToken(TSC.TokenType.TBoolval, production, Production.BooleanExpr, false)) {
+                // ascend the tree after we've derived a print statement
+                this.cst.ascendTree();
                 return true;
             }
             else if (this.matchToken(TSC.TokenType.TLparen, production, Production.BooleanExpr, false) && this.parseExpr(Production.Expr, true) &&
                 this.matchToken(TSC.TokenType.TBoolop, null, null, true) && this.parseExpr(Production.Expr, true) && this.matchToken(TSC.TokenType.TRparen, null, null, true)) {
+                // ascend the tree after we've derived a print statement
+                this.cst.ascendTree();
                 return true;
             }
             if (expected && !this.error) {
@@ -263,6 +286,8 @@ var TSC;
          */
         Parser.prototype.parseId = function (production, expected) {
             if (this.matchToken(TSC.TokenType.TId, production, Production.Id, false)) {
+                // ascend the tree after we've derived a print statement
+                this.cst.ascendTree();
                 return true;
             }
             if (expected && !this.error) {
@@ -279,6 +304,8 @@ var TSC;
         Parser.prototype.parseCharList = function (production, expected) {
             // spaces are treated as chars for me
             if (this.matchToken(TSC.TokenType.TChar, production, Production.CharList, false) && this.parseCharList(Production.CharList, false)) {
+                // ascend the tree after we've derived a print statement
+                this.cst.ascendTree();
                 return true;
             }
             else {
@@ -301,6 +328,7 @@ var TSC;
          * @param expected flag for if token is expected to be matched
          */
         Parser.prototype.matchToken = function (token, start, rewrite, expected) {
+            // If the parser has encountered an error, don't parse anymore tokens mate
             if (this.error) {
                 return false;
             }

@@ -86,6 +86,7 @@ module TSC {
          */
         public parseBlock(production: Production, expected: boolean): boolean {
             if(this.matchToken(TokenType.TLbrace, production, Production.Block, false) && this.parseStatementList(null, false) && this.matchToken(TokenType.TRbrace, null, null, true)){
+                this.cst.ascendTree();
                 return true;
             }
             if(expected && !this.error){
@@ -102,6 +103,7 @@ module TSC {
          */
         public parseStatementList(production: Production, expected: boolean) {
             if(this.parseStatement(Production.StmtList, false) && this.parseStatementList(Production.StmtList, false)){
+                this.cst.ascendTree();
                 return true;
             }
             // epsilon... accept empty and return to parseBlock
@@ -118,6 +120,7 @@ module TSC {
         public parseStatement(production: Production, expected: boolean) {
             if(this.parsePrintStatement(Production.Stmt, false) || this.parseAssignmentStatement(Production.Stmt, false) || this.parseWhileStatement(Production.Stmt, false) || 
             this.parseVarDecl(Production.Stmt, false) || this.parseIfStatement(Production.Stmt, false) || this.parseBlock(Production.Stmt, false)){
+                this.cst.ascendTree();
                 return true;
             }
             return false;
@@ -131,6 +134,8 @@ module TSC {
         public parsePrintStatement(production: Production, expected: boolean) {
             if(this.matchToken(TokenType.TPrint, production, Production.PrintStmt, false) && this.matchToken(TokenType.TLparen, null, null, true) &&
             this.parseExpr(Production.Expr, true) && this.matchToken(TokenType.TRparen, null, null, true)){
+                // ascend the tree after we've derived a print statement
+                this.cst.ascendTree();
                 return true;
             }
             if(expected && !this.error){
@@ -147,6 +152,8 @@ module TSC {
         public parseAssignmentStatement(production: Production, expected: boolean) {
             if(this.matchToken(TokenType.TId, production, Production.AssignStmt, false) && 
             this.matchToken(TokenType.TAssign, null, null, true) && this.parseExpr(Production.Expr, true)){
+                // ascend the tree after we've derived a print statement
+                this.cst.ascendTree();
                 return true;
             }
             if(expected && this.error){
@@ -164,6 +171,8 @@ module TSC {
         public parseVarDecl(production: Production, expected: boolean) {
             if(this.matchToken(TokenType.TType, production, Production.VarDecl, false) && 
             this.parseId(null, true)){
+                // ascend the tree after we've derived a print statement
+                this.cst.ascendTree();
                 return true;
             }
             if(expected && !this.error){
@@ -180,6 +189,8 @@ module TSC {
          */
         public parseWhileStatement(production: Production, expected: boolean) {
             if(this.matchToken(TokenType.TWhile, production, Production.WhileStmt, false) && this.parseBooleanExpr(Production.BooleanExpr, true) && this.parseBlock(null, true)){
+                // ascend the tree after we've derived a print statement
+                this.cst.ascendTree();
                 return true;
             }
             if(expected && !this.error){
@@ -197,6 +208,8 @@ module TSC {
         public parseIfStatement(production: Production, expected: boolean) {
             if(this.matchToken(TokenType.TIf, production, Production.IfStmt, false) && this.parseBooleanExpr(Production.BooleanExpr, true) &&
             this.parseBlock(null, true)){
+                // ascend the tree after we've derived a print statement
+                this.cst.ascendTree();
                 return true;
             }
             if(expected && !this.error){
@@ -214,6 +227,8 @@ module TSC {
         public parseExpr(production: Production, expected: boolean) {
             if(this.parseIntExpr(production, false) || this.parseStringExpr(production, false) || this.parseBooleanExpr(production, false) || 
             this.parseId(production, false)){
+                // ascend the tree after we've derived a print statement
+                this.cst.ascendTree();
                 return true;
             }
             // return error if expression not found
@@ -232,6 +247,8 @@ module TSC {
         public parseIntExpr(production: Production, expected: boolean) {
             if(this.matchToken(TokenType.TDigit, production, Production.IntExpr, false)){
                 if(this.matchToken(TokenType.TIntop, null, null, false) && this.parseExpr(Production.Expr, true)){
+                    // ascend the tree after we've derived a print statement
+                    this.cst.ascendTree();
                     return true;
                 }
                 else{
@@ -252,6 +269,8 @@ module TSC {
          */
         public parseStringExpr(production: Production, expected: boolean) {
             if(this.matchToken(TokenType.TQuote, production, Production.StringExpr, false) && this.parseCharList(Production.CharList, true) && this.matchToken(TokenType.TQuote, null, null, true)){
+                // ascend the tree after we've derived a print statement
+                this.cst.ascendTree();
                 return true;
             }
             if(expected && !this.error){
@@ -268,10 +287,14 @@ module TSC {
          */
         public parseBooleanExpr(production: Production, expected: boolean) {
             if(this.matchToken(TokenType.TBoolval, production, Production.BooleanExpr, false)){
+                // ascend the tree after we've derived a print statement
+                this.cst.ascendTree();
                 return true;
             }
             else if(this.matchToken(TokenType.TLparen, production, Production.BooleanExpr, false) && this.parseExpr(Production.Expr, true) &&
             this.matchToken(TokenType.TBoolop, null, null, true) && this.parseExpr(Production.Expr, true) && this.matchToken(TokenType.TRparen, null, null, true)){
+                // ascend the tree after we've derived a print statement
+                this.cst.ascendTree();
                 return true;
             }
             if(expected && !this.error){
@@ -288,6 +311,8 @@ module TSC {
          */
         public parseId(production: Production, expected: boolean) {
             if(this.matchToken(TokenType.TId, production, Production.Id, false)){
+                // ascend the tree after we've derived a print statement
+                this.cst.ascendTree();
                 return true;
             }
             if(expected && !this.error){
@@ -305,6 +330,8 @@ module TSC {
         public parseCharList(production: Production, expected: boolean) {
             // spaces are treated as chars for me
             if(this.matchToken(TokenType.TChar, production, Production.CharList, false) && this.parseCharList(Production.CharList, false)){
+                // ascend the tree after we've derived a print statement
+                this.cst.ascendTree();
                 return true;
             }
             else{
@@ -329,6 +356,7 @@ module TSC {
          * @param expected flag for if token is expected to be matched
          */
         public matchToken(token: TokenType, start: Production, rewrite: Production, expected: boolean) {
+            // If the parser has encountered an error, don't parse anymore tokens mate
             if(this.error){
                 return false;
             }

@@ -47,7 +47,7 @@ module TSC {
                 node.parent = this.curr;
                 // add to children of curr node
                 this.curr.children.push(node);
-                this.descendTree();
+                // Once we add a terminal to the tree, ascend the tree
             }
 
             /**
@@ -64,7 +64,8 @@ module TSC {
             /**
              * Sets current node to look at as the parent of the current node
              */
-            private ascendTree(){
+            public ascendTree(){
+                console.log("we ascended boyz");
                 this.curr = this.curr.parent;
             }
 
@@ -72,24 +73,25 @@ module TSC {
              * Prints the tree in dfs
              */
             public traverseTree(){
+                let level: number = 0;
                 if(this.root != null){
-                    this.DFS(this.root);
+                    this.DFS(this.root, level);
                 }
             }
             
             /**
              * Helper for traverseTree
              */
-            private DFS(node){
+            private DFS(node, level){
                 if(node.value instanceof Token){
-                    console.log("CST: " + node.value.value);
+                    console.log("CST: " + node.value.value + " Level: " + level);
                 }
                 else{
-                    console.log("CST: " + node.value);
+                    console.log("CST: " + node.value + " Level: " + level);
                 }
                 if(node.children.length != 0){
                     for(var i=0; i<node.children.length; i++){
-                        this.DFS(node.children[i]);
+                        this.DFS(node.children[i], level + 1);
                     }
                 }
             }
