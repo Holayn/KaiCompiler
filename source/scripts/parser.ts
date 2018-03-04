@@ -83,7 +83,8 @@ module TSC {
             return {
                 "log": this.log,
                 "cst": this.cst,
-                "symbols": this.symbols
+                "symbols": this.symbols,
+                "error": this.error
             }
         }
 
@@ -515,6 +516,9 @@ module TSC {
                 }
                 // Add terminal to log
                 this.log.push("VALID - Expecting [" + token + "], found [" + this.tokenList[this.currentToken].value + "] on line " + this.tokenList[this.currentToken].lineNumber);
+
+                // I'm pretty sure this is supposed to be part of semantic analysis but a symbol table is mentioned in Project 2 so I'm putting this here, even though this 
+                // is very hacky.
                 if(this.isSymbol && token == TokenType.TType){
                     // record type
                     this.symbol["type"] = this.tokenList[this.currentToken].value;
