@@ -68,6 +68,30 @@ var TSC;
         Tree.prototype.ascendTree = function () {
             this.curr = this.curr.parent;
         };
+        /**
+         * Prints the tree in dfs
+         */
+        Tree.prototype.traverseTree = function () {
+            if (this.root != null) {
+                this.DFS(this.root);
+            }
+        };
+        /**
+         * Helper for traverseTree
+         */
+        Tree.prototype.DFS = function (node) {
+            if (node.value instanceof TSC.Token) {
+                console.log("CST: " + node.value.value);
+            }
+            else {
+                console.log("CST: " + node.value);
+            }
+            if (node.children.length != 0) {
+                for (var i = 0; i < node.children.length; i++) {
+                    this.DFS(node.children[i]);
+                }
+            }
+        };
         return Tree;
     }());
     TSC.Tree = Tree;

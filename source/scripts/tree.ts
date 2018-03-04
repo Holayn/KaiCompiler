@@ -67,6 +67,32 @@ module TSC {
             private ascendTree(){
                 this.curr = this.curr.parent;
             }
+
+            /**
+             * Prints the tree in dfs
+             */
+            public traverseTree(){
+                if(this.root != null){
+                    this.DFS(this.root);
+                }
+            }
+            
+            /**
+             * Helper for traverseTree
+             */
+            private DFS(node){
+                if(node.value instanceof Token){
+                    console.log("CST: " + node.value.value);
+                }
+                else{
+                    console.log("CST: " + node.value);
+                }
+                if(node.children.length != 0){
+                    for(var i=0; i<node.children.length; i++){
+                        this.DFS(node.children[i]);
+                    }
+                }
+            }
         }
     
         /**
