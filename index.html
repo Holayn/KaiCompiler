@@ -98,7 +98,44 @@
 					</div>
 				</div>
 				<div class="col s6">
+					<div class="card-panel log">
+						<h5 class="light">Symbol Table</h5>
+						<table id="symbolTable" class="striped">
+							<thead>
+								<tr>
+									<th>Key</th>
+									<th>Type</th>
+									<th>Scope</th>
+									<th>Scope Level</th>
+									<th>Line Number</th>
+								</tr>
+							</thead>
+							<tbody>
+									<tr></tr>
+
+							</tbody>
+						</table>
+					</div>
 				</div>
+			</div>
+			<div class="row">
+				<!-- <div class="col s6"> -->
+				<!-- <div class="card-panel log">
+					<h5 class="light">Symbol Table</h5>
+					<table id="symbolTable">
+						<thead>
+							<tr>
+								<th>Token Number</th>
+								<th>Token Type</th>
+								<th>Value</th>
+								<th>Line Number</th>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+				</div> -->
+				<!-- </div> -->
 			</div>
 		</div>
 
@@ -198,6 +235,13 @@
 	        // Clear the log and the CST.
 			document.getElementById("taOutput").value = "";
 			document.getElementById("taCST").value = "";
+			// Clear symbol table
+			var table = document.getElementById("symbolTable");
+			// Leave header in place
+			var rowCount = table.rows.length;
+			for (var i = rowCount - 1; i > 1; i--) {
+				table.deleteRow(i);
+			}
 	        // Set the initial values for our globals.
 	        tokens = "";
 	        tokenIndex = 0;
@@ -302,6 +346,19 @@
 			var tree = res.cst.traverseTree();
 			for(var i=0; i<tree.length; i++){
 				document.getElementById("taCST").value += tree[i] + "\n";
+			}
+			// Display symbols in Symbol Table
+			var symbols = res.symbols;
+			for(var i=0; i<symbols.length; i++){
+				var table = document.getElementById("symbolTable");
+				var row = table.insertRow(-1);
+				var key = row.insertCell(0);
+				key.innerHTML = symbols[i].key;
+				var type = row.insertCell(1);
+				type.innerHTML = symbols[i].type;
+				var scope = row.insertCell(2);
+				var scopeLevel = row.insertCell(3);
+				var lineNumber = row.insertCell(4);
 			}
 		}
 		
