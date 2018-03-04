@@ -28,7 +28,8 @@ module TSC {
         Type = "Type",
         Char = "Char",
         Digit = "Digit",
-        IntOp = "IntOp"
+        IntOp = "IntOp",
+        BoolOp = "BoolOp"
     }
 
     export class Parser {
@@ -302,7 +303,9 @@ module TSC {
                 return true;
             }
             else if(this.matchToken(TokenType.TLparen, production, Production.BooleanExpr, false) && this.parseExpr([Production.Expr], true) &&
-            this.matchToken(TokenType.TBoolop, null, null, true) && this.parseExpr([Production.Expr], true) && this.matchToken(TokenType.TRparen, null, null, true)){
+            this.parseBoolop(null, true) && this.parseExpr([Production.Expr], true) && this.matchToken(TokenType.TRparen, null, null, true)){
+            // else if(this.matchToken(TokenType.TLparen, production, Production.BooleanExpr, false) && this.parseExpr([Production.Expr], true) &&
+            // this.matchToken(TokenType.TBoolop, null, null, true) && this.parseExpr([Production.Expr], true) && this.matchToken(TokenType.TRparen, null, null, true)){
                 // ascend the tree after we've derived a print statement
                 this.cst.ascendTree();
                 return true;
@@ -416,6 +419,23 @@ module TSC {
             if(expected && !this.error){
                 this.error = true;
                 this.log.push("ERROR - Expecting Digit, found " + this.tokenList[this.currentToken].type);
+            }
+            return false;
+        }
+
+        /**
+         * Parses the tokens to see if they make up an Boolop, or == or !=
+         * @param production the productions being rewritten
+         * @param expected flag for if nonterminal is expected in rewrite rule
+         */
+        public parseBoolop(production: Array<Production>, expected: boolean) {
+            if(this.matchToken(TokenType.TBoolop, production, Production.BoolOp, false)){
+                this.cst.ascendTree();
+                return true;
+            }
+            if(expected && !this.error){
+                this.error = true;
+                this.log.push("ERROR - Expecting Boolop, found " + this.tokenList[this.currentToken].type);
             }
             return false;
         }

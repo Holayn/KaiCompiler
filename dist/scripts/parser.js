@@ -29,6 +29,7 @@ var TSC;
         Production["Char"] = "Char";
         Production["Digit"] = "Digit";
         Production["IntOp"] = "IntOp";
+        Production["BoolOp"] = "BoolOp";
     })(Production = TSC.Production || (TSC.Production = {}));
     var Parser = /** @class */ (function () {
         // Constructor for parser, passed tokens from lexer. Inits values.
@@ -278,7 +279,9 @@ var TSC;
                 return true;
             }
             else if (this.matchToken(TSC.TokenType.TLparen, production, Production.BooleanExpr, false) && this.parseExpr([Production.Expr], true) &&
-                this.matchToken(TSC.TokenType.TBoolop, null, null, true) && this.parseExpr([Production.Expr], true) && this.matchToken(TSC.TokenType.TRparen, null, null, true)) {
+                this.parseBoolop(null, true) && this.parseExpr([Production.Expr], true) && this.matchToken(TSC.TokenType.TRparen, null, null, true)) {
+                // else if(this.matchToken(TokenType.TLparen, production, Production.BooleanExpr, false) && this.parseExpr([Production.Expr], true) &&
+                // this.matchToken(TokenType.TBoolop, null, null, true) && this.parseExpr([Production.Expr], true) && this.matchToken(TokenType.TRparen, null, null, true)){
                 // ascend the tree after we've derived a print statement
                 this.cst.ascendTree();
                 return true;
@@ -390,6 +393,22 @@ var TSC;
             return false;
         };
         /**
+         * Parses the tokens to see if they make up an Boolop, or == or !=
+         * @param production the productions being rewritten
+         * @param expected flag for if nonterminal is expected in rewrite rule
+         */
+        Parser.prototype.parseBoolop = function (production, expected) {
+            if (this.matchToken(TSC.TokenType.TBoolop, production, Production.BoolOp, false)) {
+                this.cst.ascendTree();
+                return true;
+            }
+            if (expected && !this.error) {
+                this.error = true;
+                this.log.push("ERROR - Expecting Boolop, found " + this.tokenList[this.currentToken].type);
+            }
+            return false;
+        };
+        /**
          * Parses the tokens to see if they make up a CharList, or a Char Charlist, or epsilon
          * @param production the productions being rewritten
          * @param expected flag for if nonterminal is expected in rewrite rule
@@ -439,8 +458,6 @@ var TSC;
                     // add final production that was rewritten
                     this.cst.addNTNode(rewrite);
                     this.log.push("VALID - Expecting " + start[start.length - 1] + ", found " + rewrite);
-                    // console.log("add node");
-                    // console.log(start + "->" + rewrite);
                 }
                 else if (rewrite != null) {
                     this.cst.addNTNode(rewrite);
