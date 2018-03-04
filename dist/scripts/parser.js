@@ -28,6 +28,7 @@ var TSC;
         Production["Type"] = "Type";
         Production["Char"] = "Char";
         Production["Digit"] = "Digit";
+        Production["IntOp"] = "IntOp";
     })(Production = TSC.Production || (TSC.Production = {}));
     var Parser = /** @class */ (function () {
         // Constructor for parser, passed tokens from lexer. Inits values.
@@ -232,11 +233,13 @@ var TSC;
             // if(this.matchToken(TokenType.TDigit, production, Production.IntExpr, false)){
             if (this.parseDigit(production.concat([Production.IntExpr]), false)) {
                 // ascend the tree after we've derived an intexpr
-                this.cst.ascendTree();
-                if (this.matchToken(TSC.TokenType.TIntop, null, null, false) && this.parseExpr([Production.Expr], true)) {
+                // if(this.parseIntop([Production.IntOp], false) && this.parseExpr([Production.Expr], true)){
+                if (this.parseIntop(null, false) && this.parseExpr([Production.Expr], true)) {
+                    this.cst.ascendTree();
                     return true;
                 }
                 else {
+                    this.cst.ascendTree();
                     return true;
                 }
             }
@@ -369,6 +372,22 @@ var TSC;
             return false;
         };
         /**
+         * Parses the tokens to see if they make up an Intop, or +
+         * @param production the productions being rewritten
+         * @param expected flag for if nonterminal is expected in rewrite rule
+         */
+        Parser.prototype.parseIntop = function (production, expected) {
+            if (this.matchToken(TSC.TokenType.TIntop, production, Production.IntOp, false)) {
+                this.cst.ascendTree();
+                return true;
+            }
+            if (expected && !this.error) {
+                this.error = true;
+                this.log.push("ERROR - Expecting Digit, found " + this.tokenList[this.currentToken].type);
+            }
+            return false;
+        };
+        /**
          * Parses the tokens to see if they make up a CharList, or a Char Charlist, or epsilon
          * @param production the productions being rewritten
          * @param expected flag for if nonterminal is expected in rewrite rule
@@ -421,6 +440,10 @@ var TSC;
                     this.log.push("VALID - Expecting " + start[start.length - 1] + ", found " + rewrite);
                     // console.log("add node");
                     // console.log(start + "->" + rewrite);
+                }
+                else if (rewrite != null) {
+                    this.cst.addNTNode(rewrite);
+                    this.log.push("VALID - Expecting " + rewrite + ", found " + rewrite);
                 }
                 this.log.push("VALID - Expecting " + token + ", found " + this.tokenList[this.currentToken].type + " " + this.tokenList[this.currentToken].value);
                 // Add token to tree

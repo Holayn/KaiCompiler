@@ -27,7 +27,8 @@ module TSC {
         BoolVal = "BoolVal",
         Type = "Type",
         Char = "Char",
-        Digit = "Digit"
+        Digit = "Digit",
+        IntOp = "IntOp"
     }
 
     export class Parser {
@@ -254,11 +255,13 @@ module TSC {
             // if(this.matchToken(TokenType.TDigit, production, Production.IntExpr, false)){
             if(this.parseDigit(production.concat([Production.IntExpr]), false)){
                 // ascend the tree after we've derived an intexpr
-                this.cst.ascendTree();
-                if(this.matchToken(TokenType.TIntop, null, null, false) && this.parseExpr([Production.Expr], true)){
+                // if(this.parseIntop([Production.IntOp], false) && this.parseExpr([Production.Expr], true)){
+                if(this.parseIntop(null, false) && this.parseExpr([Production.Expr], true)){
+                    this.cst.ascendTree();
                     return true;
                 }
                 else{
+                    this.cst.ascendTree();
                     return true;
                 }
             }
@@ -399,6 +402,23 @@ module TSC {
         }
 
         /**
+         * Parses the tokens to see if they make up an Intop, or +
+         * @param production the productions being rewritten
+         * @param expected flag for if nonterminal is expected in rewrite rule
+         */
+        public parseIntop(production: Array<Production>, expected: boolean) {
+            if(this.matchToken(TokenType.TIntop, production, Production.IntOp, false)){
+                this.cst.ascendTree();
+                return true;
+            }
+            if(expected && !this.error){
+                this.error = true;
+                this.log.push("ERROR - Expecting Digit, found " + this.tokenList[this.currentToken].type);
+            }
+            return false;
+        }
+
+        /**
          * Parses the tokens to see if they make up a CharList, or a Char Charlist, or epsilon
          * @param production the productions being rewritten
          * @param expected flag for if nonterminal is expected in rewrite rule
@@ -453,6 +473,10 @@ module TSC {
                     this.log.push("VALID - Expecting " + start[start.length-1] + ", found " + rewrite);
                     // console.log("add node");
                     // console.log(start + "->" + rewrite);
+                }
+                else if(rewrite != null){
+                    this.cst.addNTNode(rewrite);
+                    this.log.push("VALID - Expecting " + rewrite + ", found " + rewrite);
                 }
                 this.log.push("VALID - Expecting " + token + ", found " + this.tokenList[this.currentToken].type + " " + this.tokenList[this.currentToken].value);
                 // Add token to tree
