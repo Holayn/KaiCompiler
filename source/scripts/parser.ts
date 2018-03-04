@@ -24,7 +24,8 @@ module TSC {
         StringExpr = "StringExpression",
         CharList = "CharList",
         Id = "Id",
-        BoolVal = "BoolVal"
+        BoolVal = "BoolVal",
+        Type = "Type"
     }
 
     export class Parser {
@@ -173,12 +174,17 @@ module TSC {
          * @param expected flag for if nonterminal is expected in rewrite rule
          */
         public parseVarDecl(production: Array<Production>, expected: boolean) {
-            if(this.matchToken(TokenType.TType, production, Production.VarDecl, false) && 
-            this.parseId(null, true)){
+            if(this.parseType(production.concat([Production.VarDecl]), false) && this.parseId(null, true)){
                 // ascend the tree after we've derived a vardecl
                 this.cst.ascendTree();
                 return true;
             }
+            // if(this.matchToken(TokenType.TType, production, Production.VarDecl, false) && 
+            // this.parseId(null, true)){
+            //     // ascend the tree after we've derived a vardecl
+            //     this.cst.ascendTree();
+            //     return true;
+            // }
             if(expected && !this.error){
                 this.error = true;
                 this.log.push("ERROR - Expecting VarDecl, found " + this.tokenList[this.currentToken].type);
@@ -290,21 +296,17 @@ module TSC {
          * @param expected flag for if nonterminal is expected in rewrite rule
          */
         public parseBooleanExpr(production: Array<Production>, expected: boolean) {
-            // if(this.matchToken(TokenType.TBoolval, production, Production.BooleanExpr, false)){
-            //     this.cst.ascendTree();
-            //     return true;
-            // }
             if(this.parseBoolVal(production, false)){
                 // ascend the tree after we've derived a booleanexpr
                 this.cst.ascendTree();
                 return true;
             }
-            // else if(this.matchToken(TokenType.TLparen, production, Production.BooleanExpr, false) && this.parseExpr(Production.Expr, true) &&
-            // this.matchToken(TokenType.TBoolop, null, null, true) && this.parseExpr(Production.Expr, true) && this.matchToken(TokenType.TRparen, null, null, true)){
-            //     // ascend the tree after we've derived a print statement
-            //     this.cst.ascendTree();
-            //     return true;
-            // }
+            else if(this.matchToken(TokenType.TLparen, production, Production.BooleanExpr, false) && this.parseExpr([Production.Expr], true) &&
+            this.matchToken(TokenType.TBoolop, null, null, true) && this.parseExpr([Production.Expr], true) && this.matchToken(TokenType.TRparen, null, null, true)){
+                // ascend the tree after we've derived a print statement
+                this.cst.ascendTree();
+                return true;
+            }
             if(expected && !this.error){
                 this.error = true;
                 this.log.push("ERROR - Expecting BooleanExpr, found " + this.tokenList[this.currentToken].type);
@@ -318,9 +320,10 @@ module TSC {
          * @param expected flag for if nonterminal is expected in rewrite rule
          */
         public parseBoolVal(production: Array<Production>, expected: boolean) {
+            // we add a BooleanExpr to the list of productions rewritten, as Expr is rewritten to BooleanExpr, which is then rewritten to Boolval
             if(this.matchToken(TokenType.TBoolval, production.concat([Production.BooleanExpr]), Production.BoolVal, false)){
-                // ascend the tree after we've derived a boolval statement
-                this.cst.ascendTree();
+                // // ascend the tree after we've derived a boolval statement
+                // this.cst.ascendTree();
                 return true;
             }
             if(expected && !this.error){
@@ -344,6 +347,24 @@ module TSC {
             if(expected && !this.error){
                 this.error = true;
                 this.log.push("ERROR - Expecting Id, found " + this.tokenList[this.currentToken].type);
+            }
+            return false;
+        }
+
+        /**
+         * Parses the tokens to see if they make up a Type, or int, string, or boolean
+         * @param production the productions being rewritten
+         * @param expected flag for if nonterminal is expected in rewrite rule
+         */
+        public parseType(production: Array<Production>, expected: boolean) {
+            console.log("PARSING TYPE");
+            // we add a BooleanExpr to the list of productions rewritten, as Expr is rewritten to BooleanExpr, which is then rewritten to Boolval
+            if(this.matchToken(TokenType.TType, production, Production.Type, false)){
+                return true;
+            }
+            if(expected && !this.error){
+                this.error = true;
+                this.log.push("ERROR - Expecting BoolVal, found " + this.tokenList[this.currentToken].type);
             }
             return false;
         }
@@ -382,25 +403,26 @@ module TSC {
          * @param expected flag for if token is expected to be matched
          */
         public matchToken(token: TokenType, start: Array<Production>, rewrite: Production, expected: boolean) {
+            console.log(start);
             // If the parser has encountered an error, don't parse anymore tokens mate
             if(this.error){
                 return false;
             }
             if(this.tokenList[this.currentToken].type == token){
                 if(start != null) {
-                    this.log.push("VALID - Expecting " + start + ", found " + rewrite);
-                    // We know every statement is rewritten from StatementList
-                    // if(start[0] == Production.Stmt){
-                    //     this.cst.addNTNode(Production.StmtList);
-                    // }
+                    // this.log.push("VALID - Expecting " + start + ", found " + rewrite); // fix this
                     // add all productions in start
                     for(var i=0; i<start.length; i++){
                         this.cst.addNTNode(start[i]);
+                        if(i != 0){
+                            this.log.push("VALID - Expecting " + start[i-1] + ", found " + start[i]);
+                        }
                     }
-                    // this.cst.addNTNode(start[0]);
+                    // add final production that was rewritten
                     this.cst.addNTNode(rewrite);
-                    console.log("add node");
-                    console.log(start + "->" + rewrite);
+                    this.log.push("VALID - Expecting " + start[start.length-1] + ", found " + rewrite);
+                    // console.log("add node");
+                    // console.log(start + "->" + rewrite);
                 }
                 this.log.push("VALID - Expecting " + token + ", found " + this.tokenList[this.currentToken].type + " " + this.tokenList[this.currentToken].value);
                 // Add token to tree
