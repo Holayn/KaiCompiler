@@ -332,32 +332,51 @@ module TSC {
 
 
         // ---------------------------- TERMINALS -------------------------------- //
-        // if next token we're looking at match to a terminal symbol, advance the current token
-        // if error, break out of parse
 
-        // Matches to passed token type
-        public matchToken(token: TokenType) {
-            // Check if there has been an error. If so, stop
-            // if(this.error){
-            //     return false;
-            // }
-            console.log("PARSER: testing match of " + this.tokenList[this.currentToken].type + " to token: " + token);
+        /**
+         * Matches and consumes a passed token type.
+         * If the next token we're looking at match to a terminal symbol, 
+         * advance the current token.
+         * If error, break out of parse
+         * Logs appropriate production that is being derived.
+         * Token is expected to be present based on boolean value passed. If
+         * the token is not present, throw an error.
+         * @param token the token that is being matched and consumed
+         * @param start production that is being rewritten, if any
+         * @param rewrite production that is being rewritten to, if any
+         * @param expected flag for if token is expected to be matched
+         */
+        public matchToken(token: TokenType, start: Production, rewrite: Production, expected: boolean) {
+            if(this.error){
+                return false;
+            }
             if(this.tokenList[this.currentToken].type == token){
-                console.log("PARSER: TOKEN " + token + " found");
+                if(start != null) {
+                    this.log.push("VALID - Expecting " + start + ", found " + rewrite);
+                    // We know every statement is rewritten from StatementList
+                    if(start == Production.Stmt){
+                        this.cst.addNTNode(Production.StmtList);
+                    }
+                    this.cst.addNTNode(start);
+                    this.cst.addNTNode(rewrite);
+                    console.log("add node");
+                    console.log(start + "->" + rewrite);
+                }
+                this.log.push("VALID - Expecting " + token + ", found " + this.tokenList[this.currentToken].type + " " + this.tokenList[this.currentToken].value);
+                // Add token to tree
+                this.cst.addTNode(this.tokenList[this.currentToken]);
+                console.log("Adding " + this.tokenList[this.currentToken].value + " to the tree");
+                this.cst.traverseTree();
+                // consume token
+                this.currentToken++;
                 return true;
             }
-            // maybe don't have invalid here?
-            // this.log.push("INVALID - Expecting " + token + ", found " + this.tokenList[this.currentToken].type);
-            return false;
-        }
-
-        // Consumes a token
-        public consumeToken(token: TokenType) {
-            if(this.tokenList[this.currentToken].type == token){
-                console.log("PARSER: CONSUME TOKEN " + token);
-                this.log.push("VALID - Expecting " + token + ", found " + this.tokenList[this.currentToken].type);
-                this.currentToken++;
+            // if token was expected and was not present, throw an error
+            if(expected){
+                this.error = true;
+                this.log.push("ERROR - Expecting " + token + ", found " + this.tokenList[this.currentToken].type);
             }
+            return false;
         }
     }
 }
