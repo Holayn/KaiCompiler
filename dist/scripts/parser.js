@@ -26,6 +26,7 @@ var TSC;
         Production["Id"] = "Id";
         Production["BoolVal"] = "BoolVal";
         Production["Type"] = "Type";
+        Production["Char"] = "Char";
     })(Production = TSC.Production || (TSC.Production = {}));
     var Parser = /** @class */ (function () {
         // Constructor for parser, passed tokens from lexer. Inits values.
@@ -214,8 +215,8 @@ var TSC;
          * @param expected flag for if nonterminal is expected in rewrite rule
          */
         Parser.prototype.parseExpr = function (production, expected) {
-            if (this.parseIntExpr([production], false) || this.parseStringExpr([production], false) || this.parseBooleanExpr([production], false) ||
-                this.parseId([production], false)) {
+            if (this.parseIntExpr(production, false) || this.parseStringExpr(production, false) || this.parseBooleanExpr(production, false) ||
+                this.parseId(production, false)) {
                 // ascend the tree after we've derived an expr
                 this.cst.ascendTree();
                 return true;
@@ -314,7 +315,7 @@ var TSC;
          */
         Parser.prototype.parseId = function (production, expected) {
             if (this.matchToken(TSC.TokenType.TId, production, Production.Id, false)) {
-                // ascend the tree after we've derived a print statement
+                // ascend the tree after we've derived an id
                 this.cst.ascendTree();
                 return true;
             }
@@ -330,14 +331,28 @@ var TSC;
          * @param expected flag for if nonterminal is expected in rewrite rule
          */
         Parser.prototype.parseType = function (production, expected) {
-            console.log("PARSING TYPE");
-            // we add a BooleanExpr to the list of productions rewritten, as Expr is rewritten to BooleanExpr, which is then rewritten to Boolval
             if (this.matchToken(TSC.TokenType.TType, production, Production.Type, false)) {
                 return true;
             }
             if (expected && !this.error) {
                 this.error = true;
-                this.log.push("ERROR - Expecting BoolVal, found " + this.tokenList[this.currentToken].type);
+                this.log.push("ERROR - Expecting Type, found " + this.tokenList[this.currentToken].type);
+            }
+            return false;
+        };
+        /**
+         * Parses the tokens to see if they make up a Char, or a, b, c ..., z
+         * @param production the productions being rewritten
+         * @param expected flag for if nonterminal is expected in rewrite rule
+         */
+        Parser.prototype.parseChar = function (production, expected) {
+            if (this.matchToken(TSC.TokenType.TChar, production, Production.Char, false)) {
+                this.cst.ascendTree();
+                return true;
+            }
+            if (expected && !this.error) {
+                this.error = true;
+                this.log.push("ERROR - Expecting Char, found " + this.tokenList[this.currentToken].type);
             }
             return false;
         };
@@ -348,7 +363,7 @@ var TSC;
          */
         Parser.prototype.parseCharList = function (production, expected) {
             // spaces are treated as chars for me
-            if (this.matchToken(TSC.TokenType.TChar, production, Production.CharList, false) && this.parseCharList([Production.CharList], false)) {
+            if (this.parseChar(production, false) && this.parseCharList(production, false)) {
                 // ascend the tree after we've derived a print statement
                 this.cst.ascendTree();
                 return true;
@@ -373,6 +388,7 @@ var TSC;
          * @param expected flag for if token is expected to be matched
          */
         Parser.prototype.matchToken = function (token, start, rewrite, expected) {
+            console.log("PRODS");
             console.log(start);
             // If the parser has encountered an error, don't parse anymore tokens mate
             if (this.error) {
