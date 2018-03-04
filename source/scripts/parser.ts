@@ -123,63 +123,52 @@ module TSC {
             return false;
         }
 
-        public parsePrintStatement() {
-            console.log("PARSER: parsing a print");
-            // this is why we need to sep match and consume
-            if(this.matchToken(TokenType.TPrint)){
-                console.log("PARSER: printstatement found");
-                this.log.push("VALID - Expecting Statement, found PrintStatement");
-                this.log.push("VALID - Expecting Print, found " + this.tokenList[this.currentToken].type);
-                this.consumeToken(TokenType.TPrint);
-                if(this.matchToken(TokenType.TLparen)){
-                    this.consumeToken(TokenType.TLparen);
-                    if(this.parseExpr()){
-                        if(this.matchToken(TokenType.TRparen)){
-                            this.consumeToken(TokenType.TRparen);
-                        }
-                    }
-                    return true;
-                }
+        /**
+         * Parses the tokens to see if they make up a PrintStatement, or a Print ( Expr )
+         * @param production the production that is being rewritten
+         * @param expected flag for if nonterminal is expected in rewrite rule
+         */
+        public parsePrintStatement(production: Production, expected: boolean) {
+            if(this.matchToken(TokenType.TPrint, production, Production.PrintStmt, false) && this.matchToken(TokenType.TLparen, null, null, true) &&
+            this.parseExpr(Production.Expr, true) && this.matchToken(TokenType.TRparen, null, null, true)){
+                return true;
+            }
+            if(expected && !this.error){
+                this.log.push("ERROR - Expecting PrintStatement, found " + this.tokenList[this.currentToken].type);
             }
             return false;
         }
 
-        public parseAssignmentStatement() {
-            console.log("PARSER: parsing a assignmentstatement");
-            if(this.matchToken(TokenType.TId)){
-                this.log.push("VALID - Expecting Statement, found AssignmentStatement");
-                this.consumeToken(TokenType.TId);
-                if(this.matchToken(TokenType.TAssign)){
-                    this.consumeToken(TokenType.TAssign);
-                    if(this.parseExpr()){
-                        return true;
-                    }
-                    else{
-                        this.error = true;
-                        this.log.push("ERROR - Expecting Expr, found " + this.tokenList[this.currentToken].type);
-                    }
-                }
-                else{
-                    this.error = true;
-                    this.log.push("ERROR - Expecting TAssign, found " + this.tokenList[this.currentToken].type);
-                }
+        /**
+         * Parses the tokens to see if they make up an AssignmentStatement, or an Id = Expr
+         * @param production the production that is being rewritten
+         * @param expected flag for if nonterminal is expected in rewrite rule
+         */
+        public parseAssignmentStatement(production: Production, expected: boolean) {
+            if(this.matchToken(TokenType.TId, production, Production.AssignStmt, false) && 
+            this.matchToken(TokenType.TAssign, null, null, true) && this.parseExpr(Production.Expr, true)){
+                return true;
+            }
+            if(expected && this.error){
+                this.error = true;
+                this.log.push("ERROR - Expecting AssignmentStatement, found " + this.tokenList[this.currentToken].type);
             }
             return false;
         }
 
-        public parseVarDecl() {
-            console.log("PARSER: parsing a vardecl");
-            if(this.matchToken(TokenType.TType)){
-                console.log("PARSER: vardecl found");
-                this.log.push("VALID - Expecting Statement, found VarDecl");
-                this.consumeToken(TokenType.TType);
-                if(this.parseId()){
-                    return true;
-                }
-                else{
-                    this.error = true;
-                    this.log.push("ERROR - Expecting TId, found " + this.tokenList[this.currentToken].type);
-                }
+        /**
+         * Parses the tokens to see if they make up a VarDecl, or a Type Id
+         * @param production the production that is being rewritten
+         * @param expected flag for if nonterminal is expected in rewrite rule
+         */
+        public parseVarDecl(production: Production, expected: boolean) {
+            if(this.matchToken(TokenType.TType, production, Production.VarDecl, false) && 
+            this.parseId(null, true)){
+                return true;
+            }
+            if(expected && !this.error){
+                this.error = true;
+                this.log.push("ERROR - Expecting VarDecl, found " + this.tokenList[this.currentToken].type);
             }
             return false;
         }
