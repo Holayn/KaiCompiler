@@ -237,6 +237,40 @@ var TSC;
             }
             return false;
         };
+        /**
+         * Parses the tokens to see if they make up a BooleanExpr, or a Boolval or a ( Expr Boolop Expr )
+         * @param production the production that is being rewritten
+         * @param expected flag for if nonterminal is expected in rewrite rule
+         */
+        Parser.prototype.parseBooleanExpr = function (production, expected) {
+            if (this.matchToken(TSC.TokenType.TBoolval, production, Production.BooleanExpr, false)) {
+                return true;
+            }
+            else if (this.matchToken(TSC.TokenType.TLparen, production, Production.BooleanExpr, false) && this.parseExpr(Production.Expr, true) &&
+                this.matchToken(TSC.TokenType.TBoolop, null, null, true) && this.parseExpr(Production.Expr, true) && this.matchToken(TSC.TokenType.TRparen, null, null, true)) {
+                return true;
+            }
+            if (expected && !this.error) {
+                this.error = true;
+                this.log.push("ERROR - Expecting BooleanExpr, found " + this.tokenList[this.currentToken].type);
+            }
+            return false;
+        };
+        /**
+         * Parses the tokens to see if they make up an Id
+         * @param production the production that is being rewritten
+         * @param expected flag for if nonterminal is expected in rewrite rule
+         */
+        Parser.prototype.parseId = function (production, expected) {
+            if (this.matchToken(TSC.TokenType.TId, production, Production.Id, false)) {
+                return true;
+            }
+            if (expected && !this.error) {
+                this.error = true;
+                this.log.push("ERROR - Expecting Id, found " + this.tokenList[this.currentToken].type);
+            }
+            return false;
+        };
         Parser.prototype.parseCharList = function () {
             console.log("PARSER: parsing a charlist");
             // spaces are treated as chars for me

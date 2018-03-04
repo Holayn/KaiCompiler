@@ -261,6 +261,41 @@ module TSC {
             return false;
         }
 
+        /**
+         * Parses the tokens to see if they make up a BooleanExpr, or a Boolval or a ( Expr Boolop Expr )
+         * @param production the production that is being rewritten
+         * @param expected flag for if nonterminal is expected in rewrite rule
+         */
+        public parseBooleanExpr(production: Production, expected: boolean) {
+            if(this.matchToken(TokenType.TBoolval, production, Production.BooleanExpr, false)){
+                return true;
+            }
+            else if(this.matchToken(TokenType.TLparen, production, Production.BooleanExpr, false) && this.parseExpr(Production.Expr, true) &&
+            this.matchToken(TokenType.TBoolop, null, null, true) && this.parseExpr(Production.Expr, true) && this.matchToken(TokenType.TRparen, null, null, true)){
+                return true;
+            }
+            if(expected && !this.error){
+                this.error = true;
+                this.log.push("ERROR - Expecting BooleanExpr, found " + this.tokenList[this.currentToken].type);
+            }
+            return false;
+        }
+
+        /**
+         * Parses the tokens to see if they make up an Id
+         * @param production the production that is being rewritten
+         * @param expected flag for if nonterminal is expected in rewrite rule
+         */
+        public parseId(production: Production, expected: boolean) {
+            if(this.matchToken(TokenType.TId, production, Production.Id, false)){
+                return true;
+            }
+            if(expected && !this.error){
+                this.error = true;
+                this.log.push("ERROR - Expecting Id, found " + this.tokenList[this.currentToken].type);
+            }
+            return false;
+        }
 
         public parseCharList() {
             console.log("PARSER: parsing a charlist");
