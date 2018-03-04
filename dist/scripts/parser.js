@@ -194,7 +194,7 @@ var TSC;
          * @param expected flag for if nonterminal is expected in rewrite rule
          */
         Parser.prototype.parseIfStatement = function (production, expected) {
-            if (this.matchToken(TSC.TokenType.TIf, production, Production.IfStmt, false) && this.parseBooleanExpr([Production.BooleanExpr], true) &&
+            if (this.matchToken(TSC.TokenType.TIf, production, Production.IfStmt, false) && this.parseBooleanExpr([], true) &&
                 this.parseBlock(null, true)) {
                 // ascend the tree after we've derived an ifstatement
                 this.cst.ascendTree();
@@ -280,8 +280,6 @@ var TSC;
             }
             else if (this.matchToken(TSC.TokenType.TLparen, production, Production.BooleanExpr, false) && this.parseExpr([Production.Expr], true) &&
                 this.parseBoolop(null, true) && this.parseExpr([Production.Expr], true) && this.matchToken(TSC.TokenType.TRparen, null, null, true)) {
-                // else if(this.matchToken(TokenType.TLparen, production, Production.BooleanExpr, false) && this.parseExpr([Production.Expr], true) &&
-                // this.matchToken(TokenType.TBoolop, null, null, true) && this.parseExpr([Production.Expr], true) && this.matchToken(TokenType.TRparen, null, null, true)){
                 // ascend the tree after we've derived a print statement
                 this.cst.ascendTree();
                 return true;
@@ -351,6 +349,7 @@ var TSC;
          */
         Parser.prototype.parseChar = function (production, expected) {
             if (this.matchToken(TSC.TokenType.TChar, production, Production.Char, false)) {
+                // ascend tree after deriving char
                 this.cst.ascendTree();
                 return true;
             }
@@ -440,14 +439,13 @@ var TSC;
          * @param expected flag for if token is expected to be matched
          */
         Parser.prototype.matchToken = function (token, start, rewrite, expected) {
-            console.log("PRODS");
-            console.log(start);
             // If the parser has encountered an error, don't parse anymore tokens mate
             if (this.error) {
                 return false;
             }
             if (this.tokenList[this.currentToken].type == token) {
-                if (start != null) {
+                // If rewriting from a non-terminal to a terminal, add to tree and log
+                if (start != null && start.length != 0) {
                     // add all productions in start
                     for (var i = 0; i < start.length; i++) {
                         this.cst.addNTNode(start[i]);

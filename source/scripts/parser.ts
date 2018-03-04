@@ -214,7 +214,7 @@ module TSC {
          * @param expected flag for if nonterminal is expected in rewrite rule
          */
         public parseIfStatement(production: Array<Production>, expected: boolean) {
-            if(this.matchToken(TokenType.TIf, production, Production.IfStmt, false) && this.parseBooleanExpr([Production.BooleanExpr], true) &&
+            if(this.matchToken(TokenType.TIf, production, Production.IfStmt, false) && this.parseBooleanExpr([], true) &&
             this.parseBlock(null, true)){
                 // ascend the tree after we've derived an ifstatement
                 this.cst.ascendTree();
@@ -304,8 +304,6 @@ module TSC {
             }
             else if(this.matchToken(TokenType.TLparen, production, Production.BooleanExpr, false) && this.parseExpr([Production.Expr], true) &&
             this.parseBoolop(null, true) && this.parseExpr([Production.Expr], true) && this.matchToken(TokenType.TRparen, null, null, true)){
-            // else if(this.matchToken(TokenType.TLparen, production, Production.BooleanExpr, false) && this.parseExpr([Production.Expr], true) &&
-            // this.matchToken(TokenType.TBoolop, null, null, true) && this.parseExpr([Production.Expr], true) && this.matchToken(TokenType.TRparen, null, null, true)){
                 // ascend the tree after we've derived a print statement
                 this.cst.ascendTree();
                 return true;
@@ -379,6 +377,7 @@ module TSC {
          */
         public parseChar(production: Array<Production>, expected: boolean) {
             if(this.matchToken(TokenType.TChar, production, Production.Char, false)){
+                // ascend tree after deriving char
                 this.cst.ascendTree();
                 return true;
             }
@@ -474,14 +473,13 @@ module TSC {
          * @param expected flag for if token is expected to be matched
          */
         public matchToken(token: TokenType, start: Array<Production>, rewrite: Production, expected: boolean) {
-            console.log("PRODS");
-            console.log(start);
             // If the parser has encountered an error, don't parse anymore tokens mate
             if(this.error){
                 return false;
             }
             if(this.tokenList[this.currentToken].type == token){
-                if(start != null) {
+                // If rewriting from a non-terminal to a terminal, add to tree and log
+                if(start != null && start.length != 0) {
                     // add all productions in start
                     for(var i=0; i<start.length; i++){
                         this.cst.addNTNode(start[i]);
@@ -493,6 +491,7 @@ module TSC {
                     this.cst.addNTNode(rewrite);
                     this.log.push("VALID - Expecting " + start[start.length-1] + ", found " + rewrite);
                 }
+                // If rewriting to some non-terminal only, display it in tree and log
                 else if(rewrite != null){
                     this.cst.addNTNode(rewrite);
                     this.log.push("VALID - Expecting " + rewrite + ", found " + rewrite);
