@@ -72,7 +72,9 @@ module TSC {
             else{
                 console.log("PARSER: error");
             }
+            // Return the parser log
             console.log(this.log);
+            return this.log;
         }
 
         /**
@@ -98,7 +100,7 @@ module TSC {
             }
             if(expected && !this.error){
                 this.error = true;
-                this.log.push("ERROR - Expecting Block, found " + this.tokenList[this.currentToken].type);
+                this.log.push("ERROR - Expecting [Block], found [" + this.tokenList[this.currentToken].type + "]");
             }
             return false;
         }
@@ -148,7 +150,7 @@ module TSC {
                 return true;
             }
             if(expected && !this.error){
-                this.log.push("ERROR - Expecting PrintStatement, found " + this.tokenList[this.currentToken].type);
+                this.log.push("ERROR - Expecting [PrintStatement], found [" + this.tokenList[this.currentToken].type +"]");
             }
             return false;
         }
@@ -167,7 +169,7 @@ module TSC {
             }
             if(expected && this.error){
                 this.error = true;
-                this.log.push("ERROR - Expecting AssignmentStatement, found " + this.tokenList[this.currentToken].type);
+                this.log.push("ERROR - Expecting [AssignmentStatement], found [" + this.tokenList[this.currentToken].type +"]");
             }
             return false;
         }
@@ -185,7 +187,7 @@ module TSC {
             }
             if(expected && !this.error){
                 this.error = true;
-                this.log.push("ERROR - Expecting VarDecl, found " + this.tokenList[this.currentToken].type);
+                this.log.push("ERROR - Expecting [VarDecl], found [" + this.tokenList[this.currentToken].type + "]");
             }
             return false;
         }
@@ -203,7 +205,7 @@ module TSC {
             }
             if(expected && !this.error){
                 this.error = true;
-                this.log.push("ERROR - Expecting WhileStatement, found " + this.tokenList[this.currentToken].type);
+                this.log.push("ERROR - Expecting [WhileStatement], found [" + this.tokenList[this.currentToken].type + "]");
             }
             return false;
         }
@@ -214,6 +216,7 @@ module TSC {
          * @param expected flag for if nonterminal is expected in rewrite rule
          */
         public parseIfStatement(production: Array<Production>, expected: boolean) {
+            // we let parseBooleanExpr derive appropriate rewrite rules by passing empty production array
             if(this.matchToken(TokenType.TIf, production, Production.IfStmt, false) && this.parseBooleanExpr([], true) &&
             this.parseBlock(null, true)){
                 // ascend the tree after we've derived an ifstatement
@@ -222,7 +225,7 @@ module TSC {
             }
             if(expected && !this.error){
                 this.error = true;
-                this.log.push("ERROR - Expecting IfStatement, found " + this.tokenList[this.currentToken].type);
+                this.log.push("ERROR - Expecting [IfStatement], found [" + this.tokenList[this.currentToken].type + "]");
             }
             return false;
         }
@@ -242,7 +245,7 @@ module TSC {
             // return error if expression not found
             if(!this.error){
                 this.error = true;
-                this.log.push("ERROR - Expecting Expr, found " + this.tokenList[this.currentToken].type);
+                this.log.push("ERROR - Expecting [Expr], found [" + this.tokenList[this.currentToken].type + "]");
             }
             return false;
         }
@@ -268,7 +271,7 @@ module TSC {
             }
             if(expected && !this.error){
                 this.error = true;
-                this.log.push("ERROR - Expecting IntExpr, found " + this.tokenList[this.currentToken].type);
+                this.log.push("ERROR - Expecting [IntExpr], found [" + this.tokenList[this.currentToken].type + "]");
             }
             return false;
         }
@@ -286,7 +289,7 @@ module TSC {
             }
             if(expected && !this.error){
                 this.error = true;
-                this.log.push("ERROR - Expecting StringExpr, found " + this.tokenList[this.currentToken].type);
+                this.log.push("ERROR - Expecting [StringExpr], found [" + this.tokenList[this.currentToken].type + "]");
             }
             return false;
         }
@@ -310,7 +313,7 @@ module TSC {
             }
             if(expected && !this.error){
                 this.error = true;
-                this.log.push("ERROR - Expecting BooleanExpr, found " + this.tokenList[this.currentToken].type);
+                this.log.push("ERROR - Expecting [BooleanExpr], found [" + this.tokenList[this.currentToken].type + "]");
             }
             return false;
         }
@@ -329,7 +332,7 @@ module TSC {
             }
             if(expected && !this.error){
                 this.error = true;
-                this.log.push("ERROR - Expecting BoolVal, found " + this.tokenList[this.currentToken].type);
+                this.log.push("ERROR - Expecting [BoolVal], found [" + this.tokenList[this.currentToken].type + "]");
             }
             return false;
         }
@@ -347,7 +350,7 @@ module TSC {
             }
             if(expected && !this.error){
                 this.error = true;
-                this.log.push("ERROR - Expecting Id, found " + this.tokenList[this.currentToken].type);
+                this.log.push("ERROR - Expecting [Id], found [" + this.tokenList[this.currentToken].type + "]");
             }
             return false;
         }
@@ -365,7 +368,7 @@ module TSC {
             }
             if(expected && !this.error){
                 this.error = true;
-                this.log.push("ERROR - Expecting Type, found " + this.tokenList[this.currentToken].type);
+                this.log.push("ERROR - Expecting [Type], found [" + this.tokenList[this.currentToken].type + "]");
             }
             return false;
         }
@@ -383,7 +386,7 @@ module TSC {
             }
             if(expected && !this.error){
                 this.error = true;
-                this.log.push("ERROR - Expecting Char, found " + this.tokenList[this.currentToken].type);
+                this.log.push("ERROR - Expecting [Char], found [" + this.tokenList[this.currentToken].type + "]");
             }
             return false;
         }
@@ -400,7 +403,7 @@ module TSC {
             }
             if(expected && !this.error){
                 this.error = true;
-                this.log.push("ERROR - Expecting Digit, found " + this.tokenList[this.currentToken].type);
+                this.log.push("ERROR - Expecting [Digit], found [" + this.tokenList[this.currentToken].type + "]");
             }
             return false;
         }
@@ -417,7 +420,7 @@ module TSC {
             }
             if(expected && !this.error){
                 this.error = true;
-                this.log.push("ERROR - Expecting Digit, found " + this.tokenList[this.currentToken].type);
+                this.log.push("ERROR - Expecting [Digit], found [" + this.tokenList[this.currentToken].type + "]");
             }
             return false;
         }
@@ -434,7 +437,7 @@ module TSC {
             }
             if(expected && !this.error){
                 this.error = true;
-                this.log.push("ERROR - Expecting Boolop, found " + this.tokenList[this.currentToken].type);
+                this.log.push("ERROR - Expecting [Boolop], found [" + this.tokenList[this.currentToken].type + "]");
             }
             return false;
         }
@@ -484,19 +487,19 @@ module TSC {
                     for(var i=0; i<start.length; i++){
                         this.cst.addNTNode(start[i]);
                         if(i != 0){
-                            this.log.push("VALID - Expecting " + start[i-1] + ", found " + start[i]);
+                            this.log.push("VALID - Expecting [" + start[i-1] + "], found [" + start[i] + "]");
                         }
                     }
                     // add final production that was rewritten
                     this.cst.addNTNode(rewrite);
-                    this.log.push("VALID - Expecting " + start[start.length-1] + ", found " + rewrite);
+                    this.log.push("VALID - Expecting [" + start[start.length-1] + "], found [" + rewrite + "]");
                 }
                 // If rewriting to some non-terminal only, display it in tree and log
                 else if(rewrite != null){
                     this.cst.addNTNode(rewrite);
-                    this.log.push("VALID - Expecting " + rewrite + ", found " + rewrite);
+                    this.log.push("VALID - Expecting [" + rewrite + "], found [" + rewrite + "]");
                 }
-                this.log.push("VALID - Expecting " + token + ", found " + this.tokenList[this.currentToken].value);
+                this.log.push("VALID - Expecting [" + token + "], found [" + this.tokenList[this.currentToken].value + "]");
                 // Add token to tree
                 this.cst.addTNode(this.tokenList[this.currentToken]);
                 console.log("Adding " + this.tokenList[this.currentToken].value + " to the tree");
@@ -508,7 +511,7 @@ module TSC {
             // if token was expected and was not present, throw an error
             if(expected){
                 this.error = true;
-                this.log.push("ERROR - Expecting " + token + ", found " + this.tokenList[this.currentToken].type);
+                this.log.push("ERROR - Expecting [" + token + "], found [" + this.tokenList[this.currentToken].type + "]");
             }
             return false;
         }
