@@ -65,7 +65,6 @@ module TSC {
              * Sets current node to look at as the parent of the current node
              */
             public ascendTree(){
-                console.log("we ascended boyz");
                 this.curr = this.curr.parent;
             }
 

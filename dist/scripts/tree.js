@@ -66,7 +66,6 @@ var TSC;
          * Sets current node to look at as the parent of the current node
          */
         Tree.prototype.ascendTree = function () {
-            console.log("we ascended boyz");
             this.curr = this.curr.parent;
         };
         /**

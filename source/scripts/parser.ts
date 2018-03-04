@@ -23,7 +23,8 @@ module TSC {
         IntExpr = "IntegerExpression",
         StringExpr = "StringExpression",
         CharList = "CharList",
-        Id = "Id"
+        Id = "Id",
+        BoolVal = "BoolVal"
     }
 
     export class Parser {
@@ -73,7 +74,7 @@ module TSC {
          * Parses the tokens to see if they make up a Program, or a Block appended with an EOP marker
          */
         public parseProgram(): boolean {
-            if(this.parseBlock(Production.Program, true) && this.matchToken(TokenType.TEop, null, null, true)){
+            if(this.parseBlock([Production.Program], true) && this.matchToken(TokenType.TEop, null, null, true)){
                 return true;
             }
             return false;
@@ -81,11 +82,12 @@ module TSC {
 
         /**
          * Parses the tokens to see if they make up a Block, or a ( StatementList )
-         * @param production the production that is being rewritten
+         * @param production the productions being rewritten
          * @param expected flag for if nonterminal is expected in rewrite rule
          */
-        public parseBlock(production: Production, expected: boolean): boolean {
+        public parseBlock(production: Array<Production>, expected: boolean): boolean {
             if(this.matchToken(TokenType.TLbrace, production, Production.Block, false) && this.parseStatementList(null, false) && this.matchToken(TokenType.TRbrace, null, null, true)){
+                // ascend the tree after we've derived a block
                 this.cst.ascendTree();
                 return true;
             }
@@ -98,11 +100,12 @@ module TSC {
 
         /**
          * Parses the tokens to see if they make up a StatementList, or a Statement StatementList, or epsilon
-         * @param production the production that is being rewritten
+         * @param production the productions being rewritten
          * @param expected flag for if nonterminal is expected in rewrite rule
          */
-        public parseStatementList(production: Production, expected: boolean) {
-            if(this.parseStatement(Production.StmtList, false) && this.parseStatementList(Production.StmtList, false)){
+        public parseStatementList(production: Array<Production>, expected: boolean) {
+            if(this.parseStatement([Production.StmtList], false) && this.parseStatementList([Production.StmtList], false)){
+                // ascend the tree after we've derived a stmtlist
                 this.cst.ascendTree();
                 return true;
             }
@@ -114,12 +117,13 @@ module TSC {
 
         /**
          * Parses the tokens to see if they make up a Statement, or a PrintStatement, AssignStatement, WhileStatement, VarDecl, IfStatement, or Block
-         * @param production the production that is being rewritten
+         * @param production the productions being rewritten
          * @param expected flag for if nonterminal is expected in rewrite rule
          */
-        public parseStatement(production: Production, expected: boolean) {
-            if(this.parsePrintStatement(Production.Stmt, false) || this.parseAssignmentStatement(Production.Stmt, false) || this.parseWhileStatement(Production.Stmt, false) || 
-            this.parseVarDecl(Production.Stmt, false) || this.parseIfStatement(Production.Stmt, false) || this.parseBlock(Production.Stmt, false)){
+        public parseStatement(production: Array<Production>, expected: boolean) {
+            if(this.parsePrintStatement([Production.StmtList, Production.Stmt], false) || this.parseAssignmentStatement([Production.StmtList, Production.Stmt], false) || 
+            this.parseWhileStatement([Production.StmtList, Production.Stmt], false) || this.parseVarDecl([Production.StmtList, Production.Stmt], false) || 
+            this.parseIfStatement([Production.StmtList, Production.Stmt], false) || this.parseBlock([Production.StmtList, Production.Stmt], false)){
                 this.cst.ascendTree();
                 return true;
             }
@@ -128,13 +132,13 @@ module TSC {
 
         /**
          * Parses the tokens to see if they make up a PrintStatement, or a Print ( Expr )
-         * @param production the production that is being rewritten
+         * @param production the productions being rewritten
          * @param expected flag for if nonterminal is expected in rewrite rule
          */
-        public parsePrintStatement(production: Production, expected: boolean) {
+        public parsePrintStatement(production: Array<Production>, expected: boolean) {
             if(this.matchToken(TokenType.TPrint, production, Production.PrintStmt, false) && this.matchToken(TokenType.TLparen, null, null, true) &&
-            this.parseExpr(Production.Expr, true) && this.matchToken(TokenType.TRparen, null, null, true)){
-                // ascend the tree after we've derived a print statement
+            this.parseExpr([Production.Expr], true) && this.matchToken(TokenType.TRparen, null, null, true)){
+                // ascend the tree after we've derived a printstmt
                 this.cst.ascendTree();
                 return true;
             }
@@ -146,13 +150,13 @@ module TSC {
 
         /**
          * Parses the tokens to see if they make up an AssignmentStatement, or an Id = Expr
-         * @param production the production that is being rewritten
+         * @param production the productions being rewritten
          * @param expected flag for if nonterminal is expected in rewrite rule
          */
-        public parseAssignmentStatement(production: Production, expected: boolean) {
+        public parseAssignmentStatement(production: Array<Production>, expected: boolean) {
             if(this.matchToken(TokenType.TId, production, Production.AssignStmt, false) && 
-            this.matchToken(TokenType.TAssign, null, null, true) && this.parseExpr(Production.Expr, true)){
-                // ascend the tree after we've derived a print statement
+            this.matchToken(TokenType.TAssign, null, null, true) && this.parseExpr([Production.Expr], true)){
+                // ascend the tree after we've derived a assignstmt
                 this.cst.ascendTree();
                 return true;
             }
@@ -165,13 +169,13 @@ module TSC {
 
         /**
          * Parses the tokens to see if they make up a VarDecl, or a Type Id
-         * @param production the production that is being rewritten
+         * @param production the productions being rewritten
          * @param expected flag for if nonterminal is expected in rewrite rule
          */
-        public parseVarDecl(production: Production, expected: boolean) {
+        public parseVarDecl(production: Array<Production>, expected: boolean) {
             if(this.matchToken(TokenType.TType, production, Production.VarDecl, false) && 
             this.parseId(null, true)){
-                // ascend the tree after we've derived a print statement
+                // ascend the tree after we've derived a vardecl
                 this.cst.ascendTree();
                 return true;
             }
@@ -184,12 +188,12 @@ module TSC {
 
         /**
          * Parses the tokens to see if they make up a WhileStatement, or a While BooleanExpr Block
-         * @param production the production that is being rewritten
+         * @param production the productions being rewritten
          * @param expected flag for if nonterminal is expected in rewrite rule
          */
-        public parseWhileStatement(production: Production, expected: boolean) {
-            if(this.matchToken(TokenType.TWhile, production, Production.WhileStmt, false) && this.parseBooleanExpr(Production.BooleanExpr, true) && this.parseBlock(null, true)){
-                // ascend the tree after we've derived a print statement
+        public parseWhileStatement(production: Array<Production>, expected: boolean) {
+            if(this.matchToken(TokenType.TWhile, production, Production.WhileStmt, false) && this.parseBooleanExpr([Production.BooleanExpr], true) && this.parseBlock(null, true)){
+                // ascend the tree after we've derived a whilestmt
                 this.cst.ascendTree();
                 return true;
             }
@@ -202,13 +206,13 @@ module TSC {
 
         /**
          * Parses the tokens to see if they make up an IfStatement, or an If BooleanExpr Block
-         * @param production the production that is being rewritten
+         * @param production the productions being rewritten
          * @param expected flag for if nonterminal is expected in rewrite rule
          */
-        public parseIfStatement(production: Production, expected: boolean) {
-            if(this.matchToken(TokenType.TIf, production, Production.IfStmt, false) && this.parseBooleanExpr(Production.BooleanExpr, true) &&
+        public parseIfStatement(production: Array<Production>, expected: boolean) {
+            if(this.matchToken(TokenType.TIf, production, Production.IfStmt, false) && this.parseBooleanExpr([Production.BooleanExpr], true) &&
             this.parseBlock(null, true)){
-                // ascend the tree after we've derived a print statement
+                // ascend the tree after we've derived an ifstatement
                 this.cst.ascendTree();
                 return true;
             }
@@ -221,13 +225,13 @@ module TSC {
 
         /**
          * Parses the tokens to see if they make up an Expr, or an IntExpr, StringExpr, BooleanExpr, or Id
-         * @param production the production that is being rewritten
+         * @param production the productions being rewritten
          * @param expected flag for if nonterminal is expected in rewrite rule
          */
-        public parseExpr(production: Production, expected: boolean) {
-            if(this.parseIntExpr(production, false) || this.parseStringExpr(production, false) || this.parseBooleanExpr(production, false) || 
-            this.parseId(production, false)){
-                // ascend the tree after we've derived a print statement
+        public parseExpr(production: Array<Production>, expected: boolean) {
+            if(this.parseIntExpr([production], false) || this.parseStringExpr([production], false) || this.parseBooleanExpr([production], false) || 
+            this.parseId([production], false)){
+                // ascend the tree after we've derived an expr
                 this.cst.ascendTree();
                 return true;
             }
@@ -241,13 +245,13 @@ module TSC {
 
         /**
          * Parses the tokens to see if they make up an IntExpr, or a Digit, or Digit Intop Expr
-         * @param production the production that is being rewritten
+         * @param production the productions being rewritten
          * @param expected flag for if nonterminal is expected in rewrite rule
          */
-        public parseIntExpr(production: Production, expected: boolean) {
+        public parseIntExpr(production: Array<Production>, expected: boolean) {
             if(this.matchToken(TokenType.TDigit, production, Production.IntExpr, false)){
-                if(this.matchToken(TokenType.TIntop, null, null, false) && this.parseExpr(Production.Expr, true)){
-                    // ascend the tree after we've derived a print statement
+                if(this.matchToken(TokenType.TIntop, null, null, false) && this.parseExpr([Production.Expr], true)){
+                    // ascend the tree after we've derived an intexpr
                     this.cst.ascendTree();
                     return true;
                 }
@@ -264,12 +268,12 @@ module TSC {
 
         /**
          * Parses the tokens to see if they make up a StringExpr, or a " CharList "
-         * @param production the production that is being rewritten
+         * @param production the productions being rewritten
          * @param expected flag for if nonterminal is expected in rewrite rule
          */
-        public parseStringExpr(production: Production, expected: boolean) {
-            if(this.matchToken(TokenType.TQuote, production, Production.StringExpr, false) && this.parseCharList(Production.CharList, true) && this.matchToken(TokenType.TQuote, null, null, true)){
-                // ascend the tree after we've derived a print statement
+        public parseStringExpr(production: Array<Production>, expected: boolean) {
+            if(this.matchToken(TokenType.TQuote, production, Production.StringExpr, false) && this.parseCharList([Production.CharList], true) && this.matchToken(TokenType.TQuote, null, null, true)){
+                // ascend the tree after we've derived a stringexpr
                 this.cst.ascendTree();
                 return true;
             }
@@ -282,21 +286,25 @@ module TSC {
 
         /**
          * Parses the tokens to see if they make up a BooleanExpr, or a Boolval or a ( Expr Boolop Expr )
-         * @param production the production that is being rewritten
+         * @param production the productions being rewritten
          * @param expected flag for if nonterminal is expected in rewrite rule
          */
-        public parseBooleanExpr(production: Production, expected: boolean) {
-            if(this.matchToken(TokenType.TBoolval, production, Production.BooleanExpr, false)){
-                // ascend the tree after we've derived a print statement
+        public parseBooleanExpr(production: Array<Production>, expected: boolean) {
+            // if(this.matchToken(TokenType.TBoolval, production, Production.BooleanExpr, false)){
+            //     this.cst.ascendTree();
+            //     return true;
+            // }
+            if(this.parseBoolVal(production, false)){
+                // ascend the tree after we've derived a booleanexpr
                 this.cst.ascendTree();
                 return true;
             }
-            else if(this.matchToken(TokenType.TLparen, production, Production.BooleanExpr, false) && this.parseExpr(Production.Expr, true) &&
-            this.matchToken(TokenType.TBoolop, null, null, true) && this.parseExpr(Production.Expr, true) && this.matchToken(TokenType.TRparen, null, null, true)){
-                // ascend the tree after we've derived a print statement
-                this.cst.ascendTree();
-                return true;
-            }
+            // else if(this.matchToken(TokenType.TLparen, production, Production.BooleanExpr, false) && this.parseExpr(Production.Expr, true) &&
+            // this.matchToken(TokenType.TBoolop, null, null, true) && this.parseExpr(Production.Expr, true) && this.matchToken(TokenType.TRparen, null, null, true)){
+            //     // ascend the tree after we've derived a print statement
+            //     this.cst.ascendTree();
+            //     return true;
+            // }
             if(expected && !this.error){
                 this.error = true;
                 this.log.push("ERROR - Expecting BooleanExpr, found " + this.tokenList[this.currentToken].type);
@@ -305,11 +313,29 @@ module TSC {
         }
 
         /**
-         * Parses the tokens to see if they make up an Id
-         * @param production the production that is being rewritten
+         * Parses the tokens to see if they make up a BoolVal, or true or false
+         * @param production the productions being rewritten
          * @param expected flag for if nonterminal is expected in rewrite rule
          */
-        public parseId(production: Production, expected: boolean) {
+        public parseBoolVal(production: Array<Production>, expected: boolean) {
+            if(this.matchToken(TokenType.TBoolval, production.concat([Production.BooleanExpr]), Production.BoolVal, false)){
+                // ascend the tree after we've derived a boolval statement
+                this.cst.ascendTree();
+                return true;
+            }
+            if(expected && !this.error){
+                this.error = true;
+                this.log.push("ERROR - Expecting BoolVal, found " + this.tokenList[this.currentToken].type);
+            }
+            return false;
+        }
+
+        /**
+         * Parses the tokens to see if they make up an Id
+         * @param production the productions being rewritten
+         * @param expected flag for if nonterminal is expected in rewrite rule
+         */
+        public parseId(production: Array<Production>, expected: boolean) {
             if(this.matchToken(TokenType.TId, production, Production.Id, false)){
                 // ascend the tree after we've derived a print statement
                 this.cst.ascendTree();
@@ -324,12 +350,12 @@ module TSC {
 
         /**
          * Parses the tokens to see if they make up a CharList, or a Char Charlist, or epsilon
-         * @param production the production that is being rewritten
+         * @param production the productions being rewritten
          * @param expected flag for if nonterminal is expected in rewrite rule
          */
-        public parseCharList(production: Production, expected: boolean) {
+        public parseCharList(production: Array<Production>, expected: boolean) {
             // spaces are treated as chars for me
-            if(this.matchToken(TokenType.TChar, production, Production.CharList, false) && this.parseCharList(Production.CharList, false)){
+            if(this.matchToken(TokenType.TChar, production, Production.CharList, false) && this.parseCharList([Production.CharList], false)){
                 // ascend the tree after we've derived a print statement
                 this.cst.ascendTree();
                 return true;
@@ -351,11 +377,11 @@ module TSC {
          * Token is expected to be present based on boolean value passed. If
          * the token is not present, throw an error.
          * @param token the token that is being matched and consumed
-         * @param start production that is being rewritten, if any
+         * @param start productions that is being rewritten, if any
          * @param rewrite production that is being rewritten to, if any
          * @param expected flag for if token is expected to be matched
          */
-        public matchToken(token: TokenType, start: Production, rewrite: Production, expected: boolean) {
+        public matchToken(token: TokenType, start: Array<Production>, rewrite: Production, expected: boolean) {
             // If the parser has encountered an error, don't parse anymore tokens mate
             if(this.error){
                 return false;
@@ -364,10 +390,14 @@ module TSC {
                 if(start != null) {
                     this.log.push("VALID - Expecting " + start + ", found " + rewrite);
                     // We know every statement is rewritten from StatementList
-                    if(start == Production.Stmt){
-                        this.cst.addNTNode(Production.StmtList);
+                    // if(start[0] == Production.Stmt){
+                    //     this.cst.addNTNode(Production.StmtList);
+                    // }
+                    // add all productions in start
+                    for(var i=0; i<start.length; i++){
+                        this.cst.addNTNode(start[i]);
                     }
-                    this.cst.addNTNode(start);
+                    // this.cst.addNTNode(start[0]);
                     this.cst.addNTNode(rewrite);
                     console.log("add node");
                     console.log(start + "->" + rewrite);
