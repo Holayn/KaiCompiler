@@ -34,7 +34,7 @@ var TSC;
             node.parent = this.curr;
             // add to children of curr node
             this.curr.children.push(node);
-            // this.descendTree();
+            this.descendTree();
         };
         /**
          * Adds terminal node
@@ -50,7 +50,23 @@ var TSC;
             node.parent = this.curr;
             // add to children of curr node
             this.curr.children.push(node);
-            // this.descendTree();
+            this.descendTree();
+        };
+        /**
+         * Sets current node to look at as the latest child
+         */
+        Tree.prototype.descendTree = function () {
+            if (this.curr == null) {
+                return;
+            }
+            var latestChild = this.curr.children[this.curr.children.length - 1];
+            this.curr = latestChild;
+        };
+        /**
+         * Sets current node to look at as the parent of the current node
+         */
+        Tree.prototype.ascendTree = function () {
+            this.curr = this.curr.parent;
         };
         return Tree;
     }());

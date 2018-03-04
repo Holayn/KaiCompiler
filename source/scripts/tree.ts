@@ -30,7 +30,7 @@ module TSC {
                 node.parent = this.curr;
                 // add to children of curr node
                 this.curr.children.push(node);
-                // this.descendTree();
+                this.descendTree();
             }
 
             /**
@@ -47,7 +47,25 @@ module TSC {
                 node.parent = this.curr;
                 // add to children of curr node
                 this.curr.children.push(node);
-                // this.descendTree();
+                this.descendTree();
+            }
+
+            /**
+             * Sets current node to look at as the latest child
+             */
+            public descendTree(){
+                if(this.curr == null){
+                    return;
+                }
+                let latestChild = this.curr.children[this.curr.children.length-1];
+                this.curr = latestChild;
+            }
+
+            /**
+             * Sets current node to look at as the parent of the current node
+             */
+            private ascendTree(){
+                this.curr = this.curr.parent;
             }
         }
     
