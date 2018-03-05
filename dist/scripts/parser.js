@@ -7,6 +7,7 @@
  */
 var TSC;
 (function (TSC) {
+    // Different Productions that are in the grammar
     var Production;
     (function (Production) {
         Production["Program"] = "Program";
@@ -188,7 +189,7 @@ var TSC;
          * @param expected flag for if nonterminal is expected in rewrite rule
          */
         Parser.prototype.parseWhileStatement = function (production, expected) {
-            if (this.matchToken(TSC.TokenType.TWhile, production, Production.WhileStmt, false) && this.parseBooleanExpr([Production.BooleanExpr], true) && this.parseBlock(null, true)) {
+            if (this.matchToken(TSC.TokenType.TWhile, production, Production.WhileStmt, false) && this.parseBooleanExpr([], true) && this.parseBlock(null, true)) {
                 // ascend the tree after we've derived a whilestmt
                 this.cst.ascendTree();
                 return true;
@@ -439,13 +440,13 @@ var TSC;
         // ---------------------------- TERMINALS -------------------------------- //
         /**
          * Matches and consumes a passed token type.
-         * If the next token we're looking at match to a terminal symbol,
-         * advance the current token.
+         * If the next token we're looking at matches to a terminal symbol,
+         * consume token and advance the current token.
          * If error, break out of parse
-         * Logs appropriate production that is being derived and adds appropriate productions
+         * Logs appropriate productions that are being derived and adds appropriate productions
          * to the CST.
          * Token is expected to be present based on boolean value passed. If
-         * the token is not present, throw an error.
+         * the token is not present, return an error.
          * @param token the token that is being matched and consumed
          * @param start productions that is being rewritten, if any
          * @param rewrite production that is being rewritten to, if any
@@ -460,17 +461,21 @@ var TSC;
                 // If rewriting from a non-terminal to a terminal, add to tree and log
                 if (start != null && start.length != 0) {
                     // add all productions in start
+                    // for example, we might be deriving, from PrintStatement's Expr, an IntExpr, which is
+                    // made up of a digit. So we need to show in the log and tree that Expr is rewritten to
+                    // IntExpr, which is then rewritten to Digit
                     for (var i = 0; i < start.length; i++) {
                         this.cst.addNTNode(start[i]);
-                        // Check for type declaration. Add to symbol table
-                        if (start[i] == Production.VarDecl) {
-                            this.isSymbol = true;
-                        }
+                        // // Check for type declaration. Add to symbol table
+                        // if(start[i] == Production.VarDecl){
+                        //     this.isSymbol = true;
+                        // }
                         if (i != 0) {
                             this.log.push("VALID - Expecting [" + start[i - 1] + "], found [" + start[i] + "] on line " + this.tokenList[this.currentToken].lineNumber);
                         }
                     }
-                    // add final production that was rewritten
+                    // add final production that was rewritten. Technically, could have all productions in start array, but 
+                    // too lazy to go and modify all the code. Definitely a TODO.
                     this.cst.addNTNode(rewrite);
                     this.log.push("VALID - Expecting [" + start[start.length - 1] + "], found [" + rewrite + "] on line " + this.tokenList[this.currentToken].lineNumber);
                 }
