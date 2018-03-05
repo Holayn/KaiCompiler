@@ -189,10 +189,10 @@ module TSC
 							else if(char == "\t"){
 								char = "\\t";
 							}
-							errors.push(new Error(TSC.ErrorType.InvalidCharacterInString, char, this.lineNumber, this.colNumber));
+							this.errors.push(new Error(TSC.ErrorType.InvalidCharacterInString, char, this.lineNumber, this.colNumber));
 							break;
 						}
-						endLexemePtr++;
+						this.endLexemePtr++;
 						continue;
 					}
 

@@ -306,12 +306,17 @@
                 if(lexAnalysis.tokens.length != 0){
                     putMessage("______________________________");
                     putMessage("Compiling Program " + programCounter + " . . .\n");
-                    lex(lexAnalysis);
+                    logLex(lexAnalysis);
                     if(lexAnalysis.complete){
-                        console.log("eyylmao")
                         isLexComplete = true;
                     }
-                    parse(lexAnalysis);
+                    // Continue to parse if no errors
+                    if(lexAnalysis.errors.length == 0){
+                        parse(lexAnalysis);
+                    }
+                    else{
+                        putMessage("Parser skipped due to Lexer errors . . ");
+                    }
                     programCounter++;
                 }
                 else{
@@ -321,7 +326,7 @@
         }
 		
 		// Fills log with messages from lexer
-		function lex(lexAnalysis) {
+		function logLex(lexAnalysis) {
 			putMessage("Lexical Analysis:");
             // Grab the tokens from the lexer . . .
             // let lexer = new TSC.Lexer();
@@ -383,7 +388,9 @@
 			// Parse fail, do not print CST
 			if(res.error){
 				putMessage("\n");
-				putMessage("Parse failed due to error.");
+                putMessage("Parse failed due to error.");
+                putMessage("CST generation failed due to parse error.");
+				Materialize.toast('Parse error!', 4000, 'toastcolor');
 			}
 			else{
 				putMessage("\n");
@@ -395,18 +402,18 @@
 					document.getElementById("taCST").value += tree[i] + "\n";
 				}
 				// Display symbols in Symbol Table
-				var symbols = res.symbols;
-				for(var i=0; i<symbols.length; i++){
-					var table = document.getElementById("symbolTable");
-					var row = table.insertRow(-1);
-					var key = row.insertCell(0);
-					key.innerHTML = symbols[i].key;
-					var type = row.insertCell(1);
-					type.innerHTML = symbols[i].type;
-					var scope = row.insertCell(2);
-					var scopeLevel = row.insertCell(3);
-					var lineNumber = row.insertCell(4);
-				}
+				// var symbols = res.symbols;
+				// for(var i=0; i<symbols.length; i++){
+				// 	var table = document.getElementById("symbolTable");
+				// 	var row = table.insertRow(-1);
+				// 	var key = row.insertCell(0);
+				// 	key.innerHTML = symbols[i].key;
+				// 	var type = row.insertCell(1);
+				// 	type.innerHTML = symbols[i].type;
+				// 	var scope = row.insertCell(2);
+				// 	var scopeLevel = row.insertCell(3);
+				// 	var lineNumber = row.insertCell(4);
+				// }
 			}
 		}
 		

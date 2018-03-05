@@ -177,10 +177,10 @@ var TSC;
                         else if (char == "\t") {
                             char = "\\t";
                         }
-                        errors.push(new TSC.Error(TSC.ErrorType.InvalidCharacterInString, char, this.lineNumber, this.colNumber));
+                        this.errors.push(new TSC.Error(TSC.ErrorType.InvalidCharacterInString, char, this.lineNumber, this.colNumber));
                         break;
                     }
-                    endLexemePtr++;
+                    this.endLexemePtr++;
                     continue;
                 }
                 // Test for Left Brace
