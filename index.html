@@ -163,8 +163,12 @@
 								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Simple 1</a>
 								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Simple 2</a>
 								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Regular</a>
-								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Multiple</a>
-								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Crazy One Liner (Lex Pass)</a>
+                                <a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Multiple</a>
+                                <a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">All Productions thx Tien</a>
+                                <a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Crazy One Liner (Lex Pass)</a>
+                                <a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Crazy One Liner Pt. 2 Thx Tien</a>
+                                <a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">WhileStatement</a>
+                                <a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">IfStatement</a>
 							</div>
 						</div>
 					</li>
@@ -189,6 +193,18 @@
 								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Missing End Comment Brace</a>
 							</div>
 						</div>
+                    </li>
+                    <li>
+						<div class="collapsible-header"><i class="material-icons">new_releases</i>Parse Error Cases</div>
+						<div class="collapsible-body">
+							<div class="collection">
+								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Invalid Expr</a>
+								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Invalid VarDecl</a>
+								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Invalid Print</a>
+								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Incomplete BooleanExpr</a>
+								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Incomplete IntExpr</a>
+							</div>
+						</div>
 					</li>
 				</ul>
 			</div>
@@ -202,6 +218,7 @@
 		<div class="container">
 			<div class="row">
 			<div class="col l6 s12">
+                <h5 class="white-text">A Compiler by Kai Wong</h5>
 				<!-- <h5 class="white-text">Footer Content</h5> -->
 				<!-- <p class="grey-text text-lighten-4">You can use rows and columns here to organize your footer content.</p> -->
 			</div>
@@ -303,7 +320,7 @@
             while(!isLexComplete){
                 lexAnalysis = lexer.lex();
                 // Log and parse if there are tokens
-                if(lexAnalysis.tokens.length != 0){
+                if(lexAnalysis.tokens.length != 0 || lexAnalysis.errors.length != 0){
                     putMessage("______________________________");
                     putMessage("Compiling Program " + programCounter + " . . .\n");
                     logLex(lexAnalysis);

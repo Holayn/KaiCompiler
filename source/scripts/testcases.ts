@@ -74,8 +74,83 @@
     s = "hey"
 }$`;
                     break;
+                case "All Productions thx Tien":
+                    (<HTMLInputElement>document.getElementById("taSourceCode")).value = `/* Test case for all productions - thx Tien */
+{
+    /* Int Declaration */
+    int a
+    int b
+    string s
+    boolean z
+    
+    z = true
+    s = "kai sucks"
+
+    a = 0
+    b = 0
+
+    /* While Loop */
+    while (a != 3) {
+        print(a)
+        while (b != 3) {
+                print(b)
+                b = 1 + b
+                if (b == 2) {
+                    /* Print Statement */
+                    print("kai sucks"/* This will do nothing */)
+                }
+        }
+
+        b = 0
+        a = 1 + a
+    }
+}$`;
                 case "Crazy One Liner (Lex Pass)":
                     (<HTMLInputElement>document.getElementById("taSourceCode")).value = `/* Test case for crazy one liner */\n+\${hellotruefalse!======trueprinta=3b=0print(\"false true\")whi33leiftruefalsestring!= stringintbooleanaa truewhileif{hi+++==!==}}/*aaahaha*/hahahahaha/*awao*/$`;
+                    break;
+                case "Crazy One Liner Pt. 2 Thx Tien":
+                    (<HTMLInputElement>document.getElementById("taSourceCode")).value = `/*Test case for all productions - thx Tien*/{/*IntDeclaration*/intaintbstringsbooleanzz=trues="kai sucks"a=0b=0/*WhileLoop*/while(a!=3){print(a)while(b!=3){print(b)b=1+bif(b==2){/*PrintStatement*/print("kai sucks"/*Thiswilldonothing*/)}}b=0a=1+a}}$`;
+                    break;
+                case "WhileStatement":
+                    (<HTMLInputElement>document.getElementById("taSourceCode")).value = `/* Test case for WhileStatement */
+{
+    string s
+    int a
+    a = 1
+    {
+        s = "hey there sexy"
+        int a
+        a = 2
+        print(a)
+    }
+    {
+        while (a != 5) {
+            a = 1 + a
+            print(a)
+        }
+        print(3 + a)
+        print(s)
+    }
+} $`;
+                    break;
+                    case "IfStatement":
+                    (<HTMLInputElement>document.getElementById("taSourceCode")).value = `/* Test case for IfStatement */
+{
+    int a
+    a = 1
+    if(1 == 1){
+        print("nums")
+    }
+    if(a == a){
+        print("ids")
+    }
+    if("hey" == "hey"){
+        print("strings")
+    }
+    if(true == (a == a)){
+        print("booleans")
+    }
+} $`;
                     break;
                 case "Missing EOP":
                     (<HTMLInputElement>document.getElementById("taSourceCode")).value = `/* Missing EOP */
@@ -140,6 +215,51 @@ s = "hey there`;
     print("my name is eleven")
     /* hey i love compilers
 }$`;
+                    break;
+                case "Invalid StatementList":
+                    (<HTMLInputElement>document.getElementById("taSourceCode")).value = `/* Test case for invalid StatementList */
+{
+    4 + 2
+}$`;
+                    break;
+                case "Invalid Expr":
+                    (<HTMLInputElement>document.getElementById("taSourceCode")).value = `/* Test case for invalid Expr */
+{
+    int a
+    a = a + 2
+}$`;
+                    break;
+                case "Invalid VarDecl":
+                    (<HTMLInputElement>document.getElementById("taSourceCode")).value = `/* Test case for invalid VarDecl */
+{
+    int 4
+}$`;
+                    break;
+                case "Invalid Print":
+                    (<HTMLInputElement>document.getElementById("taSourceCode")).value = `/* Test case for invalid Print */
+{
+    print($)
+}$`;
+                    break;
+                case "Incomplete BooleanExpr":
+                    (<HTMLInputElement>document.getElementById("taSourceCode")).value = `/* Test case for incomplete BooleanExpr */
+{
+    s = "strb"
+    print(s)
+    
+    if (a != ) {
+        print("true")
+    }
+}$`;
+                    break;
+                case "Incomplete IntExpr":
+                    (<HTMLInputElement>document.getElementById("taSourceCode")).value = `/* Test case for incomplete IntExpr */
+{
+    int a
+    a = 1 +
+    print(a)
+}$`;
+                    break;
             }
             (<HTMLInputElement>document.getElementById("taOutput")).value = "Inserted Program: " + testcase.innerHTML;
         }
