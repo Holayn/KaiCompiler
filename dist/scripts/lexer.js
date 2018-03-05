@@ -42,19 +42,6 @@ var TSC;
             // Trim the leading and trailing spaces.
             sourceCode = TSC.Utils.trim(sourceCode);
             console.log("Source code: " + sourceCode);
-            // // Define array to return tokens in
-            // let tokens = [];
-            // // Define array to return errors in
-            // let errors = [];
-            // // Define array to return warnings in
-            // let warnings = [];
-            // // Pointers that make up the buffer of characters we are matching to
-            // let startLexemePtr = 0;
-            // let endLexemePtr = 1;
-            // // Tracker for current line number
-            // let lineNumber = 1;
-            // // Tracker for current col
-            // let colNumber = 0;
             // We need to recognize different tokens.
             // Thus, we need to have the different patterns for each token defined.
             // A lexeme is a sequence of characters in the source that we match to a pattern for a token.

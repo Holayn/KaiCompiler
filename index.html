@@ -312,15 +312,18 @@
             // Construct new lexer
             let lexer = new TSC.Lexer();
             // Lex program
-            var isLexComplete = false;
-            var programCounter = 1;
-            var lexAnalysis;
+            var isLexComplete = false; // flag for completion of lex
+            var programCounter = 1; // counter for number of programs compiled
+            var lexAnalysis; // object returned by lexer
+            var programDetected = false; // flag for program detection
             // We're compiling programs in sequence.
             // For every program, lex, parse, perform semantic analysis, etc...
             while(!isLexComplete){
                 lexAnalysis = lexer.lex();
                 // Log and parse if there are tokens
-                if(lexAnalysis.tokens.length != 0 || lexAnalysis.errors.length != 0){
+                // if(lexAnalysis.tokens.length != 0 || lexAnalysis.errors.length != 0){
+                if(!lexAnalysis.complete){
+                    programDetected = true;
                     putMessage("______________________________");
                     putMessage("Compiling Program " + programCounter + " . . .\n");
                     logLex(lexAnalysis);
@@ -338,6 +341,10 @@
                 }
                 else{
                     isLexComplete = true;
+                }
+                if(!programDetected){
+                    logLex(lexAnalysis);
+                    parse(lexAnalysis);
                 }
             }
         }
