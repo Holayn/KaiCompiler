@@ -478,7 +478,8 @@ module TSC {
          * If the next token we're looking at match to a terminal symbol, 
          * advance the current token.
          * If error, break out of parse
-         * Logs appropriate production that is being derived.
+         * Logs appropriate production that is being derived and adds appropriate productions
+         * to the CST.
          * Token is expected to be present based on boolean value passed. If
          * the token is not present, throw an error.
          * @param token the token that is being matched and consumed
@@ -510,6 +511,8 @@ module TSC {
                     this.log.push("VALID - Expecting [" + start[start.length-1] + "], found [" + rewrite + "] on line " + this.tokenList[this.currentToken].lineNumber);
                 }
                 // If rewriting to some non-terminal only, display it in tree and log
+                // For example, when we're deriving from IntExpr, we're not deriving intop from IntExpr
+                // But we want to add intop to the tree, so this accounts for it
                 else if(rewrite != null){
                     this.cst.addNTNode(rewrite);
                     this.log.push("VALID - Expecting [" + rewrite + "], found [" + rewrite + "] on line " + this.tokenList[this.currentToken].lineNumber);

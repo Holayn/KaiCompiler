@@ -442,7 +442,8 @@ var TSC;
          * If the next token we're looking at match to a terminal symbol,
          * advance the current token.
          * If error, break out of parse
-         * Logs appropriate production that is being derived.
+         * Logs appropriate production that is being derived and adds appropriate productions
+         * to the CST.
          * Token is expected to be present based on boolean value passed. If
          * the token is not present, throw an error.
          * @param token the token that is being matched and consumed
