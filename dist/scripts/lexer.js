@@ -313,7 +313,8 @@ var TSC;
                         "tokens": this.tokens,
                         "errors": this.errors,
                         "warnings": this.warnings,
-                        "complete": this.isComplete
+                        "complete": this.isComplete,
+                        "line": this.lineNumber
                     };
                     this.endLexemePtr++;
                     this.colNumber++;
@@ -376,7 +377,8 @@ var TSC;
                 "tokens": this.tokens,
                 "errors": this.errors,
                 "warnings": this.warnings,
-                "complete": this.isComplete
+                "complete": this.isComplete,
+                "line": this.lineNumber
             };
             // TODO: remove all spaces in the middle; remove line breaks too.
             return lexAnalysisRes;
