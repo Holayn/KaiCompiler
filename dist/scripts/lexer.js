@@ -63,7 +63,9 @@ var TSC;
             // RegExp for ID
             var rID = new RegExp('[a-z]$');
             // RegExp for Character
-            var rCHAR = new RegExp('[a-z]$| $');
+            var rCHAR = new RegExp('[a-z]$');
+            // RegExp for Space
+            var rSPACE = new RegExp(' $');
             // RegExp for whitespace
             var rWHITE = new RegExp(' $|\t$|\n$|\r$');
             // RegExp for newline
@@ -136,12 +138,16 @@ var TSC;
                     this.endLexemePtr++;
                     continue;
                 }
-                // If the lexer is currently in a String literal, only test for Characters.
+                // If the lexer is currently in a String literal, only test for Characters and Spaces.
                 // If we reach another quote, we have reached the end of the String literal.
                 if (this.foundQuote) {
-                    // console.log("HELP" + sourceCode.charAt(endLexemePtr-1));
                     if (rCHAR.test(sourceCode.charAt(this.endLexemePtr - 1))) {
                         var token = new TSC.Token(TSC.TokenType.TChar, sourceCode.charAt(this.endLexemePtr - 1), this.lineNumber, this.colNumber);
+                        this.tokens.push(token);
+                        this.colNumber++;
+                    }
+                    else if (rSPACE.test(sourceCode.charAt(this.endLexemePtr - 1))) {
+                        var token = new TSC.Token(TSC.TokenType.TSpace, sourceCode.charAt(this.endLexemePtr - 1), this.lineNumber, this.colNumber);
                         this.tokens.push(token);
                         this.colNumber++;
                     }

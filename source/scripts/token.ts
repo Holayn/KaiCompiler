@@ -23,7 +23,8 @@ module TSC {
         TRparen = "TRparen",
         TLparen = "TLparen",
         TQuote = "TQuote",
-        TChar = "TChar"
+        TChar = "TChar",
+        TSpace = "TSpace"
     }
 
     export class Token {

@@ -30,7 +30,8 @@ module TSC {
         Char = "Char",
         Digit = "Digit",
         IntOp = "IntOp",
-        BoolOp = "BoolOp"
+        BoolOp = "BoolOp",
+        Space = "Space"
     }
 
     export class Parser {
@@ -455,6 +456,25 @@ module TSC {
         }
 
         /**
+         * Parses the tokens to see if they make up a Space, or a " "
+         * @param production the productions being rewritten
+         * @param expected flag for if nonterminal is expected in rewrite rule
+         */
+        public parseSpace(production: Array<Production>, expected: boolean) {
+            if(this.matchToken(TokenType.TSpace, production, Production.Space, false)){
+                // ascend the tree if found space
+                this.cst.ascendTree();
+                return true;
+            }
+            if(expected && !this.error){
+                this.error = true;
+                this.log.push("ERROR - Expecting [Space], found [" + this.tokenList[this.currentToken].type + "] on line " + this.tokenList[this.currentToken].lineNumber);
+            }
+            return false;
+        }
+        
+
+        /**
          * Parses the tokens to see if they make up a CharList, or a Char Charlist, or epsilon
          * @param production the productions being rewritten
          * @param expected flag for if nonterminal is expected in rewrite rule
@@ -462,7 +482,12 @@ module TSC {
         public parseCharList(production: Array<Production>, expected: boolean) {
             // spaces are treated as chars for me
             if(this.parseChar(production, false) && this.parseCharList(production, false)){
-                // ascend the tree after we've derived a print statement
+                // ascend the tree after we've derived a charlist
+                this.cst.ascendTree();
+                return true;
+            }
+            else if(this.parseSpace(production, false) && this.parseCharList(production, false)){
+                // ascend the tree after we've derived a charlist
                 this.cst.ascendTree();
                 return true;
             }
