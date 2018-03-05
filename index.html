@@ -10,13 +10,14 @@
 	<!--Import materialize.css-->
 	<link type="text/css" rel="stylesheet" href="dist/styles/materialize.min.css"  media="screen,projection"/>
 	<link href="dist/styles/jquery-linedtextarea.css" type="text/css" rel="stylesheet" />
-	<link rel="shortcut icon" href="dist/images/code.png">
+    <link rel="shortcut icon" href="dist/images/code.png">
+    <link rel="stylesheet" href="dist/styles/Treant/Treant.css" type="text/css"/>
 </head>
 <body onload="init();">
 	<!--Import jQuery before materialize.js-->
 	<script type="text/javascript" src="dist/styles/jquery-3.3.1.min.js"></script>
 	<script type="text/javascript" src="dist/styles/js/materialize.min.js"></script>
-	<script type="text/javascript" src="dist/styles/js/jquery-linedtextarea.js"></script>
+    <script type="text/javascript" src="dist/styles/js/jquery-linedtextarea.js"></script>
 	<script>
 		// for code input 
 		$(function() {
@@ -124,6 +125,7 @@
 				</div>
 			</div>
 			<div class="row">
+                <div id="tree-simple" style="width:335px; height: 160px"> </div>
 				<!-- <div class="col s6"> -->
 				<!-- <div class="card-panel log">
 					<h5 class="light">Symbol Table</h5>
@@ -200,14 +202,14 @@
 							<div class="collection">
 								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Invalid Expr</a>
 								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Invalid VarDecl</a>
-								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Invalid Print</a>
+								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Invalid Print Pt. 2</a>
 								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Incomplete BooleanExpr</a>
 								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Incomplete IntExpr</a>
 							</div>
 						</div>
 					</li>
 				</ul>
-			</div>
+            </div>
 			<div class="modal-footer">
 				<a class="modal-action modal-close waves-effect waves-green btn-flat">Close</a>
 			</div>
@@ -248,13 +250,37 @@
 	<script type="text/javascript" src="dist/scripts/error.js"></script>	
 	<script type="text/javascript" src="dist/scripts/warning.js"></script>	
 	<script type="text/javascript" src="dist/scripts/testcases.js"></script>
-	<script type="text/javascript" src="dist/scripts/tree.js"></script>
+    <script type="text/javascript" src="dist/scripts/tree.js"></script>
+    <script type="text/javascript" src="dist/styles/Treant/vendor/raphael.js"></script>
+    <script type="text/javascript" src="dist/styles/Treant/Treant.js"></script>
 	<script type="text/javascript">
 	
-		var verboseOn = true;
+        var verboseOn = true;
 
+        var simple_chart_config = {
+            chart: {
+                container: "#tree-simple"
+            },
+            
+            nodeStructure: {
+                text: { name: "Parent node" },
+                children: [
+                    {
+                        text: { name: "First child" }
+                    },
+                    {
+                        text: { name: "Second child" }
+                    }
+                ]
+            }
+        };
+        console.log(simple_chart_config);
+
+        var my_chart = new Treant(simple_chart_config);
+        
 		function init() {
-	        // Clear the log and the CST.
+            // Clear the log and the CST.
+            var my_chart = new Treant(simple_chart_config);
 			document.getElementById("taOutput").value = "";
 			document.getElementById("taCST").value = "";
 			// Clear symbol table

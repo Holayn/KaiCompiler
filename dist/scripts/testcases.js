@@ -24,6 +24,7 @@ var TSC;
                     break;
                 case "All Productions thx Tien":
                     document.getElementById("taSourceCode").value = "/* Test case for all productions - thx Tien */\n{\n    /* Int Declaration */\n    int a\n    int b\n    string s\n    boolean z\n    \n    z = true\n    s = \"kai sucks\"\n\n    a = 0\n    b = 0\n\n    /* While Loop */\n    while (a != 3) {\n        print(a)\n        while (b != 3) {\n                print(b)\n                b = 1 + b\n                if (b == 2) {\n                    /* Print Statement */\n                    print(\"kai sucks\"/* This will do nothing */)\n                }\n        }\n\n        b = 0\n        a = 1 + a\n    }\n}$";
+                    break;
                 case "Crazy One Liner (Lex Pass)":
                     document.getElementById("taSourceCode").value = "/* Test case for crazy one liner */\n+${hellotruefalse!======trueprinta=3b=0print(\"false true\")whi33leiftruefalsestring!= stringintbooleanaa truewhileif{hi+++==!==}}/*aaahaha*/hahahahaha/*awao*/$";
                     break;
@@ -69,7 +70,7 @@ var TSC;
                 case "Invalid VarDecl":
                     document.getElementById("taSourceCode").value = "/* Test case for invalid VarDecl */\n{\n    int 4\n}$";
                     break;
-                case "Invalid Print":
+                case "Invalid Print Pt. 2":
                     document.getElementById("taSourceCode").value = "/* Test case for invalid Print */\n{\n    print($)\n}$";
                     break;
                 case "Incomplete BooleanExpr":

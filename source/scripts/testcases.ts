@@ -105,6 +105,7 @@
         a = 1 + a
     }
 }$`;
+                    break;
                 case "Crazy One Liner (Lex Pass)":
                     (<HTMLInputElement>document.getElementById("taSourceCode")).value = `/* Test case for crazy one liner */\n+\${hellotruefalse!======trueprinta=3b=0print(\"false true\")whi33leiftruefalsestring!= stringintbooleanaa truewhileif{hi+++==!==}}/*aaahaha*/hahahahaha/*awao*/$`;
                     break;
@@ -235,7 +236,7 @@ s = "hey there`;
     int 4
 }$`;
                     break;
-                case "Invalid Print":
+                case "Invalid Print Pt. 2":
                     (<HTMLInputElement>document.getElementById("taSourceCode")).value = `/* Test case for invalid Print */
 {
     print($)
