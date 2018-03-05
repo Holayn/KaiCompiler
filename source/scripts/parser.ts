@@ -519,16 +519,16 @@ module TSC {
 
                 // I'm pretty sure this is supposed to be part of semantic analysis but a symbol table is mentioned in Project 2 so I'm putting this here, even though this 
                 // is very hacky.
-                if(this.isSymbol && token == TokenType.TType){
-                    // record type
-                    this.symbol["type"] = this.tokenList[this.currentToken].value;
-                }
-                if(this.isSymbol && token == TokenType.TId){
-                    this.symbol["key"] = this.tokenList[this.currentToken].value;
-                    this.symbols.push(this.symbol);
-                    this.symbol = {};
-                    this.isSymbol = false;
-                }
+                // if(this.isSymbol && token == TokenType.TType){
+                //     // record type
+                //     this.symbol["type"] = this.tokenList[this.currentToken].value;
+                // }
+                // if(this.isSymbol && token == TokenType.TId){
+                //     this.symbol["key"] = this.tokenList[this.currentToken].value;
+                //     this.symbols.push(this.symbol);
+                //     this.symbol = {};
+                //     this.isSymbol = false;
+                // }
                 // Add token to tree
                 this.cst.addTNode(this.tokenList[this.currentToken]);
                 console.log("Adding " + this.tokenList[this.currentToken].value + " to the tree");
