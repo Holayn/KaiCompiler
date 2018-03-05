@@ -271,6 +271,7 @@
             // Clear the log and the CST.
 			document.getElementById("taOutput").value = "";
 			document.getElementById("taCST").value = "";
+			document.getElementById("tree-cst").value = "";
 			// Clear symbol table
 			var table = document.getElementById("symbolTable");
 			// Leave header in place
@@ -446,6 +447,13 @@
                 putMessage("Parse failed due to error.");
                 putMessage("CST generation failed due to parse error.");
 				Materialize.toast('Parse error!', 4000, 'toastcolor');
+				// Empty CST visual display
+				var cst_visual = new Treant({
+					chart: {
+						container: "#tree-cst"
+					},
+					nodeStructure: {}
+				});
 			}
 			else{
 				putMessage("\n");
