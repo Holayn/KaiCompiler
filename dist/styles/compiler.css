@@ -76,3 +76,6 @@ main {
 .tabs .tab a {
 	color: #26a69a !important;
 }
+.Treant {
+	overflow: scroll !important;
+}
