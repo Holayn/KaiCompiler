@@ -71,20 +71,9 @@ var TSC;
         /**
          * Prints the tree in dfs
          */
-        Tree.prototype.traverseTree = function () {
+        Tree.prototype.traverseTree = function (treantTree) {
             var tree = [];
             var level = 0;
-            var treantTree = {};
-            // Base Treant.js CST config
-            treantTree = {
-                chart: {
-                    container: "#tree-cst"
-                },
-                nodeStructure: {
-                    text: { name: "Program" },
-                    children: []
-                }
-            };
             if (this.root != null) {
                 this.DFS(this.root, level, tree, "", treantTree['nodeStructure'].children);
             }
@@ -112,28 +101,25 @@ var TSC;
                 tree.push(dash + "<" + node.value + ">");
                 // Add new node to children array passed
                 // Pass reference to new children array to next call
-                // Don't add Program because it's already in the tree
-                if (node.value != "Program") {
-                    child = {
-                        text: { name: "<" + node.value + ">" },
-                        children: []
-                    };
-                    treantTree.push(child);
+                child = {
+                    text: { name: "<" + node.value + ">" },
+                    children: []
+                };
+                treantTree.push(child);
+            }
+            // if(node.children.length != 0){
+            for (var i = 0; i < node.children.length; i++) {
+                // to next call of DFS, increase level, pass the tree array, increase the dash by one dash, and pass
+                // the reference to the next children array
+                // Since no child was added for Program production, just pass old array to next call
+                if (child['children'] == null) {
+                    this.DFS(node.children[i], level + 1, tree, dash + "-", treantTree);
+                }
+                else {
+                    this.DFS(node.children[i], level + 1, tree, dash + "-", child['children']);
                 }
             }
-            if (node.children.length != 0) {
-                for (var i = 0; i < node.children.length; i++) {
-                    // to next call of DFS, increase level, pass the tree array, increase the dash by one dash, and pass
-                    // the reference to the next children array
-                    // Since no child was added for Program production, just pass old array to next call
-                    if (child['children'] == null) {
-                        this.DFS(node.children[i], level + 1, tree, dash + "-", treantTree);
-                    }
-                    else {
-                        this.DFS(node.children[i], level + 1, tree, dash + "-", child['children']);
-                    }
-                }
-            }
+            // }
         };
         return Tree;
     }());
