@@ -36,7 +36,6 @@ var TSC;
     var Parser = /** @class */ (function () {
         // Constructor for parser, passed tokens from lexer. Inits values.
         function Parser(tokens) {
-            this.isSymbol = false; // flag to record symbol and its type
             this.symbol = {}; // object to hold symbol data
             this.tokenList = tokens;
             // Set current token to the first token in the list
@@ -174,6 +173,13 @@ var TSC;
          */
         Parser.prototype.parseVarDecl = function (production, expected) {
             if (this.parseType(production.concat([Production.VarDecl]), false) && this.parseId(null, true)) {
+                // If we've found a VarDecl, add the last two tokens to the symbol table
+                console.log(this.tokenList[this.currentToken - 1]);
+                this.symbol["type"] = this.tokenList[this.currentToken - 2].value;
+                this.symbol["key"] = this.tokenList[this.currentToken - 1].value;
+                this.symbols.push(this.symbol);
+                this.symbol = {};
+                console.log(this.symbols);
                 // ascend the tree after we've derived a vardecl
                 this.cst.ascendTree();
                 return true;
@@ -489,10 +495,6 @@ var TSC;
                     // IntExpr, which is then rewritten to Digit
                     for (var i = 0; i < start.length; i++) {
                         this.cst.addNTNode(start[i]);
-                        // // Check for type declaration. Add to symbol table
-                        // if(start[i] == Production.VarDecl){
-                        //     this.isSymbol = true;
-                        // }
                         if (i != 0) {
                             this.log.push("VALID - Expecting [" + start[i - 1] + "], found [" + start[i] + "] on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
                         }
@@ -508,18 +510,6 @@ var TSC;
                 }
                 // Add terminal to log
                 this.log.push("VALID - Expecting [" + token + "], found [" + this.tokenList[this.currentToken].value + "] on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
-                // I'm pretty sure this is supposed to be part of semantic analysis but a symbol table is mentioned in Project 2 so I'm putting this here, even though this 
-                // is very hacky.
-                // if(this.isSymbol && token == TokenType.TType){
-                //     // record type
-                //     this.symbol["type"] = this.tokenList[this.currentToken].value;
-                // }
-                // if(this.isSymbol && token == TokenType.TId){
-                //     this.symbol["key"] = this.tokenList[this.currentToken].value;
-                //     this.symbols.push(this.symbol);
-                //     this.symbol = {};
-                //     this.isSymbol = false;
-                // }
                 // Add token to tree
                 this.cst.addTNode(this.tokenList[this.currentToken]);
                 console.log("Adding " + this.tokenList[this.currentToken].value + " to the tree");

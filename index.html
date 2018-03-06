@@ -485,18 +485,18 @@
                 var cst_visual = new Treant(cst.treant);
 
 				// Display symbols in Symbol Table
-				// var symbols = res.symbols;
-				// for(var i=0; i<symbols.length; i++){
-				// 	var table = document.getElementById("symbolTable");
-				// 	var row = table.insertRow(-1);
-				// 	var key = row.insertCell(0);
-				// 	key.innerHTML = symbols[i].key;
-				// 	var type = row.insertCell(1);
-				// 	type.innerHTML = symbols[i].type;
-				// 	var scope = row.insertCell(2);
-				// 	var scopeLevel = row.insertCell(3);
-				// 	var lineNumber = row.insertCell(4);
-				// }
+				var symbols = res.symbols;
+				for(var i=0; i<symbols.length; i++){
+					var table = document.getElementById("symbolTable");
+					var row = table.insertRow(-1);
+					var key = row.insertCell(0);
+					key.innerHTML = symbols[i].key;
+					var type = row.insertCell(1);
+					type.innerHTML = symbols[i].type;
+					var scope = row.insertCell(2);
+					var scopeLevel = row.insertCell(3);
+					var lineNumber = row.insertCell(4);
+				}
 			}
 		}
 		
