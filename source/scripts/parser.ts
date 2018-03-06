@@ -113,7 +113,7 @@ module TSC {
             }
             if(expected && !this.error){
                 this.error = true;
-                this.log.push("ERROR - Expecting [Block], found [" + this.tokenList[this.currentToken].type + "] on line " + this.tokenList[this.currentToken].lineNumber);
+                this.log.push("ERROR - Expecting [Block], found [" + this.tokenList[this.currentToken].type + "] on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
             }
             return false;
         }
@@ -163,7 +163,7 @@ module TSC {
                 return true;
             }
             if(expected && !this.error){
-                this.log.push("ERROR - Expecting [PrintStatement], found [" + this.tokenList[this.currentToken].type +"] on line " + this.tokenList[this.currentToken].lineNumber);
+                this.log.push("ERROR - Expecting [PrintStatement], found [" + this.tokenList[this.currentToken].type +"] on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
             }
             return false;
         }
@@ -182,7 +182,7 @@ module TSC {
             }
             if(expected && this.error){
                 this.error = true;
-                this.log.push("ERROR - Expecting [AssignmentStatement], found [" + this.tokenList[this.currentToken].type +"] on line " + this.tokenList[this.currentToken].lineNumber);
+                this.log.push("ERROR - Expecting [AssignmentStatement], found [" + this.tokenList[this.currentToken].type +"] on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
             }
             return false;
         }
@@ -200,7 +200,7 @@ module TSC {
             }
             if(expected && !this.error){
                 this.error = true;
-                this.log.push("ERROR - Expecting [VarDecl], found [" + this.tokenList[this.currentToken].type + "] on line " + this.tokenList[this.currentToken].lineNumber);
+                this.log.push("ERROR - Expecting [VarDecl], found [" + this.tokenList[this.currentToken].type + "] on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
             }
             return false;
         }
@@ -218,7 +218,7 @@ module TSC {
             }
             if(expected && !this.error){
                 this.error = true;
-                this.log.push("ERROR - Expecting [WhileStatement], found [" + this.tokenList[this.currentToken].type + "] on line " + this.tokenList[this.currentToken].lineNumber);
+                this.log.push("ERROR - Expecting [WhileStatement], found [" + this.tokenList[this.currentToken].type + "] on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
             }
             return false;
         }
@@ -238,7 +238,7 @@ module TSC {
             }
             if(expected && !this.error){
                 this.error = true;
-                this.log.push("ERROR - Expecting [IfStatement], found [" + this.tokenList[this.currentToken].type + "] on line " + this.tokenList[this.currentToken].lineNumber);
+                this.log.push("ERROR - Expecting [IfStatement], found [" + this.tokenList[this.currentToken].type + "] on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
             }
             return false;
         }
@@ -258,7 +258,7 @@ module TSC {
             // return error if expression not found
             if(!this.error){
                 this.error = true;
-                this.log.push("ERROR - Expecting [Expr], found [" + this.tokenList[this.currentToken].type + "] on line " + this.tokenList[this.currentToken].lineNumber);
+                this.log.push("ERROR - Expecting [Expr], found [" + this.tokenList[this.currentToken].type + "] on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
             }
             return false;
         }
@@ -284,7 +284,7 @@ module TSC {
             }
             if(expected && !this.error){
                 this.error = true;
-                this.log.push("ERROR - Expecting [IntExpr], found [" + this.tokenList[this.currentToken].type + "] on line " + this.tokenList[this.currentToken].lineNumber);
+                this.log.push("ERROR - Expecting [IntExpr], found [" + this.tokenList[this.currentToken].type + "] on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
             }
             return false;
         }
@@ -302,7 +302,7 @@ module TSC {
             }
             if(expected && !this.error){
                 this.error = true;
-                this.log.push("ERROR - Expecting [StringExpr], found [" + this.tokenList[this.currentToken].type + "] on line " + this.tokenList[this.currentToken].lineNumber);
+                this.log.push("ERROR - Expecting [StringExpr], found [" + this.tokenList[this.currentToken].type + "] on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
             }
             return false;
         }
@@ -326,7 +326,7 @@ module TSC {
             }
             if(expected && !this.error){
                 this.error = true;
-                this.log.push("ERROR - Expecting [BooleanExpr], found [" + this.tokenList[this.currentToken].type + "] on line " + this.tokenList[this.currentToken].lineNumber);
+                this.log.push("ERROR - Expecting [BooleanExpr], found [" + this.tokenList[this.currentToken].type + "] on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
             }
             return false;
         }
@@ -345,7 +345,7 @@ module TSC {
             }
             if(expected && !this.error){
                 this.error = true;
-                this.log.push("ERROR - Expecting [BoolVal], found [" + this.tokenList[this.currentToken].type + "] on line " + this.tokenList[this.currentToken].lineNumber);
+                this.log.push("ERROR - Expecting [BoolVal], found [" + this.tokenList[this.currentToken].type + "] on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
             }
             return false;
         }
@@ -363,7 +363,7 @@ module TSC {
             }
             if(expected && !this.error){
                 this.error = true;
-                this.log.push("ERROR - Expecting [Id], found [" + this.tokenList[this.currentToken].type + "] on line " + this.tokenList[this.currentToken].lineNumber);
+                this.log.push("ERROR - Expecting [Id], found [" + this.tokenList[this.currentToken].type + "] on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
             }
             return false;
         }
@@ -381,7 +381,7 @@ module TSC {
             }
             if(expected && !this.error){
                 this.error = true;
-                this.log.push("ERROR - Expecting [Type], found [" + this.tokenList[this.currentToken].type + "] on line " + this.tokenList[this.currentToken].lineNumber);
+                this.log.push("ERROR - Expecting [Type], found [" + this.tokenList[this.currentToken].type + "] on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
             }
             return false;
         }
@@ -399,7 +399,7 @@ module TSC {
             }
             if(expected && !this.error){
                 this.error = true;
-                this.log.push("ERROR - Expecting [Char], found [" + this.tokenList[this.currentToken].type + "] on line " + this.tokenList[this.currentToken].lineNumber);
+                this.log.push("ERROR - Expecting [Char], found [" + this.tokenList[this.currentToken].type + "] on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
             }
             return false;
         }
@@ -416,7 +416,7 @@ module TSC {
             }
             if(expected && !this.error){
                 this.error = true;
-                this.log.push("ERROR - Expecting [Digit], found [" + this.tokenList[this.currentToken].type + "] on line " + this.tokenList[this.currentToken].lineNumber);
+                this.log.push("ERROR - Expecting [Digit], found [" + this.tokenList[this.currentToken].type + "] on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
             }
             return false;
         }
@@ -433,7 +433,7 @@ module TSC {
             }
             if(expected && !this.error){
                 this.error = true;
-                this.log.push("ERROR - Expecting [Digit], found [" + this.tokenList[this.currentToken].type + "] on line " + this.tokenList[this.currentToken].lineNumber);
+                this.log.push("ERROR - Expecting [Digit], found [" + this.tokenList[this.currentToken].type + "] on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
             }
             return false;
         }
@@ -450,7 +450,7 @@ module TSC {
             }
             if(expected && !this.error){
                 this.error = true;
-                this.log.push("ERROR - Expecting [Boolop], found [" + this.tokenList[this.currentToken].type + "] on line " + this.tokenList[this.currentToken].lineNumber);
+                this.log.push("ERROR - Expecting [Boolop], found [" + this.tokenList[this.currentToken].type + "] on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
             }
             return false;
         }
@@ -468,7 +468,7 @@ module TSC {
             }
             if(expected && !this.error){
                 this.error = true;
-                this.log.push("ERROR - Expecting [Space], found [" + this.tokenList[this.currentToken].type + "] on line " + this.tokenList[this.currentToken].lineNumber);
+                this.log.push("ERROR - Expecting [Space], found [" + this.tokenList[this.currentToken].type + "] on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
             }
             return false;
         }
@@ -532,13 +532,13 @@ module TSC {
                         //     this.isSymbol = true;
                         // }
                         if(i != 0){
-                            this.log.push("VALID - Expecting [" + start[i-1] + "], found [" + start[i] + "] on line " + this.tokenList[this.currentToken].lineNumber);
+                            this.log.push("VALID - Expecting [" + start[i-1] + "], found [" + start[i] + "] on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
                         }
                     }
                     // add final production that was rewritten. Technically, could have all productions in start array, but 
                     // too lazy to go and modify all the code. Definitely a TODO.
                     this.cst.addNTNode(rewrite);
-                    this.log.push("VALID - Expecting [" + start[start.length-1] + "], found [" + rewrite + "] on line " + this.tokenList[this.currentToken].lineNumber);
+                    this.log.push("VALID - Expecting [" + start[start.length-1] + "], found [" + rewrite + "] on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
                 }
                 // If rewriting to some non-terminal only, display it in tree and log
                 // For example, when we're deriving from IntExpr, we're not deriving intop from IntExpr
@@ -547,10 +547,10 @@ module TSC {
                 // a While statement. But we still need to show the rewrite for BooleanExpr)
                 else if(rewrite != null){
                     this.cst.addNTNode(rewrite);
-                    this.log.push("VALID - Expecting [" + rewrite + "], found [" + rewrite + "] on line " + this.tokenList[this.currentToken].lineNumber);
+                    this.log.push("VALID - Expecting [" + rewrite + "], found [" + rewrite + "] on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
                 }
                 // Add terminal to log
-                this.log.push("VALID - Expecting [" + token + "], found [" + this.tokenList[this.currentToken].value + "] on line " + this.tokenList[this.currentToken].lineNumber);
+                this.log.push("VALID - Expecting [" + token + "], found [" + this.tokenList[this.currentToken].value + "] on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
 
                 // I'm pretty sure this is supposed to be part of semantic analysis but a symbol table is mentioned in Project 2 so I'm putting this here, even though this 
                 // is very hacky.
@@ -574,7 +574,7 @@ module TSC {
             // if token was expected and was not present, throw an error
             if(expected){
                 this.error = true;
-                this.log.push("ERROR - Expecting [" + token + "], found [" + this.tokenList[this.currentToken].type + "] on line " + this.tokenList[this.currentToken].lineNumber);
+                this.log.push("ERROR - Expecting [" + token + "], found [" + this.tokenList[this.currentToken].type + "] on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
             }
             return false;
         }

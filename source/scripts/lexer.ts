@@ -384,7 +384,8 @@ module TSC
                             "errors": this.errors,
                             "warnings": this.warnings,
 							"complete": this.isComplete,
-							"line": this.lineNumber
+							"line": this.lineNumber,
+							"col": this.colNumber
 						};
 						
                         this.endLexemePtr++;
@@ -466,7 +467,8 @@ module TSC
 						"errors": this.errors,
 						"warnings": this.warnings,
 						"complete": this.isComplete,
-						"line": this.lineNumber
+						"line": this.lineNumber,
+						"col": this.colNumber
 					};
 					return this.lexAnalysisRes;
 				}
@@ -482,7 +484,8 @@ module TSC
 					"errors": this.errors,
                     "warnings": this.warnings,
 					"complete": this.isComplete,
-					"line": this.lineNumber
+					"line": this.lineNumber,
+					"col": this.colNumber
 				};
 
 				return this.lexAnalysisRes;

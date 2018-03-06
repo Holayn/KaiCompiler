@@ -326,7 +326,8 @@ var TSC;
                         "errors": this.errors,
                         "warnings": this.warnings,
                         "complete": this.isComplete,
-                        "line": this.lineNumber
+                        "line": this.lineNumber,
+                        "col": this.colNumber
                     };
                     this.endLexemePtr++;
                     this.colNumber++;
@@ -396,7 +397,8 @@ var TSC;
                     "errors": this.errors,
                     "warnings": this.warnings,
                     "complete": this.isComplete,
-                    "line": this.lineNumber
+                    "line": this.lineNumber,
+                    "col": this.colNumber
                 };
                 return this.lexAnalysisRes;
             }
@@ -409,7 +411,8 @@ var TSC;
                 "errors": this.errors,
                 "warnings": this.warnings,
                 "complete": this.isComplete,
-                "line": this.lineNumber
+                "line": this.lineNumber,
+                "col": this.colNumber
             };
             return this.lexAnalysisRes;
         };

@@ -415,7 +415,7 @@
 				if(lexAnalysis.warnings[i].type == TSC.WarningType.MissingEOP){
 					putMessage("LEXER -> | WARNING: No EOP [$] detected at end-of-file. Adding to end-of-file...");
 					// Insert an EOP into the tokens array
-					lexAnalysis.tokens.push(new TSC.Token(TSC.TokenType.TEop, "$", lexAnalysis.line));
+					lexAnalysis.tokens.push(new TSC.Token(TSC.TokenType.TEop, "$", lexAnalysis.line, lexAnalysis.col));
 				}
 			}
 			for(var i=0; i<lexAnalysis.errors.length; i++){
