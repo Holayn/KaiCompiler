@@ -71,7 +71,7 @@ var TSC;
                     document.getElementById("taSourceCode").value = "/* Test case for invalid VarDecl */\n{\n    int 4\n}$";
                     break;
                 case "Invalid Print Pt. 2":
-                    document.getElementById("taSourceCode").value = "/* Test case for invalid Print */\n{\n    print($)\n}$";
+                    document.getElementById("taSourceCode").value = "/* Test case for invalid Print pt. 2 */\n{\n    print(\"$)\n}$";
                     break;
                 case "Incomplete BooleanExpr":
                     document.getElementById("taSourceCode").value = "/* Test case for incomplete BooleanExpr */\n{\n    s = \"strb\"\n    print(s)\n    \n    if (a != ) {\n        print(\"true\")\n    }\n}$";

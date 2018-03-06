@@ -237,9 +237,9 @@ s = "hey there`;
 }$`;
                     break;
                 case "Invalid Print Pt. 2":
-                    (<HTMLInputElement>document.getElementById("taSourceCode")).value = `/* Test case for invalid Print */
+                    (<HTMLInputElement>document.getElementById("taSourceCode")).value = `/* Test case for invalid Print pt. 2 */
 {
-    print($)
+    print("$)
 }$`;
                     break;
                 case "Incomplete BooleanExpr":
