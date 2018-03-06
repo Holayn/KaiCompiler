@@ -130,6 +130,7 @@ module TSC {
             }
             // epsilon... accept empty and return to parseBlock
             else{
+                this.log.push("VALID - Found \u03B5 on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
                 return true;
             }
         }
@@ -499,6 +500,7 @@ module TSC {
             }
             else{
                 // epsilon... accept empty
+                this.log.push("VALID - Found \u03B5 on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
                 return true;
             }
         }

@@ -114,6 +114,7 @@ var TSC;
                 return true;
             }
             else {
+                this.log.push("VALID - Found \u03B5 on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
                 return true;
             }
         };
@@ -463,6 +464,7 @@ var TSC;
             }
             else {
                 // epsilon... accept empty
+                this.log.push("VALID - Found \u03B5 on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
                 return true;
             }
         };
