@@ -184,6 +184,9 @@ module TSC
 								char = "\\t";
 							}
 							this.errors.push(new Error(TSC.ErrorType.InvalidCharacterInString, char, this.lineNumber, this.colNumber));
+							this.foundQuote = false;
+							// this.endLexemePtr++;
+							// this.colNumber++;
 							break;
 						}
 						this.endLexemePtr++;
