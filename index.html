@@ -444,10 +444,6 @@
 		// Fills log with messages from lexer
 		function logLex(lexAnalysis, programCounter) {
 			putMessage("Lexical Analysis:");
-            // Grab the tokens from the lexer . . .
-            // let lexer = new TSC.Lexer();
-			// var lexAnalysis = lexer.lex();
-			console.log(lexAnalysis);
 			// For all tokens, print out their type and value..only if verbose mode is on
 			if(verboseOn){
 				for(var i=0; i<lexAnalysis.tokens.length; i++){

@@ -119,6 +119,7 @@ module TSC
 					// For compiling multiple programs in sequence, if there was an error in the previous program,
 					// keep on clearing the tokens array until we find an EOP token. Then from there,
 					// we can lex the next program
+					// Basically, keep on clearing the state of the lexer until we can start lexing the next program
 					if(prevProgramError){
 						this.foundQuote = false;
 						this.tokens = [];
@@ -374,7 +375,6 @@ module TSC
 						// We've found it, so stop clearing tokens and start saving next tokens found and
 						// return them once we're done lexing
 						if(prevProgramError){
-							console.log(prevProgramError);
 							this.tokens = [];
 							this.errors = [];
 							prevProgramError = false;

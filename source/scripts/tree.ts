@@ -108,19 +108,11 @@ module TSC {
                     }
                     treantTree.push(child);
                 }
-                // if(node.children.length != 0){
-                    for(var i=0; i<node.children.length; i++){
-                        // to next call of DFS, increase level, pass the tree array, increase the dash by one dash, and pass
-                        // the reference to the next children array
-                        // Since no child was added for Program production, just pass old array to next call
-                        if(child['children'] == null){
-                            this.DFS(node.children[i], level + 1, tree, dash + "-", treantTree);
-                        }
-                        else{
-                            this.DFS(node.children[i], level + 1, tree, dash + "-", child['children']);
-                        }
-                    }
-                // }
+                for(var i=0; i<node.children.length; i++){
+                    // to next call of DFS, increase level, pass the tree array, increase the dash by one dash, and pass
+                    // the reference to the next children array
+                    this.DFS(node.children[i], level + 1, tree, dash + "-", child['children']);
+                }
             }
         }
     
