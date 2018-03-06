@@ -35,8 +35,9 @@ var TSC;
             // Line and col to keep track of comment
             this.startCommentCol = 0;
             this.startCommentLine = 0;
+            this.lexAnalysisRes = {};
         }
-        Lexer.prototype.lex = function () {
+        Lexer.prototype.lex = function (prevProgramError) {
             // Grab the "raw" source code.
             var sourceCode = document.getElementById("taSourceCode").value;
             // Trim the leading and trailing spaces.
@@ -100,18 +101,6 @@ var TSC;
             var rCOMMENTSTART = new RegExp('/\\*$');
             // RegExp for Comment End
             var rCOMMENTEND = new RegExp('\\*/$');
-            // // Keeps track of the lexer is currently in a comment block
-            // let inComment: boolean = false;
-            // // Keeps track if we've run into EOP
-            // let foundEOP: boolean = false;
-            // // Keeps track if we've run into a quotation mark
-            // let foundQuote: boolean = false;
-            // // Line and col to keep track of quotation mark
-            // let startQuoteCol: number = 0;
-            // let startQuoteLine: number = 0;
-            // // Line and col to keep track of comment
-            // let startCommentCol: number = 0;
-            // let startCommentLine: number = 0;
             // Run Regular Expression matching on the buffer of characters we have so far
             // If the character we just "added" to the buffer we're looking at creates a match...
             // Create a new Token for match
@@ -119,6 +108,14 @@ var TSC;
             // Runtime: O(n^2) where n is length of source code. One pass is performed over source code, 
             // with each iteration performing an O(n) regular expression check
             while (this.endLexemePtr <= sourceCode.length) {
+                // For compiling multiple programs in sequence, if there was an error in the previous program,
+                // keep on clearing the tokens array until we find an EOP token. Then from there,
+                // we can lex the next program
+                if (prevProgramError) {
+                    this.tokens = [];
+                    this.errors = [];
+                    this.warnings = [];
+                }
                 console.log(sourceCode.substring(this.startLexemePtr, this.endLexemePtr));
                 console.log(this.endLexemePtr);
                 //We're iterating through the program, so that means we haven't found the EOP
@@ -158,6 +155,11 @@ var TSC;
                         this.foundQuote = false;
                     }
                     else {
+                        // If we're on the hunt for an EOP, then ignore errors
+                        if (prevProgramError) {
+                            this.endLexemePtr++;
+                            continue;
+                        }
                         // If we run into a character that does not match a Character, throw an error
                         console.log("ERROR: Invalid character in String");
                         var char = sourceCode.charAt(this.endLexemePtr - 1);
@@ -307,9 +309,19 @@ var TSC;
                     this.foundEOP = true;
                     // Stop looking for an ending quote. The next quote found belongs to the next program
                     this.foundQuote = false;
+                    // If the previous program had an error and we're now looking for the next EOP marker
+                    // We've found it, so stop clearing tokens and start saving next tokens found and
+                    // return them once we're done lexing
+                    if (prevProgramError) {
+                        this.tokens = [];
+                        prevProgramError = false;
+                        this.endLexemePtr++;
+                        this.colNumber++;
+                        continue;
+                    }
                     // Return the results of lex and then re-init everything so we can lex next program
                     // Define an object to return values in
-                    var lexAnalysisRes_1 = {
+                    this.lexAnalysisRes = {
                         "tokens": this.tokens,
                         "errors": this.errors,
                         "warnings": this.warnings,
@@ -321,15 +333,22 @@ var TSC;
                     this.tokens = [];
                     this.errors = [];
                     this.warnings = [];
-                    return lexAnalysisRes_1;
+                    return this.lexAnalysisRes;
                 }
                 else {
+                    // Only catch illegal characters if we're not looking for the next EOP marker
+                    if (prevProgramError) {
+                        this.endLexemePtr++;
+                        this.colNumber++;
+                        continue;
+                    }
                     if (this.endLexemePtr == sourceCode.length) {
                         // If code ends with a trailling start comment, throw error
                         if (rCOMMENTSTART.test(sourceCode.substring(this.startLexemePtr, this.endLexemePtr + 1))) {
                             this.errors.push(new TSC.Error(TSC.ErrorType.MissingCommentEnd, "*/", this.startCommentLine, this.startCommentCol));
                         }
                         else {
+                            console.log("ERROR TOKEN");
                             this.errors.push(new TSC.Error(TSC.ErrorType.InvalidToken, sourceCode.charAt(this.endLexemePtr - 1), this.lineNumber, this.colNumber));
                         }
                         break;
@@ -349,6 +368,7 @@ var TSC;
                         this.startCommentLine = this.lineNumber;
                     }
                     else {
+                        console.log("ERROR TOKEN");
                         this.errors.push(new TSC.Error(TSC.ErrorType.InvalidToken, sourceCode.charAt(this.endLexemePtr - 2), this.lineNumber, this.colNumber));
                         break;
                     }
@@ -369,19 +389,29 @@ var TSC;
                     this.warnings.push(new TSC.Warning(TSC.WarningType.MissingEOP, "$", this.lineNumber, this.colNumber));
                 }
             }
-            // We're done lexing
+            else {
+                // Define an object to return values in
+                this.lexAnalysisRes = {
+                    "tokens": this.tokens,
+                    "errors": this.errors,
+                    "warnings": this.warnings,
+                    "complete": this.isComplete,
+                    "line": this.lineNumber
+                };
+                return this.lexAnalysisRes;
+            }
+            // We've reached end of source code
             this.isComplete = true;
             console.log(this.tokens);
             // Define an object to return values in
-            var lexAnalysisRes = {
+            this.lexAnalysisRes = {
                 "tokens": this.tokens,
                 "errors": this.errors,
                 "warnings": this.warnings,
                 "complete": this.isComplete,
                 "line": this.lineNumber
             };
-            // TODO: remove all spaces in the middle; remove line breaks too.
-            return lexAnalysisRes;
+            return this.lexAnalysisRes;
         };
         return Lexer;
     }());

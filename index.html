@@ -45,7 +45,7 @@
 				<div class="col s6">
 					<div class="card-panel input">
 						<h5 class="light">Editor</h5>
-						<textarea class="lined" id="taSourceCode">{print(true)}$</textarea>
+						<textarea class="lined" id="taSourceCode"></textarea>
 						<br>
 						<div class="fixed-action-btn horizontal click-to-toggle togglebutton">
 							<a class="btn-floating btn blue lighten-2">
@@ -271,7 +271,6 @@
             // Clear the log and the CST.
 			document.getElementById("taOutput").value = "";
 			document.getElementById("taCST").value = "";
-			document.getElementById("tree-cst").value = "";
 			// Clear symbol table
 			var table = document.getElementById("symbolTable");
 			// Leave header in place
@@ -283,7 +282,14 @@
 	        tokens = "";
 	        tokenIndex = 0;
 	        currentToken = ' ';
-	        errorCount = 0;        
+			errorCount = 0;        
+			// Clear visual CST
+			var cst_visual = new Treant({
+				chart: {
+					container: "#tree-cst"
+				},
+				nodeStructure: {}
+			});
 		}
 		
 		function btnVerbose_click() {
@@ -331,6 +337,7 @@
             var programCounter = 1; // counter for number of programs compiled
             var lexAnalysis; // object returned by lexer
 			var programDetected = false; // flag for program detection
+			var prevProgramError = false; // flag to keep track if previous program in sequence of programs had error
 			
 			// Base Treant.js CST config
 			// Declaring it here and passing it to calls of parse will allow
@@ -350,33 +357,43 @@
             // We're compiling programs in sequence.
             // For every program, lex, parse, perform semantic analysis, etc...
             while(!isLexComplete){
-                lexAnalysis = lexer.lex();
-                // Log and parse if there are tokens
-                // if(lexAnalysis.tokens.length != 0 || lexAnalysis.errors.length != 0){
-                if(!lexAnalysis.complete){
-                    programDetected = true;
-                    putMessage("______________________________");
-                    putMessage("Compiling Program " + programCounter + " . . .\n");
-                    logLex(lexAnalysis);
-                    if(lexAnalysis.complete){
-                        isLexComplete = true;
-                    }
-                    // Continue to parse if no errors
-                    if(lexAnalysis.errors.length == 0){
-                        parse(lexAnalysis, treantTree);
-                    }
-                    else{
-                        putMessage("Parser skipped due to Lexer errors . . ");
-                    }
-                    programCounter++;
-                }
-                else{
-                    isLexComplete = true;
-                }
-                if(!programDetected){
-                    logLex(lexAnalysis);
-                    parse(lexAnalysis, treantTree);
-                }
+				console.log("Starting another lex");
+				lexAnalysis = lexer.lex(prevProgramError);
+				console.log(lexAnalysis);
+				// Attempt to lex . . 
+				// If we get an error, report it
+				// Then, try to lex again by having lexer look for next EOP token, then lexing from there
+				// If no error, parse. Then lex next program
+				// If reach end of source code and no tokens, throw error
+				if(lexAnalysis.errors.length != 0){
+					programDetected = true; // we know a program was detected, aka user actually typed code besides comments
+					putMessage("______________________________");
+					putMessage("Compiling Program " + programCounter + " . . .\n");
+					programCounter++;
+					logLex(lexAnalysis);
+					prevProgramError = true;
+					putMessage("Parser skipped due to Lexer errors . . ");
+				}
+				// No tokens were found but lex completed, meaning that there is no more input to lex
+				else if(lexAnalysis.tokens.length == 0){
+					isLexComplete = true;
+				}
+				else{
+					programDetected = true; // we know a program was detected, aka user actually typed code besides comments
+					putMessage("______________________________");
+					putMessage("Compiling Program " + programCounter + " . . .\n");
+					programCounter++;
+					logLex(lexAnalysis);
+					prevProgramError = false;
+					parse(lexAnalysis, treantTree);
+				}
+				if(lexAnalysis.complete){
+					isLexComplete = true;
+				}
+				// If the user tried to compile without typing any code besides comments, throw error
+				if(!programDetected){
+					putMessage("Why are you trying to compile zero code? Cheese and crackers you dimwit go eat a sock.");
+				}
             }
         }
 		
