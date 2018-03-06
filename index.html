@@ -369,8 +369,8 @@
 					programDetected = true; // we know a program was detected, aka user actually typed code besides comments
 					putMessage("______________________________");
 					putMessage("Compiling Program " + programCounter + " . . .\n");
+					logLex(lexAnalysis, programCounter);
 					programCounter++;
-					logLex(lexAnalysis);
 					prevProgramError = true;
 					putMessage("Parser skipped due to Lexer errors . . ");
 				}
@@ -382,10 +382,10 @@
 					programDetected = true; // we know a program was detected, aka user actually typed code besides comments
 					putMessage("______________________________");
 					putMessage("Compiling Program " + programCounter + " . . .\n");
-					programCounter++;
-					logLex(lexAnalysis);
+					logLex(lexAnalysis, programCounter);
 					prevProgramError = false;
-					parse(lexAnalysis, treantTree);
+					parse(lexAnalysis, treantTree, programCounter);
+					programCounter++;
 				}
 				if(lexAnalysis.complete){
 					isLexComplete = true;
@@ -398,7 +398,7 @@
         }
 		
 		// Fills log with messages from lexer
-		function logLex(lexAnalysis) {
+		function logLex(lexAnalysis, programCounter) {
 			putMessage("Lexical Analysis:");
             // Grab the tokens from the lexer . . .
             // let lexer = new TSC.Lexer();
@@ -434,10 +434,10 @@
 			}
 			// Display toasts for warnings and errors
 			if(lexAnalysis.warnings.length > 0){
-				Materialize.toast('Lex warning!', 4000, 'toastcolor');
+				Materialize.toast('Program ' + programCounter + ': Lex warning!', 4000, 'toastcolor');
 			}
 			if(lexAnalysis.errors.length > 0){
-				Materialize.toast('Lex error!', 4000, 'toastcolor');
+				Materialize.toast('Program ' + programCounter + ': Lex error!', 4000, 'toastcolor');
 			}
 			putMessage("\n");
 			putMessage("Lexical Analysis complete! " + lexAnalysis.warnings.length + " WARNING(S) and " + lexAnalysis.errors.length + " ERROR(S)");
@@ -446,7 +446,7 @@
 		
 		// Takes tokens from lexical analysis and passes them to parser
 		// Also passes Treant CST config so parser can construct CST or add on to existing CST
-	    function parse(lexAnalysis, treantTree) {
+	    function parse(lexAnalysis, treantTree, programCounter) {
 			putMessage("Parsing...");
 			// Put tokens into parser for validation
 			let parser = new TSC.Parser(lexAnalysis.tokens);
@@ -463,14 +463,14 @@
 				putMessage("\n");
                 putMessage("Parse failed due to error.");
                 putMessage("CST generation failed due to parse error.");
-				Materialize.toast('Parse error!', 4000, 'toastcolor');
+				Materialize.toast('Program ' + programCounter + ': Parse error!', 4000, 'toastcolor');
 				// Empty CST visual display
-				var cst_visual = new Treant({
-					chart: {
-						container: "#tree-cst"
-					},
-					nodeStructure: {}
-				});
+				// var cst_visual = new Treant({
+				// 	chart: {
+				// 		container: "#tree-cst"
+				// 	},
+				// 	nodeStructure: {}
+				// });
 			}
 			else{
 				putMessage("\n");
