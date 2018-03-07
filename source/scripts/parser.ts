@@ -200,6 +200,7 @@ module TSC {
                 console.log(this.tokenList[this.currentToken-1]);
                 this.symbol["type"] = this.tokenList[this.currentToken-2].value;
                 this.symbol["key"] = this.tokenList[this.currentToken-1].value;
+                this.symbol["line"] = this.tokenList[this.currentToken-1].lineNumber;
                 this.symbols.push(this.symbol);
                 this.symbol = {};
                 console.log(this.symbols);
