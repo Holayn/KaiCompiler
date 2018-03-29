@@ -43,7 +43,6 @@ var TSC;
                 case TSC.Production.VarDecl:
                     console.log("found vardecl");
                     this.ast.addNTNode(TSC.Production.VarDecl);
-                    console.log("wtf");
                     // We now need to get its children and add to AST
                     // Get the type
                     this.ast.addNode(node.children[0].children[0].value);
@@ -51,6 +50,36 @@ var TSC;
                     // Get the id
                     this.ast.addNode(node.children[1].children[0].value);
                     this.ast.ascendTree();
+                    this.ast.ascendTree();
+                    break;
+                case TSC.Production.PrintStmt:
+                    console.log("found wendy");
+                    this.ast.addNTNode(TSC.Production.PrintStmt);
+                    // figure out expression
+                    this.traverse(node.children[2]);
+                    this.ast.ascendTree();
+                    break;
+                case TSC.Production.Id:
+                    console.log("found id");
+                    this.ast.addNode(node.children[0].value);
+                    this.ast.ascendTree();
+                    break;
+                case TSC.Production.IntExpr:
+                    console.log("found intexpr");
+                    // figure out which intexpr this is
+                    // actual expression
+                    if (node.children.length > 1) {
+                        this.ast.addNode(node.children[1].children[0].value);
+                        this.ast.addNode(node.children[0].children[0].value);
+                        this.ast.ascendTree();
+                        // figure out expression
+                        this.traverse(node.children[2]);
+                        this.ast.ascendTree();
+                    }
+                    else {
+                        this.ast.addNode(node.children[0].children[0].value);
+                        this.ast.ascendTree();
+                    }
                     break;
                 default:
                     // Traverse node's children
