@@ -31,11 +31,68 @@ module TSC {
         // Let's just go through source code again, assume everything correct
         // On "important" things, add to tree.
 
-        currentSymbol: number; // the index of the current nonterminal or terminal symbol we're looking at
-        tokenList: Array<Token>; // list of tokens passed from lexer
+        // currentSymbol: number; // the index of the current nonterminal or terminal symbol we're looking at
+        // tokenList: Array<Token>; // list of tokens passed from lexer
         warnings: Array<WarningType>; // array to hold warnings
         errors: Array<ErrorType>; // array to hold errors
         ast: Tree; // pointer to the ast
+
+        constructor(){
+            this.warnings = [];
+            this.errors = [];
+            this.ast = new Tree();
+        }
+
+        /**
+         * Starts the semantic analysis using the CST produced in parse
+         */
+        public analyze(parseResult){
+            // Traverse the CST in a preorder fashion
+            // If we find something "important", add it to the CST
+            this.traverse(parseResult.cst.root);
+            // Return the AST for now
+            return this.ast;
+        }
+
+        /**
+         * Performs preorder traversal given a CST node
+         */
+        public traverse(node){
+            // Check if "important". If so, add to AST, descend AST.
+            switch(node.value){
+                case Production.Block:
+                    console.log("found block");
+                    this.ast.addNTNode(Production.Block);
+                    // Traverse node's children
+                    for(var i=0; i<node.children.length; i++){
+                        this.traverse(node.children[i]);
+                    }
+                    // Go up the AST once we finish traversing
+                    // Don't go up if we're at the root doe
+                    if(this.ast.curr != null){
+                        this.ast.ascendTree();
+                    }
+                    break;
+                case Production.VarDecl:
+                    console.log("found vardecl");
+                    this.ast.addNTNode(Production.VarDecl);
+                    console.log("wtf");
+                    // We now need to get its children and add to AST
+                    // Get the type
+                    this.ast.addNode(node.children[0].children[0].value);
+                    this.ast.ascendTree();
+                    // Get the id
+                    this.ast.addNode(node.children[1].children[0].value);
+                    this.ast.ascendTree();
+                    break;
+                default:
+                    // Traverse node's children
+                    for(var i=0; i<node.children.length; i++){
+                        this.traverse(node.children[i]);
+                    }
+                    break
+            }
+        }
 
         // currentToken: number; // the index of the current token we're looking at
         // tokenList: Array<Token>; // list of tokens passed from lexer

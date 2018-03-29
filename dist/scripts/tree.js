@@ -23,8 +23,6 @@ var TSC;
          */
         Tree.prototype.addNTNode = function (production) {
             var node = new NonTerminalTreeNode(production);
-            console.log(node);
-            console.log(production);
             if (this.root == null) {
                 this.root = node;
                 this.curr = node;
@@ -50,7 +48,22 @@ var TSC;
             node.parent = this.curr;
             // add to children of curr node
             this.curr.children.push(node);
-            // Once we add a terminal to the tree, ascend the tree
+        };
+        /**
+         * Add general node
+         */
+        Tree.prototype.addNode = function (input) {
+            var node = new GeneralTreeNode(input);
+            if (this.root == null) {
+                this.root = node;
+                this.curr = node;
+                return;
+            }
+            // set parent
+            node.parent = this.curr;
+            // add to children of curr node
+            this.curr.children.push(node);
+            this.descendTree();
         };
         /**
          * Sets current node to look at as the latest child
@@ -86,7 +99,7 @@ var TSC;
         Tree.prototype.DFS = function (node, level, tree, dash, treantTree) {
             var child = {};
             if (node.value instanceof TSC.Token) {
-                console.log("CST: " + node.value.value + " Level: " + level);
+                console.log("Tree: " + node.value.value + " Level: " + level);
                 tree.push(dash + "[" + node.value.value + "]");
                 // Add new node to children array passed
                 // Pass reference to new children array to next call
@@ -97,7 +110,7 @@ var TSC;
                 treantTree.push(child);
             }
             else {
-                console.log("CST: " + node.value + " Level: " + level);
+                console.log("Tree: " + node.value + " Level: " + level);
                 tree.push(dash + "<" + node.value + ">");
                 // Add new node to children array passed
                 // Pass reference to new children array to next call
@@ -156,4 +169,18 @@ var TSC;
         return TerminalTreeNode;
     }(TreeNode));
     TSC.TerminalTreeNode = TerminalTreeNode;
+    /**
+     * A TreeNode that represents any value
+     */
+    var GeneralTreeNode = /** @class */ (function (_super) {
+        __extends(GeneralTreeNode, _super);
+        function GeneralTreeNode() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        GeneralTreeNode.prototype["super"] = function (value) {
+            this.value = value;
+        };
+        return GeneralTreeNode;
+    }(TreeNode));
+    TSC.GeneralTreeNode = GeneralTreeNode;
 })(TSC || (TSC = {}));

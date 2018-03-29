@@ -19,8 +19,6 @@ module TSC {
              */
             public addNTNode(production: Production){
                 let node = new NonTerminalTreeNode(production);
-                console.log(node);
-                console.log(production);
                 if(this.root == null){
                     this.root = node;
                     this.curr = node;
@@ -47,7 +45,23 @@ module TSC {
                 node.parent = this.curr;
                 // add to children of curr node
                 this.curr.children.push(node);
-                // Once we add a terminal to the tree, ascend the tree
+            }
+
+            /**
+             * Add general node
+             */
+            public addNode(input: any){
+                let node = new GeneralTreeNode(input);
+                if(this.root == null){
+                    this.root = node;
+                    this.curr = node;
+                    return;
+                }
+                // set parent
+                node.parent = this.curr;
+                // add to children of curr node
+                this.curr.children.push(node);
+                this.descendTree();
             }
 
             /**
@@ -87,7 +101,7 @@ module TSC {
             private DFS(node, level, tree, dash, treantTree){
                 let child = {};
                 if(node.value instanceof Token){
-                    console.log("CST: " + node.value.value + " Level: " + level);
+                    console.log("Tree: " + node.value.value + " Level: " + level);
                     tree.push(dash + "[" + node.value.value + "]")
                     // Add new node to children array passed
                     // Pass reference to new children array to next call
@@ -98,7 +112,7 @@ module TSC {
                     treantTree.push(child);
                 }
                 else{
-                    console.log("CST: " + node.value + " Level: " + level);
+                    console.log("Tree: " + node.value + " Level: " + level);
                     tree.push(dash + "<" + node.value + ">")
                     // Add new node to children array passed
                     // Pass reference to new children array to next call
@@ -146,6 +160,16 @@ module TSC {
         export class TerminalTreeNode extends TreeNode {
             value: Token;
             super(value: Token){
+                this.value = value;
+            }
+        }
+
+        /**
+         * A TreeNode that represents any value
+         */
+        export class GeneralTreeNode extends TreeNode {
+            value: any;
+            super(value: any){
                 this.value = value;
             }
         }

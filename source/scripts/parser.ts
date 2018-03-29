@@ -46,7 +46,7 @@ module TSC {
         symbol: Object = {}; // object to hold symbol data
         symbols: Array<Object>; // keeps array of symbols found
 
-        productionSymbols: Array<Object>; // holds nonterminal and terminal symbols for the SA to use
+        // productionSymbols: Array<Object>; // holds nonterminal and terminal symbols for the SA to use
 
          // Constructor for parser, passed tokens from lexer. Inits values.
         constructor(tokens){
@@ -543,7 +543,7 @@ module TSC {
                     // IntExpr, which is then rewritten to Digit
                     for(var i=0; i<start.length; i++){
                         this.cst.addNTNode(start[i]);
-                        this.productionSymbols.push(start[i]);
+                        // this.productionSymbols.push(start[i]);
                         if(i != 0){
                             this.log.push("VALID - Expecting [" + start[i-1] + "], found [" + start[i] + "] on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
                         }
@@ -551,7 +551,7 @@ module TSC {
                     // add final production that was rewritten. Technically, could have all productions in start array, but 
                     // too lazy to go and modify all the code. Definitely a TODO.
                     this.cst.addNTNode(rewrite);
-                    this.productionSymbols.push(rewrite);
+                    // this.productionSymbols.push(rewrite);
                     this.log.push("VALID - Expecting [" + start[start.length-1] + "], found [" + rewrite + "] on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
                 }
                 // If rewriting to some non-terminal only, display it in tree and log
@@ -561,7 +561,7 @@ module TSC {
                 // a While statement. But we still need to show the rewrite for BooleanExpr)
                 else if(rewrite != null){
                     this.cst.addNTNode(rewrite);
-                    this.productionSymbols.push(rewrite);
+                    // this.productionSymbols.push(rewrite);
                     this.log.push("VALID - Expecting [" + rewrite + "], found [" + rewrite + "] on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
                 }
                 // Add terminal to log
@@ -569,7 +569,7 @@ module TSC {
 
                 // Add token to tree
                 this.cst.addTNode(this.tokenList[this.currentToken]);
-                this.productionSymbols.push(this.tokenList[this.currentToken]);
+                // this.productionSymbols.push(this.tokenList[this.currentToken]);
                 console.log("Adding " + this.tokenList[this.currentToken].value + " to the tree");
                 // consume token
                 this.currentToken++;
