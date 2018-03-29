@@ -32,6 +32,7 @@ var TSC;
         Production["IntOp"] = "IntOp";
         Production["BoolOp"] = "BoolOp";
         Production["Space"] = "Space";
+        Production["Addition"] = "Addition";
     })(Production = TSC.Production || (TSC.Production = {}));
     var Parser = /** @class */ (function () {
         // Constructor for parser, passed tokens from lexer. Inits values.
@@ -44,6 +45,7 @@ var TSC;
             this.log = [];
             // Holds symbols found by parser
             this.symbols = [];
+            this.productionSymbols = [];
             // Flag for parser error
             this.error = false;
             // Tree data structure
@@ -71,6 +73,7 @@ var TSC;
             }
             // Return the parser log
             console.log(this.log);
+            console.log(this.productionSymbols);
             return {
                 "log": this.log,
                 "cst": this.cst,
@@ -500,6 +503,7 @@ var TSC;
                     // IntExpr, which is then rewritten to Digit
                     for (var i = 0; i < start.length; i++) {
                         this.cst.addNTNode(start[i]);
+                        this.productionSymbols.push(start[i]);
                         if (i != 0) {
                             this.log.push("VALID - Expecting [" + start[i - 1] + "], found [" + start[i] + "] on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
                         }
@@ -507,16 +511,19 @@ var TSC;
                     // add final production that was rewritten. Technically, could have all productions in start array, but 
                     // too lazy to go and modify all the code. Definitely a TODO.
                     this.cst.addNTNode(rewrite);
+                    this.productionSymbols.push(rewrite);
                     this.log.push("VALID - Expecting [" + start[start.length - 1] + "], found [" + rewrite + "] on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
                 }
                 else if (rewrite != null) {
                     this.cst.addNTNode(rewrite);
+                    this.productionSymbols.push(rewrite);
                     this.log.push("VALID - Expecting [" + rewrite + "], found [" + rewrite + "] on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
                 }
                 // Add terminal to log
                 this.log.push("VALID - Expecting [" + token + "], found [" + this.tokenList[this.currentToken].value + "] on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
                 // Add token to tree
                 this.cst.addTNode(this.tokenList[this.currentToken]);
+                this.productionSymbols.push(this.tokenList[this.currentToken]);
                 console.log("Adding " + this.tokenList[this.currentToken].value + " to the tree");
                 // consume token
                 this.currentToken++;
