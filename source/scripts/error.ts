@@ -7,7 +7,8 @@ module TSC {
         InvalidToken = "InvalidToken",
         MissingCommentEnd = "MissingCommentEnd",
         InvalidCharacterInString = "InvalidCharacterInString",
-        MissingStringEndQuote = "MissingStringEndQuote"
+        MissingStringEndQuote = "MissingStringEndQuote",
+        DuplicateVariable = "DuplicateVariable"
     }
     export class Error {
         type: ErrorType;

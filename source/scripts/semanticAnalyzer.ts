@@ -28,7 +28,9 @@ module TSC {
             this.traverse(parseResult.cst.root);
             return {
                 "ast": this.ast,
-                "scopeTree": this.scopeTree
+                "scopeTree": this.scopeTree,
+                "errors": this.errors,
+                "error": this.error
             }
         }
 
@@ -73,13 +75,14 @@ module TSC {
                     this.ast.ascendTree();
                     // Add variable declaration to current scope
                     // Check if already declared in current scope
-                    if(!this.scopeTree.curr.value.hasOwnProperty(id)){
-                        this.scopeTree.curr.value.id = new ScopeObject();
-                        this.scopeTree.curr.value.id.type = type;
+                    if(!this.scopeTree.curr.value.hasOwnProperty(id.value)){
+                        this.scopeTree.curr.value[id.value] = new ScopeObject();
+                        this.scopeTree.curr.value[id.value].type = type;
                     }
                     // Throw error if variable already declared in scope
                     else{
                         this.error = true;
+                        this.errors.push(new Error(ErrorType.DuplicateVariable, null, node.children[1].children[0].value.lineNumber, node.children[1].children[0].value.colNumber));
                     }
                     break;
                 case Production.PrintStmt:

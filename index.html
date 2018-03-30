@@ -558,9 +558,14 @@
                 document.getElementById("taAST").value += ast.tree[i] + "\n";
             }
             console.log("Scope tree: ");
-            console.log(res.scopeTree);
-            // Display CST visually with Treant.js
-            var ast_visual = new Treant(ast.treant);
+			console.log(res.scopeTree);
+			if(res.error){
+				console.log(res.errors[0]);
+			}
+			else{
+				// Display AST visually with Treant.js
+				var ast_visual = new Treant(ast.treant);
+			}
         }
 		
     

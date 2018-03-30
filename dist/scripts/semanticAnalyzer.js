@@ -21,7 +21,9 @@ var TSC;
             this.traverse(parseResult.cst.root);
             return {
                 "ast": this.ast,
-                "scopeTree": this.scopeTree
+                "scopeTree": this.scopeTree,
+                "errors": this.errors,
+                "error": this.error
             };
         };
         /**
@@ -65,12 +67,13 @@ var TSC;
                     this.ast.ascendTree();
                     // Add variable declaration to current scope
                     // Check if already declared in current scope
-                    if (!this.scopeTree.curr.value.hasOwnProperty(id)) {
-                        this.scopeTree.curr.value.id = new TSC.ScopeObject();
-                        this.scopeTree.curr.value.id.type = type;
+                    if (!this.scopeTree.curr.value.hasOwnProperty(id.value)) {
+                        this.scopeTree.curr.value[id.value] = new TSC.ScopeObject();
+                        this.scopeTree.curr.value[id.value].type = type;
                     }
                     else {
                         this.error = true;
+                        this.errors.push(new TSC.Error(TSC.ErrorType.DuplicateVariable, null, node.children[1].children[0].value.lineNumber, node.children[1].children[0].value.colNumber));
                     }
                     break;
                 case TSC.Production.PrintStmt:
