@@ -168,7 +168,7 @@
 						</table>
 					</div>
 				</div>
-			</div>
+            </div>
 			<div class="row">
                 <div id="visual-cst" class="card-panel log">
                     <h5 class="light">Visual CST Representation</h5>
@@ -176,11 +176,11 @@
                 </div>
             </div>
             <div class="row">
-                    <div id="visual-ast" class="card-panel log">
-                        <h5 class="light">Visual AST Representation</h5>
-                        <div id="tree-ast" style="width: 100%; height: 500px"></div>
-                    </div>
+                <div id="visual-ast" class="card-panel log">
+                    <h5 class="light">Visual AST Representation</h5>
+                    <div id="tree-ast" style="width: 100%; height: 500px"></div>
                 </div>
+            </div>
 		</div>
 
 		<!-- Modal Structure -->
@@ -323,6 +323,12 @@
 			var cst_visual = new Treant({
 				chart: {
 					container: "#tree-cst"
+				},
+				nodeStructure: {}
+            });
+            var ast_visual = new Treant({
+				chart: {
+					container: "#tree-ast"
 				},
 				nodeStructure: {}
 			});
@@ -508,13 +514,6 @@
                 putMessage("Parse failed due to error.");
                 putMessage("CST generation failed due to parse error.");
 				Materialize.toast('Program ' + programCounter + ': Parse error!', 4000, 'toastcolor');
-				// Empty CST visual display
-				// var cst_visual = new Treant({
-				// 	chart: {
-				// 		container: "#tree-cst"
-				// 	},
-				// 	nodeStructure: {}
-				// });
 			}
 			else{
 				putMessage("\n");
@@ -543,7 +542,6 @@
 					lineNumber.innerHTML = symbols[i].line;
 				}
             }
-            
             // Return the results of the parser so the cst can be used by the semantic analyzer
             return res;
         }
@@ -554,6 +552,10 @@
             let semanticAnalyzer = new TSC.SemanticAnalyzer();
             var res = semanticAnalyzer.analyze(parseResult);
             var ast = res.traverseTree(treantAST);
+            // Display AST in AST field
+            for(var i=0; i<ast.tree.length; i++){
+                document.getElementById("taAST").value += ast.tree[i] + "\n";
+            }
             console.log(ast);
             // Display CST visually with Treant.js
             var ast_visual = new Treant(ast.treant);
