@@ -102,6 +102,12 @@ module TSC {
                     this.traverse(node.children[2]);
                     this.ast.ascendTree();
                     break;
+                case Production.WhileStmt:
+                    console.log("found while");
+                    this.ast.addNode(Production.WhileStmt);
+                    this.traverse(node.children[1]);
+                    this.traverse(node.children[2]);
+                    break;
                 case Production.Id:
                     console.log("found id");
                     this.ast.addNode(node.children[0].value);
@@ -112,7 +118,7 @@ module TSC {
                     // figure out which intexpr this is
                     // more than just a digit
                     if(node.children.length > 1){
-                        this.ast.addNode(node.children[1].children[0].value);
+                        this.ast.addNode("Addition");
                         this.ast.addNode(node.children[0].children[0].value);
                         this.ast.ascendTree();
                         // figure out expression

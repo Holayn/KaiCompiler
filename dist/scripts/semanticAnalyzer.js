@@ -69,6 +69,12 @@ var TSC;
                     this.traverse(node.children[2]);
                     this.ast.ascendTree();
                     break;
+                case TSC.Production.WhileStmt:
+                    console.log("found while");
+                    this.ast.addNode(TSC.Production.WhileStmt);
+                    this.traverse(node.children[1]);
+                    this.traverse(node.children[2]);
+                    break;
                 case TSC.Production.Id:
                     console.log("found id");
                     this.ast.addNode(node.children[0].value);
@@ -79,7 +85,7 @@ var TSC;
                     // figure out which intexpr this is
                     // more than just a digit
                     if (node.children.length > 1) {
-                        this.ast.addNode(node.children[1].children[0].value);
+                        this.ast.addNode("Addition");
                         this.ast.addNode(node.children[0].children[0].value);
                         this.ast.ascendTree();
                         // figure out expression
