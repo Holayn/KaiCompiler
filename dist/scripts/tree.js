@@ -48,6 +48,7 @@ var TSC;
             node.parent = this.curr;
             // add to children of curr node
             this.curr.children.push(node);
+            // we don't descend tree here because terminal nodes are always leaf nodes
         };
         /**
          * Add general node

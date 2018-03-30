@@ -67,13 +67,37 @@ var TSC;
                 case TSC.Production.IntExpr:
                     console.log("found intexpr");
                     // figure out which intexpr this is
-                    // actual expression
+                    // more than just a digit
                     if (node.children.length > 1) {
                         this.ast.addNode(node.children[1].children[0].value);
                         this.ast.addNode(node.children[0].children[0].value);
                         this.ast.ascendTree();
                         // figure out expression
                         this.traverse(node.children[2]);
+                        this.ast.ascendTree();
+                    }
+                    else {
+                        this.ast.addNode(node.children[0].children[0].value);
+                        this.ast.ascendTree();
+                    }
+                    break;
+                case TSC.Production.BooleanExpr:
+                    console.log("found boolexpr");
+                    // figure out which boolexpr this is.
+                    // more than just a boolval
+                    if (node.children.length > 1) {
+                        console.log(node.children[2].children[0].value.value);
+                        if (node.children[2].children[0].value.value == "==") {
+                            this.ast.addNode("EqualTo");
+                        }
+                        else {
+                            this.ast.addNode("NotEqualTo");
+                        }
+                        console.log("left expr");
+                        this.traverse(node.children[1]);
+                        console.log("right expr");
+                        this.traverse(node.children[3]);
+                        console.log("done boolexpr");
                         this.ast.ascendTree();
                     }
                     else {
