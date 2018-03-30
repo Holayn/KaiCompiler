@@ -7,10 +7,13 @@ var TSC;
 (function (TSC) {
     var SemanticAnalyzer = /** @class */ (function () {
         function SemanticAnalyzer() {
+            this.symbol = {}; // object to hold symbol data
             this.warnings = [];
             this.errors = [];
             this.ast = new TSC.Tree();
             this.scopeTree = new TSC.Tree();
+            this.symbols = [];
+            this.declaredScopes = 0;
         }
         /**
          * Starts the semantic analysis using the CST produced in parse
@@ -23,7 +26,8 @@ var TSC;
                 "ast": this.ast,
                 "scopeTree": this.scopeTree,
                 "errors": this.errors,
-                "error": this.error
+                "error": this.error,
+                "symbols": this.symbols
             };
         };
         /**
@@ -44,6 +48,8 @@ var TSC;
                     console.log(node);
                     newScope.lineNumber = node.lineNumber;
                     newScope.colNumber = node.colNumber;
+                    newScope.id = this.declaredScopes;
+                    this.declaredScopes++;
                     this.scopeTree.addNode(newScope);
                     this.ast.addNode(TSC.Production.Block);
                     // Traverse node's children
@@ -74,6 +80,14 @@ var TSC;
                     if (!this.scopeTree.curr.value.table.hasOwnProperty(id.value)) {
                         this.scopeTree.curr.value.table[id.value] = new TSC.ScopeObject();
                         this.scopeTree.curr.value.table[id.value].type = type;
+                        // Add to symbol table
+                        this.symbol["type"] = type.value;
+                        this.symbol["key"] = id.value;
+                        this.symbol["line"] = node.children[1].children[0].lineNumber;
+                        this.symbol["scope"] = this.scopeTree.curr.value.id;
+                        this.symbols.push(this.symbol);
+                        this.symbol = {};
+                        console.log(this.symbols);
                     }
                     else {
                         this.error = true;

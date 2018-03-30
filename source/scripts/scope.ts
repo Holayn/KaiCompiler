@@ -11,6 +11,7 @@ module TSC {
         table: Object;
         lineNumber: number;
         colNumber: number;
+        id: number;
         constructor(){
             this.table = {};
         }

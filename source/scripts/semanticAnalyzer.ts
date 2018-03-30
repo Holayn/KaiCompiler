@@ -11,12 +11,18 @@ module TSC {
         ast: Tree; // pointer to the ast
         scopeTree: Tree; // pointer to the scope tree, which will just be a 
         error: boolean; // flag for error
+        declaredScopes: number; // keeps track of number of scopes declared so we can assign new scopes proper ids
+
+        symbol: Object = {}; // object to hold symbol data
+        symbols: Array<Object>; // keeps array of symbols found
 
         constructor(){
             this.warnings = [];
             this.errors = [];
             this.ast = new Tree();
             this.scopeTree = new Tree();
+            this.symbols = [];
+            this.declaredScopes = 0;
         }
 
         /**
@@ -30,7 +36,8 @@ module TSC {
                 "ast": this.ast,
                 "scopeTree": this.scopeTree,
                 "errors": this.errors,
-                "error": this.error
+                "error": this.error,
+                "symbols": this.symbols
             }
         }
 
@@ -52,6 +59,8 @@ module TSC {
                     console.log(node);
                     newScope.lineNumber = node.lineNumber;
                     newScope.colNumber = node.colNumber;
+                    newScope.id = this.declaredScopes;
+                    this.declaredScopes++;
                     this.scopeTree.addNode(newScope);
                     this.ast.addNode(Production.Block);
                     // Traverse node's children
@@ -82,6 +91,14 @@ module TSC {
                     if(!this.scopeTree.curr.value.table.hasOwnProperty(id.value)){
                         this.scopeTree.curr.value.table[id.value] = new ScopeObject();
                         this.scopeTree.curr.value.table[id.value].type = type;
+                        // Add to symbol table
+                        this.symbol["type"] = type.value;
+                        this.symbol["key"] = id.value;
+                        this.symbol["line"] = node.children[1].children[0].lineNumber;
+                        this.symbol["scope"] = this.scopeTree.curr.value.id;
+                        this.symbols.push(this.symbol);
+                        this.symbol = {};
+                        console.log(this.symbols);
                     }
                     // Throw error if variable already declared in scope
                     else{
