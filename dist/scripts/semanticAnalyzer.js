@@ -10,6 +10,7 @@ var TSC;
             this.warnings = [];
             this.errors = [];
             this.ast = new TSC.Tree();
+            this.scopeTree = new TSC.Tree();
         }
         /**
          * Starts the semantic analysis using the CST produced in parse
@@ -18,17 +19,26 @@ var TSC;
             // Traverse the CST in a preorder fashion
             // If we find something "important", add it to the CST
             this.traverse(parseResult.cst.root);
-            // Return the AST for now
-            return this.ast;
+            return {
+                "ast": this.ast,
+                "scopeTree": this.scopeTree
+            };
         };
         /**
          * Performs preorder traversal given a CST node
+         * Creates scope tree along with AST creation
          */
         SemanticAnalyzer.prototype.traverse = function (node) {
+            // If we have an error, break
+            if (this.error) {
+                return;
+            }
             // Check if "important". If so, add to AST, descend AST.
             switch (node.value) {
                 case TSC.Production.Block:
                     console.log("found block");
+                    // Scope tree: add a scope to the tree whenever we encounter a Block
+                    this.scopeTree.addNode(new Object());
                     this.ast.addNode(TSC.Production.Block);
                     // Traverse node's children
                     for (var i = 0; i < node.children.length; i++) {
@@ -45,12 +55,23 @@ var TSC;
                     this.ast.addNode(TSC.Production.VarDecl);
                     // We now need to get its children and add to AST
                     // Get the type
-                    this.ast.addNode(node.children[0].children[0].value);
+                    var type = node.children[0].children[0].value;
+                    this.ast.addNode(type);
                     this.ast.ascendTree();
                     // Get the id
-                    this.ast.addNode(node.children[1].children[0].value);
+                    var id = node.children[1].children[0].value;
+                    this.ast.addNode(id);
                     this.ast.ascendTree();
                     this.ast.ascendTree();
+                    // Add variable declaration to current scope
+                    // Check if already declared in current scope
+                    if (!this.scopeTree.curr.value.hasOwnProperty(id)) {
+                        this.scopeTree.curr.value.id = new TSC.ScopeObject();
+                        this.scopeTree.curr.value.id.type = type;
+                    }
+                    else {
+                        this.error = true;
+                    }
                     break;
                 case TSC.Production.PrintStmt:
                     console.log("found wendy");
@@ -61,6 +82,7 @@ var TSC;
                     break;
                 case TSC.Production.AssignStmt:
                     console.log("found assign");
+                    // make the "root" an assign statement
                     this.ast.addNode(TSC.Production.AssignStmt);
                     // Get the id
                     this.ast.addNode(node.children[0].children[0].value);

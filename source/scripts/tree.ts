@@ -84,25 +84,37 @@ module TSC {
             }
 
             /**
-             * Prints the tree in dfs
+             * Prints the tree in dfs for CST display
              */
-            public traverseTree(treantTree){
+            public traverseTreeCST(treantTree){
                 let tree: Array<String> = [];
                 let level: number = 0;
                 if(this.root != null){
-                    this.DFS(this.root, level, tree, "", treantTree['nodeStructure'].children);
+                    this.DFSCST(this.root, level, tree, "", treantTree['nodeStructure'].children);
+                }
+                // Return array of nodes and tree config
+                return {"tree": tree, "treant": treantTree};
+            }
+
+            /**
+             * Prints the tree in dfs for AST display
+             */
+            public traverseTreeAST(treantTree){
+                let tree: Array<String> = [];
+                let level: number = 0;
+                if(this.root != null){
+                    this.DFSAST(this.root, level, tree, "", treantTree['nodeStructure'].children);
                 }
                 // Return array of nodes and tree config
                 return {"tree": tree, "treant": treantTree};
             }
             
             /**
-             * Helper for traverseTree
+             * Helper for traverseTreeCST
              */
-            private DFS(node, level, tree, dash, treantTree){
+            private DFSCST(node, level, tree, dash, treantTree){
                 let child = {};
                 if(node.value instanceof Token){
-                    console.log("Tree: " + node.value.value + " Level: " + level);
                     tree.push(dash + "[" + node.value.value + "]")
                     // Add new node to children array passed
                     // Pass reference to new children array to next call
@@ -113,7 +125,6 @@ module TSC {
                     treantTree.push(child);
                 }
                 else{
-                    console.log("Tree: " + node.value + " Level: " + level);
                     tree.push(dash + "<" + node.value + ">")
                     // Add new node to children array passed
                     // Pass reference to new children array to next call
@@ -126,7 +137,37 @@ module TSC {
                 for(var i=0; i<node.children.length; i++){
                     // to next call of DFS, increase level, pass the tree array, increase the dash by one dash, and pass
                     // the reference to the next children array
-                    this.DFS(node.children[i], level + 1, tree, dash + "-", child['children']);
+                    this.DFSCST(node.children[i], level + 1, tree, dash + "-", child['children']);
+                }
+            }
+
+            /**
+             * Helper for traverseTreeAST
+             */
+            private DFSAST(node, level, tree, dash, treantTree){
+                let child = {};
+                // Check if null to find appropriate value to place in tree
+                // Add new node to children array passed
+                // Pass reference to new children array to next call
+                if(node.value.value != null){
+                    tree.push(dash + node.value.value);
+                    child = {
+                        text: { name: node.value.value + " " },
+                        children: []
+                    }
+                }
+                else{
+                    tree.push(dash + node.value);
+                    child = {
+                        text: { name: node.value + " " },
+                        children: []
+                    }
+                }
+                treantTree.push(child);
+                for(var i=0; i<node.children.length; i++){
+                    // to next call of DFS, increase level, pass the tree array, increase the dash by one dash, and pass
+                    // the reference to the next children array
+                    this.DFSAST(node.children[i], level + 1, tree, dash + "-", child['children']);
                 }
             }
         }

@@ -181,7 +181,6 @@ var TSC;
         Parser.prototype.parseVarDecl = function (production, expected) {
             if (this.parseType(production.concat([Production.VarDecl]), false) && this.parseId(null, true)) {
                 // If we've found a VarDecl, add the last two tokens to the symbol table
-                console.log(this.tokenList[this.currentToken - 1]);
                 this.symbol["type"] = this.tokenList[this.currentToken - 2].value;
                 this.symbol["key"] = this.tokenList[this.currentToken - 1].value;
                 this.symbol["line"] = this.tokenList[this.currentToken - 1].lineNumber;
@@ -525,7 +524,6 @@ var TSC;
                 // Add token to tree
                 this.cst.addTNode(this.tokenList[this.currentToken]);
                 // this.productionSymbols.push(this.tokenList[this.currentToken]);
-                console.log("Adding " + this.tokenList[this.currentToken].value + " to the tree");
                 // consume token
                 this.currentToken++;
                 return true;

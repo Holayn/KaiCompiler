@@ -83,24 +83,35 @@ var TSC;
             this.curr = this.curr.parent;
         };
         /**
-         * Prints the tree in dfs
+         * Prints the tree in dfs for CST display
          */
-        Tree.prototype.traverseTree = function (treantTree) {
+        Tree.prototype.traverseTreeCST = function (treantTree) {
             var tree = [];
             var level = 0;
             if (this.root != null) {
-                this.DFS(this.root, level, tree, "", treantTree['nodeStructure'].children);
+                this.DFSCST(this.root, level, tree, "", treantTree['nodeStructure'].children);
             }
             // Return array of nodes and tree config
             return { "tree": tree, "treant": treantTree };
         };
         /**
-         * Helper for traverseTree
+         * Prints the tree in dfs for AST display
          */
-        Tree.prototype.DFS = function (node, level, tree, dash, treantTree) {
+        Tree.prototype.traverseTreeAST = function (treantTree) {
+            var tree = [];
+            var level = 0;
+            if (this.root != null) {
+                this.DFSAST(this.root, level, tree, "", treantTree['nodeStructure'].children);
+            }
+            // Return array of nodes and tree config
+            return { "tree": tree, "treant": treantTree };
+        };
+        /**
+         * Helper for traverseTreeCST
+         */
+        Tree.prototype.DFSCST = function (node, level, tree, dash, treantTree) {
             var child = {};
             if (node.value instanceof TSC.Token) {
-                console.log("Tree: " + node.value.value + " Level: " + level);
                 tree.push(dash + "[" + node.value.value + "]");
                 // Add new node to children array passed
                 // Pass reference to new children array to next call
@@ -111,7 +122,6 @@ var TSC;
                 treantTree.push(child);
             }
             else {
-                console.log("Tree: " + node.value + " Level: " + level);
                 tree.push(dash + "<" + node.value + ">");
                 // Add new node to children array passed
                 // Pass reference to new children array to next call
@@ -124,7 +134,36 @@ var TSC;
             for (var i = 0; i < node.children.length; i++) {
                 // to next call of DFS, increase level, pass the tree array, increase the dash by one dash, and pass
                 // the reference to the next children array
-                this.DFS(node.children[i], level + 1, tree, dash + "-", child['children']);
+                this.DFSCST(node.children[i], level + 1, tree, dash + "-", child['children']);
+            }
+        };
+        /**
+         * Helper for traverseTreeAST
+         */
+        Tree.prototype.DFSAST = function (node, level, tree, dash, treantTree) {
+            var child = {};
+            // Check if null to find appropriate value to place in tree
+            // Add new node to children array passed
+            // Pass reference to new children array to next call
+            if (node.value.value != null) {
+                tree.push(dash + node.value.value);
+                child = {
+                    text: { name: node.value.value + " " },
+                    children: []
+                };
+            }
+            else {
+                tree.push(dash + node.value);
+                child = {
+                    text: { name: node.value + " " },
+                    children: []
+                };
+            }
+            treantTree.push(child);
+            for (var i = 0; i < node.children.length; i++) {
+                // to next call of DFS, increase level, pass the tree array, increase the dash by one dash, and pass
+                // the reference to the next children array
+                this.DFSAST(node.children[i], level + 1, tree, dash + "-", child['children']);
             }
         };
         return Tree;
