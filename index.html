@@ -439,7 +439,7 @@
 					logLex(lexAnalysis, programCounter);
 					prevProgramError = false;
                     var parseResult = parse(lexAnalysis, treantCST, programCounter);
-                    analyze(parseResult, treantAST); // perform semantic analysis on the cst from the parse
+                    analyze(parseResult, treantAST, programCounter); // perform semantic analysis on the cst from the parse
                     programCounter++;
 				}
 				if(lexAnalysis.complete){
@@ -548,24 +548,38 @@
         }
 
         // Calls the semantic analyzer
-        function analyze(parseResult, treantAST) {
-            console.log("Starting semantic analysis");
+        function analyze(parseResult, treantAST, programCounter) {
+            putMessage("Performing Semantic Analysis...");
             let semanticAnalyzer = new TSC.SemanticAnalyzer();
-            var res = semanticAnalyzer.analyze(parseResult);
-            var ast = res.ast.traverseTreeAST(treantAST);
-            // Display AST in AST field
-            for(var i=0; i<ast.tree.length; i++){
-                document.getElementById("taAST").value += ast.tree[i] + "\n";
-            }
-            console.log("Scope tree: ");
-			console.log(res.scopeTree);
+			var res = semanticAnalyzer.analyze(parseResult);
+			// Print warnings
+
 			if(res.error){
-				console.log(res.errors[0]);
+				putMessage("\n");
+				// Print error
+				var errorMsg = res.errors[0];
+				var scopeTree = res.scopeTree;
+				console.log(scopeTree);
+				console.log(errorMsg);
+				switch(errorMsg.type){
+					case TSC.ErrorType.DuplicateVariable:
+						putMessage("S.ANALYZE -> | ERROR: Variable " + errorMsg.value.value + " on line " + errorMsg.lineNumber + " col " + errorMsg.colNumber + " has already been declared in current scope on line " + scopeTree.curr.value.lineNumber + " col " + scopeTree.curr.value.colNumber);
+						break;
+				}
+				putMessage("\n");
+                putMessage("AST generation failed due to semantic analysis error.");
+				Materialize.toast('Program ' + programCounter + ': Semantic error!', 4000, 'toastcolor');
 			}
 			else{
+				var ast = res.ast.traverseTreeAST(treantAST);
+				// Display AST in AST field
+				for(var i=0; i<ast.tree.length; i++){
+					document.getElementById("taAST").value += ast.tree[i] + "\n";
+				}
 				// Display AST visually with Treant.js
 				var ast_visual = new Treant(ast.treant);
 			}
+			putMessage("Semantic Analysis complete!")
         }
 		
     

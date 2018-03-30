@@ -6,4 +6,13 @@ module TSC {
             this.initialized = false;
         }
     }
+
+    export class ScopeNode {
+        table: Object;
+        lineNumber: number;
+        colNumber: number;
+        constructor(){
+            this.table = {};
+        }
+    }
 }

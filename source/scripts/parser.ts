@@ -541,7 +541,7 @@ module TSC {
                     // made up of a digit. So we need to show in the log and tree that Expr is rewritten to
                     // IntExpr, which is then rewritten to Digit
                     for(var i=0; i<start.length; i++){
-                        this.cst.addNTNode(start[i]);
+                        this.cst.addNTNode(start[i], this.tokenList[this.currentToken].lineNumber, this.tokenList[this.currentToken].colNumber);
                         // this.productionSymbols.push(start[i]);
                         if(i != 0){
                             this.log.push("VALID - Expecting [" + start[i-1] + "], found [" + start[i] + "] on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
@@ -549,7 +549,7 @@ module TSC {
                     }
                     // add final production that was rewritten. Technically, could have all productions in start array, but 
                     // too lazy to go and modify all the code. Definitely a TODO.
-                    this.cst.addNTNode(rewrite);
+                    this.cst.addNTNode(rewrite, this.tokenList[this.currentToken].lineNumber, this.tokenList[this.currentToken].colNumber);
                     // this.productionSymbols.push(rewrite);
                     this.log.push("VALID - Expecting [" + start[start.length-1] + "], found [" + rewrite + "] on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
                 }
@@ -559,7 +559,7 @@ module TSC {
                 // Another example is WhileStatement's BooleanExpr. We're not deriving BooleanExpr from WhileStatement (as in, the BooleanExpr doesn't make it
                 // a While statement. But we still need to show the rewrite for BooleanExpr)
                 else if(rewrite != null){
-                    this.cst.addNTNode(rewrite);
+                    this.cst.addNTNode(rewrite, this.tokenList[this.currentToken].lineNumber, this.tokenList[this.currentToken].colNumber);
                     // this.productionSymbols.push(rewrite);
                     this.log.push("VALID - Expecting [" + rewrite + "], found [" + rewrite + "] on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
                 }
@@ -567,7 +567,7 @@ module TSC {
                 this.log.push("VALID - Expecting [" + token + "], found [" + this.tokenList[this.currentToken].value + "] on line " + this.tokenList[this.currentToken].lineNumber + " col " + this.tokenList[this.currentToken].colNumber);
 
                 // Add token to tree
-                this.cst.addTNode(this.tokenList[this.currentToken]);
+                this.cst.addTNode(this.tokenList[this.currentToken], this.tokenList[this.currentToken].lineNumber, this.tokenList[this.currentToken].colNumber);
                 // this.productionSymbols.push(this.tokenList[this.currentToken]);
                 // consume token
                 this.currentToken++;

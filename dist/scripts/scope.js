@@ -7,4 +7,11 @@ var TSC;
         return ScopeObject;
     }());
     TSC.ScopeObject = ScopeObject;
+    var ScopeNode = /** @class */ (function () {
+        function ScopeNode() {
+            this.table = {};
+        }
+        return ScopeNode;
+    }());
+    TSC.ScopeNode = ScopeNode;
 })(TSC || (TSC = {}));

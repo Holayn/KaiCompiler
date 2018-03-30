@@ -21,8 +21,10 @@ var TSC;
         /**
          * Adds non-terminal node
          */
-        Tree.prototype.addNTNode = function (production) {
+        Tree.prototype.addNTNode = function (production, lineNumber, colNumber) {
             var node = new NonTerminalTreeNode(production);
+            node.lineNumber = lineNumber;
+            node.colNumber = colNumber;
             if (this.root == null) {
                 this.root = node;
                 this.curr = node;
@@ -37,8 +39,10 @@ var TSC;
         /**
          * Adds terminal node
          */
-        Tree.prototype.addTNode = function (token) {
+        Tree.prototype.addTNode = function (token, lineNumber, colNumber) {
             var node = new TerminalTreeNode(token);
+            node.lineNumber = lineNumber;
+            node.colNumber = colNumber;
             if (this.root == null) {
                 this.root = node;
                 this.curr = node;

@@ -48,7 +48,11 @@ module TSC {
                 case Production.Block:
                     console.log("found block");
                     // Scope tree: add a scope to the tree whenever we encounter a Block
-                    this.scopeTree.addNode(new Object());
+                    let newScope = new ScopeNode();
+                    console.log(node);
+                    newScope.lineNumber = node.lineNumber;
+                    newScope.colNumber = node.colNumber;
+                    this.scopeTree.addNode(newScope);
                     this.ast.addNode(Production.Block);
                     // Traverse node's children
                     for(var i=0; i<node.children.length; i++){
@@ -75,14 +79,14 @@ module TSC {
                     this.ast.ascendTree();
                     // Add variable declaration to current scope
                     // Check if already declared in current scope
-                    if(!this.scopeTree.curr.value.hasOwnProperty(id.value)){
-                        this.scopeTree.curr.value[id.value] = new ScopeObject();
-                        this.scopeTree.curr.value[id.value].type = type;
+                    if(!this.scopeTree.curr.value.table.hasOwnProperty(id.value)){
+                        this.scopeTree.curr.value.table[id.value] = new ScopeObject();
+                        this.scopeTree.curr.value.table[id.value].type = type;
                     }
                     // Throw error if variable already declared in scope
                     else{
                         this.error = true;
-                        this.errors.push(new Error(ErrorType.DuplicateVariable, null, node.children[1].children[0].value.lineNumber, node.children[1].children[0].value.colNumber));
+                        this.errors.push(new Error(ErrorType.DuplicateVariable, id, node.children[1].children[0].value.lineNumber, node.children[1].children[0].value.colNumber));
                     }
                     break;
                 case Production.PrintStmt:

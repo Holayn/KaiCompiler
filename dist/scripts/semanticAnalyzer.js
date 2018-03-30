@@ -40,7 +40,11 @@ var TSC;
                 case TSC.Production.Block:
                     console.log("found block");
                     // Scope tree: add a scope to the tree whenever we encounter a Block
-                    this.scopeTree.addNode(new Object());
+                    var newScope = new TSC.ScopeNode();
+                    console.log(node);
+                    newScope.lineNumber = node.lineNumber;
+                    newScope.colNumber = node.colNumber;
+                    this.scopeTree.addNode(newScope);
                     this.ast.addNode(TSC.Production.Block);
                     // Traverse node's children
                     for (var i = 0; i < node.children.length; i++) {
@@ -67,13 +71,13 @@ var TSC;
                     this.ast.ascendTree();
                     // Add variable declaration to current scope
                     // Check if already declared in current scope
-                    if (!this.scopeTree.curr.value.hasOwnProperty(id.value)) {
-                        this.scopeTree.curr.value[id.value] = new TSC.ScopeObject();
-                        this.scopeTree.curr.value[id.value].type = type;
+                    if (!this.scopeTree.curr.value.table.hasOwnProperty(id.value)) {
+                        this.scopeTree.curr.value.table[id.value] = new TSC.ScopeObject();
+                        this.scopeTree.curr.value.table[id.value].type = type;
                     }
                     else {
                         this.error = true;
-                        this.errors.push(new TSC.Error(TSC.ErrorType.DuplicateVariable, null, node.children[1].children[0].value.lineNumber, node.children[1].children[0].value.colNumber));
+                        this.errors.push(new TSC.Error(TSC.ErrorType.DuplicateVariable, id, node.children[1].children[0].value.lineNumber, node.children[1].children[0].value.colNumber));
                     }
                     break;
                 case TSC.Production.PrintStmt:

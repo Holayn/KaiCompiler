@@ -17,8 +17,10 @@ module TSC {
             /**
              * Adds non-terminal node
              */
-            public addNTNode(production: Production){
+            public addNTNode(production: Production, lineNumber: number, colNumber: number){
                 let node = new NonTerminalTreeNode(production);
+                node.lineNumber = lineNumber;
+                node.colNumber = colNumber;
                 if(this.root == null){
                     this.root = node;
                     this.curr = node;
@@ -34,8 +36,10 @@ module TSC {
             /**
              * Adds terminal node
              */
-            public addTNode(token: Token){
+            public addTNode(token: Token, lineNumber: number, colNumber: number){
                 let node = new TerminalTreeNode(token);
+                node.lineNumber = lineNumber;
+                node.colNumber = colNumber;
                 if(this.root == null){
                     this.root = node;
                     this.curr = node;
@@ -191,6 +195,8 @@ module TSC {
          */
         export class NonTerminalTreeNode extends TreeNode {
             value: Production;
+            lineNumber: number;
+            colNumber: number;
             super(value: Production){
                 this.value = value;
             }
@@ -201,6 +207,8 @@ module TSC {
          */
         export class TerminalTreeNode extends TreeNode {
             value: Token;
+            lineNumber: number;
+            colNumber: number;
             super(value: Token){
                 this.value = value;
             }
