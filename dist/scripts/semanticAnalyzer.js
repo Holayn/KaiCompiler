@@ -105,6 +105,23 @@ var TSC;
                         this.ast.ascendTree();
                     }
                     break;
+                case TSC.Production.StringExpr:
+                    console.log("found stringexpr");
+                    // we have to generate string until we reach the end of the charlist
+                    var stringBuilder = [];
+                    var currCharList = node.children[1];
+                    var lastCharList = false;
+                    while (!lastCharList) {
+                        stringBuilder.push(currCharList.children[0].children[0].value.value);
+                        if (currCharList.children.length == 1) {
+                            lastCharList = true;
+                            continue;
+                        }
+                        currCharList = currCharList.children[1];
+                    }
+                    var resString = stringBuilder.join("");
+                    this.ast.addNode(resString);
+                    break;
                 default:
                     // Traverse node's children
                     for (var i = 0; i < node.children.length; i++) {
