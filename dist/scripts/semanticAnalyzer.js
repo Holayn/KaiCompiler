@@ -75,6 +75,12 @@ var TSC;
                     this.traverse(node.children[1]);
                     this.traverse(node.children[2]);
                     break;
+                case TSC.Production.IfStmt:
+                    console.log("found if");
+                    this.ast.addNode(TSC.Production.IfStmt);
+                    this.traverse(node.children[1]);
+                    this.traverse(node.children[2]);
+                    break;
                 case TSC.Production.Id:
                     console.log("found id");
                     this.ast.addNode(node.children[0].value);

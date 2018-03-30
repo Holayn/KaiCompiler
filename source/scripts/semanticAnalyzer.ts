@@ -108,6 +108,12 @@ module TSC {
                     this.traverse(node.children[1]);
                     this.traverse(node.children[2]);
                     break;
+                case Production.IfStmt:
+                    console.log("found if");
+                    this.ast.addNode(Production.IfStmt);
+                    this.traverse(node.children[1]);
+                    this.traverse(node.children[2]);
+                    break;
                 case Production.Id:
                     console.log("found id");
                     this.ast.addNode(node.children[0].value);
