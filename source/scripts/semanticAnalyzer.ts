@@ -62,7 +62,7 @@ module TSC {
             switch(node.value){
                 case Production.Block:
                     console.log("found block");
-                    this.ast.addNTNode(Production.Block);
+                    this.ast.addNode(Production.Block);
                     // Traverse node's children
                     for(var i=0; i<node.children.length; i++){
                         this.traverse(node.children[i]);
@@ -75,7 +75,7 @@ module TSC {
                     break;
                 case Production.VarDecl:
                     console.log("found vardecl");
-                    this.ast.addNTNode(Production.VarDecl);
+                    this.ast.addNode(Production.VarDecl);
                     // We now need to get its children and add to AST
                     // Get the type
                     this.ast.addNode(node.children[0].children[0].value);
@@ -87,8 +87,18 @@ module TSC {
                     break;
                 case Production.PrintStmt:
                     console.log("found wendy");
-                    this.ast.addNTNode(Production.PrintStmt);
+                    this.ast.addNode(Production.PrintStmt);
                     // figure out expression
+                    this.traverse(node.children[2]);
+                    this.ast.ascendTree();
+                    break;
+                case Production.AssignStmt:
+                    console.log("found assign");
+                    this.ast.addNode(Production.AssignStmt);
+                    // Get the id
+                    this.ast.addNode(node.children[0].children[0].value);
+                    this.ast.ascendTree();
+                    // figure out the expression
                     this.traverse(node.children[2]);
                     this.ast.ascendTree();
                     break;
