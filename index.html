@@ -46,55 +46,52 @@
 					<div class="card-panel input">
 						<h5 class="light">Editor</h5>
 						<textarea class="lined" id="taSourceCode">
+/* Test case for all productions - thx Tien */
+{
+    /* Int Declaration */
+    int a
+    int b
+    string s
+    boolean z
+    
+    z = true
+    s = "kai sucks"
+
+    a = 0
+    b = 0
+
+    /* While Loop */
+    while (a != 3) {
+        print(a)
+        while (b != 3) {
+                print(b)
+                b = 1 + b
+                if (b == 2) {
+                    /* Print Statement */
+                    print("kai sucks"/* This will do nothing */)
+                }
+        }
+
+        b = 0
+        a = 1 + a
+    }
+}$
+/* Second program with parse error */
 {
     int a
-}$
-</textarea>
-<!-- /* Test case for all productions - thx Tien */
-{
-	/* Int Declaration */
-	int a
-	int b
-	string s
-	boolean z
-	
-	z = true
-	s = "kai sucks"
-
-	a = 0
-	b = 0
-
-	/* While Loop */
-	while (a != 3) {
-		print(a)
-		while (b != 3) {
-				print(b)
-				b = 1 + b
-				if (b == 2) {
-					/* Print Statement */
-					print("kai sucks"/* This will do nothing */)
-				}
-		}
-
-		b = 0
-		a = 1 + a
-	}
-}$ -->
-<!-- /* Second program with parse error */
-{
-	int a
-	a = a + 2
+    a = a + 2
 }$
 /* Third program with lex error */
 {
-	print("hello there")
-	print("General Genobi")
+    print("hello there")
+    print("General Genobi")
 }$
 /* Fourth normal program */
 {
-	print("hello there")
-	print("general kenobi")
-}$ -->
+    print("hello there")
+    print("general kenobi")
+}$
+</textarea>
 						<br>
 						<div class="fixed-action-btn horizontal click-to-toggle togglebutton">
 							<a class="btn-floating btn blue lighten-2">

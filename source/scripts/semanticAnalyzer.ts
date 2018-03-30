@@ -178,6 +178,7 @@ module TSC {
                     }
                     let resString = stringBuilder.join("");
                     this.ast.addNode(resString);
+                    this.ast.ascendTree();
                     break;
                 default:
                     // Traverse node's children
