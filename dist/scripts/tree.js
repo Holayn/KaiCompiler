@@ -201,6 +201,8 @@ var TSC;
     TSC.NonTerminalTreeNode = NonTerminalTreeNode;
     /**
      * A TreeNode that represents Terminals
+     * Actually, Terminals don't need to store line and col numbers, as
+     * the tokens themselves store them
      */
     var TerminalTreeNode = /** @class */ (function (_super) {
         __extends(TerminalTreeNode, _super);
@@ -215,6 +217,8 @@ var TSC;
     TSC.TerminalTreeNode = TerminalTreeNode;
     /**
      * A TreeNode that represents any value
+     * General tree nodes don't need to hold information such as line numbers and col numbers
+     * since they make up the AST.
      */
     var GeneralTreeNode = /** @class */ (function (_super) {
         __extends(GeneralTreeNode, _super);

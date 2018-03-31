@@ -6,8 +6,8 @@
 module TSC {
     export class SemanticAnalyzer {
 
-        warnings: Array<WarningType>; // array to hold warnings
-        errors: Array<ErrorType>; // array to hold errors
+        warnings: Array<Warning>; // array to hold warnings
+        errors: Array<Error>; // array to hold errors
         ast: Tree; // pointer to the ast
         scopeTree: Tree; // pointer to the scope tree, which will just be a 
         error: boolean; // flag for error
@@ -24,7 +24,7 @@ module TSC {
             this.scopeTree = new Tree();
             this.symbols = [];
             this.declaredScopes = 0;
-            this.scopeLevel = 1;
+            this.scopeLevel = 0;
         }
 
         /**
@@ -48,19 +48,13 @@ module TSC {
          * Creates scope tree along with AST creation
          */
         public traverse(node){
-            // If we have an error, break
-            if(this.error){
-                return;
-            }
             // Check if "important". If so, add to AST, descend AST.
             switch(node.value){
                 case Production.Block:
-                    console.log("found block");
                     // Scope tree: add a scope to the tree whenever we encounter a Block
                     // Increase the number of scopes that have been declared
                     // Increase the scope level as we are on a new one
                     let newScope = new ScopeNode();
-                    console.log(node);
                     newScope.lineNumber = node.lineNumber;
                     newScope.colNumber = node.colNumber;
                     newScope.id = this.declaredScopes;
@@ -85,7 +79,6 @@ module TSC {
                     }
                     break;
                 case Production.VarDecl:
-                    console.log("found vardecl");
                     this.ast.addNode(Production.VarDecl);
                     // We now need to get its children and add to AST
                     // Get the type
@@ -110,51 +103,51 @@ module TSC {
                         this.symbol["scopeLevel"] = this.scopeLevel;
                         this.symbols.push(this.symbol);
                         this.symbol = {};
-                        console.log(this.symbols);
                     }
                     // Throw error if variable already declared in scope
                     else{
                         this.error = true;
-                        this.errors.push(new Error(ErrorType.DuplicateVariable, id, node.children[1].children[0].value.lineNumber, node.children[1].children[0].value.colNumber));
+                        let err = new ScopeError(ErrorType.UndeclaredVariable, node.value, node.lineNumber, node.colNumber);
+                        // Couldn't make this part of the constructor for some reason
+                        err.setScopeLineCol(this.scopeTree.curr.value.lineNumber, this.scopeTree.curr.value.colNumber);
+                        this.errors.push(err);
                     }
                     break;
                 case Production.PrintStmt:
-                    console.log("found wendy");
                     this.ast.addNode(Production.PrintStmt);
                     // figure out expression
                     this.traverse(node.children[2]);
                     this.ast.ascendTree();
                     break;
                 case Production.AssignStmt:
-                    console.log("found assign");
                     // make the "root" an assign statement
                     this.ast.addNode(Production.AssignStmt);
                     // Get the id
                     this.ast.addNode(node.children[0].children[0].value);
+                    // Check if id is in scope
+                    this.checkScopes(node.children[0].children[0]);
                     this.ast.ascendTree();
                     // figure out the expression
                     this.traverse(node.children[2]);
                     this.ast.ascendTree();
                     break;
                 case Production.WhileStmt:
-                    console.log("found while");
                     this.ast.addNode(Production.WhileStmt);
                     this.traverse(node.children[1]);
                     this.traverse(node.children[2]);
                     break;
                 case Production.IfStmt:
-                    console.log("found if");
                     this.ast.addNode(Production.IfStmt);
                     this.traverse(node.children[1]);
                     this.traverse(node.children[2]);
                     break;
                 case Production.Id:
-                    console.log("found id");
                     this.ast.addNode(node.children[0].value);
                     this.ast.ascendTree();
+                    // Check if variable declared in current or parent scopes
+                    this.checkScopes(node.children[0]);
                     break;
                 case Production.IntExpr:
-                    console.log("found intexpr");
                     // figure out which intexpr this is
                     // more than just a digit
                     if(node.children.length > 1){
@@ -172,22 +165,17 @@ module TSC {
                     }
                     break;
                 case Production.BooleanExpr:
-                    console.log("found boolexpr");
                     // figure out which boolexpr this is.
                     // more than just a boolval
                     if(node.children.length > 1){
-                        console.log(node.children[2].children[0].value.value);
                         if(node.children[2].children[0].value.value == "=="){
                             this.ast.addNode("EqualTo");
                         }
                         else{
                             this.ast.addNode("NotEqualTo");
                         }
-                        console.log("left expr");
                         this.traverse(node.children[1]);
-                        console.log("right expr");
                         this.traverse(node.children[3]);
-                        console.log("done boolexpr");
                         this.ast.ascendTree();
                     }
                     // just a boolval
@@ -197,7 +185,6 @@ module TSC {
                     }
                     break;
                 case Production.StringExpr:
-                    console.log("found stringexpr");
                     // we have to generate string until we reach the end of the charlist
                     let stringBuilder = [];
                     let currCharList = node.children[1];
@@ -220,6 +207,37 @@ module TSC {
                         this.traverse(node.children[i]);
                     }
                     break;
+            }
+        }
+        /**
+         * Checks to see if id is in current or parent scope
+         * @param node the node whose value we're checking is in scope or not
+         */
+        public checkScopes(node): boolean{
+            console.log("checking scope");
+            // pointer to current position in scope tree
+            let ptr = this.scopeTree.curr;
+            console.log(node);
+            // Check current scope
+            if(this.scopeTree.curr.value.table.hasOwnProperty(node.value.value)){
+                return true;
+            }
+            // Check parent scopes
+            else{
+                while(ptr.parent != null){
+                    ptr = ptr.parent;
+                    // Check if id in scope
+                    if(this.scopeTree.curr.value.table.hasOwnProperty(node.value.value)){
+                        return true;
+                    }
+                }
+                // Didn't find id in scope, push error and return false
+                this.error = true;
+                let err = new ScopeError(ErrorType.UndeclaredVariable, node.value, node.lineNumber, node.colNumber);
+                // Couldn't make this part of the constructor for some reason
+                err.setScopeLineCol(this.scopeTree.curr.value.lineNumber, this.scopeTree.curr.value.colNumber);
+                this.errors.push(err);
+                return false;
             }
         }
     }

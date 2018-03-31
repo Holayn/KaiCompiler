@@ -204,6 +204,8 @@ module TSC {
     
         /**
          * A TreeNode that represents Terminals
+         * Actually, Terminals don't need to store line and col numbers, as 
+         * the tokens themselves store them
          */
         export class TerminalTreeNode extends TreeNode {
             value: Token;
@@ -216,6 +218,8 @@ module TSC {
 
         /**
          * A TreeNode that represents any value
+         * General tree nodes don't need to hold information such as line numbers and col numbers
+         * since they make up the AST.
          */
         export class GeneralTreeNode extends TreeNode {
             value: any;

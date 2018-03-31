@@ -8,7 +8,8 @@ module TSC {
         MissingCommentEnd = "MissingCommentEnd",
         InvalidCharacterInString = "InvalidCharacterInString",
         MissingStringEndQuote = "MissingStringEndQuote",
-        DuplicateVariable = "DuplicateVariable"
+        DuplicateVariable = "DuplicateVariable",
+        UndeclaredVariable = "UndeclaredVariable"
     }
     export class Error {
         type: ErrorType;
@@ -21,6 +22,16 @@ module TSC {
             this.value = value;
             this.lineNumber = lineNumber;
             this.colNumber = colNumber;
+        }
+    }
+    export class ScopeError extends Error {
+        scopeLine: number;
+        scopeCol: number;
+        super(){
+        }
+        public setScopeLineCol(scopeLine, scopeCol){
+            this.scopeLine = scopeLine;
+            this.scopeCol = scopeCol;
         }
     }
 }
