@@ -14,6 +14,7 @@ var TSC;
             this.scopeTree = new TSC.Tree();
             this.symbols = [];
             this.declaredScopes = 0;
+            this.scopeLevel = 1;
         }
         /**
          * Starts the semantic analysis using the CST produced in parse
@@ -44,6 +45,8 @@ var TSC;
                 case TSC.Production.Block:
                     console.log("found block");
                     // Scope tree: add a scope to the tree whenever we encounter a Block
+                    // Increase the number of scopes that have been declared
+                    // Increase the scope level as we are on a new one
                     var newScope = new TSC.ScopeNode();
                     console.log(node);
                     newScope.lineNumber = node.lineNumber;
@@ -51,15 +54,22 @@ var TSC;
                     newScope.id = this.declaredScopes;
                     this.declaredScopes++;
                     this.scopeTree.addNode(newScope);
+                    this.scopeLevel++;
                     this.ast.addNode(TSC.Production.Block);
                     // Traverse node's children
                     for (var i = 0; i < node.children.length; i++) {
                         this.traverse(node.children[i]);
                     }
                     // Go up the AST once we finish traversing
-                    // Don't go up if we're at the root doe
+                    // Don't go up if we're at the root doe. curr is the parent node
                     if (this.ast.curr != null) {
                         this.ast.ascendTree();
+                    }
+                    // Go up the scope tree as well as we have cleared a scope
+                    // Decrease the scope level for we are going up a scope level
+                    if (this.scopeTree.curr != null) {
+                        this.scopeTree.ascendTree();
+                        this.scopeLevel--;
                     }
                     break;
                 case TSC.Production.VarDecl:
@@ -85,6 +95,7 @@ var TSC;
                         this.symbol["key"] = id.value;
                         this.symbol["line"] = node.children[1].children[0].lineNumber;
                         this.symbol["scope"] = this.scopeTree.curr.value.id;
+                        this.symbol["scopeLevel"] = this.scopeLevel;
                         this.symbols.push(this.symbol);
                         this.symbol = {};
                         console.log(this.symbols);

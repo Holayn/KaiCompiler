@@ -12,6 +12,7 @@ module TSC {
         scopeTree: Tree; // pointer to the scope tree, which will just be a 
         error: boolean; // flag for error
         declaredScopes: number; // keeps track of number of scopes declared so we can assign new scopes proper ids
+        scopeLevel: number; // keeps track of current level of the scope that we're on
 
         symbol: Object = {}; // object to hold symbol data
         symbols: Array<Object>; // keeps array of symbols found
@@ -23,6 +24,7 @@ module TSC {
             this.scopeTree = new Tree();
             this.symbols = [];
             this.declaredScopes = 0;
+            this.scopeLevel = 1;
         }
 
         /**
@@ -55,6 +57,8 @@ module TSC {
                 case Production.Block:
                     console.log("found block");
                     // Scope tree: add a scope to the tree whenever we encounter a Block
+                    // Increase the number of scopes that have been declared
+                    // Increase the scope level as we are on a new one
                     let newScope = new ScopeNode();
                     console.log(node);
                     newScope.lineNumber = node.lineNumber;
@@ -62,15 +66,22 @@ module TSC {
                     newScope.id = this.declaredScopes;
                     this.declaredScopes++;
                     this.scopeTree.addNode(newScope);
+                    this.scopeLevel++;
                     this.ast.addNode(Production.Block);
                     // Traverse node's children
                     for(var i=0; i<node.children.length; i++){
                         this.traverse(node.children[i]);
                     }
                     // Go up the AST once we finish traversing
-                    // Don't go up if we're at the root doe
+                    // Don't go up if we're at the root doe. curr is the parent node
                     if(this.ast.curr != null){
                         this.ast.ascendTree();
+                    }
+                    // Go up the scope tree as well as we have cleared a scope
+                    // Decrease the scope level for we are going up a scope level
+                    if(this.scopeTree.curr != null){
+                        this.scopeTree.ascendTree();
+                        this.scopeLevel--;
                     }
                     break;
                 case Production.VarDecl:
@@ -96,6 +107,7 @@ module TSC {
                         this.symbol["key"] = id.value;
                         this.symbol["line"] = node.children[1].children[0].lineNumber;
                         this.symbol["scope"] = this.scopeTree.curr.value.id;
+                        this.symbol["scopeLevel"] = this.scopeLevel;
                         this.symbols.push(this.symbol);
                         this.symbol = {};
                         console.log(this.symbols);
