@@ -5,7 +5,9 @@
  */
 module TSC {
     export enum WarningType {
-        MissingEOP = "MissingEOP"
+        MissingEOP = "MissingEOP",
+        UninitializedVariable = "UninitializedVariable",
+        UnusedVariable = "UnusedVariable"
     }
     export class Warning {
         type: WarningType;

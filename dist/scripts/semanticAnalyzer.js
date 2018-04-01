@@ -29,11 +29,14 @@ var TSC;
             // Traverse the CST in a preorder fashion
             // If we find something "important", add it to the CST
             this.traverse(parseResult.cst.root);
+            // Traverse scope tree to generate warnings
+            this.findWarnings(this.scopeTree.root);
             return {
                 "ast": this.ast,
                 "scopeTree": this.scopeTree,
                 "errors": this.errors,
                 "error": this.error,
+                "warnings": this.warnings,
                 "symbols": this.symbols
             };
         };
@@ -126,6 +129,8 @@ var TSC;
                     this.ast.ascendTree();
                     // Check for type match
                     this.checkTypeMatch(node.children[0].children[0].value, idType, expressionType, node.children[0].children[0].lineNumber, node.children[0].children[0].colNumber, node.children[2].lineNumber, node.children[2].colNumber);
+                    // Update scope tree node object initialized flag. variable has been initialized.
+                    // TODO:
                     break;
                 case TSC.Production.WhileStmt:
                     this.ast.addNode(TSC.Production.WhileStmt);
@@ -214,12 +219,37 @@ var TSC;
             }
         };
         /**
+         * Marks an id as initialized in current or parent scope
+         * We must stop if we find in current scope, because variable can be redeclared in child scope
+         */
+        SemanticAnalyzer.prototype.markAsInitialized = function (node) {
+            // pointer to current position in scope tree
+            var ptr = this.scopeTree.curr;
+            console.log(node);
+            // Check current scope
+            if (ptr.value.table.hasOwnProperty(node.value.value)) {
+                // Mark as initialized
+                ptr.value.table[node.value.value].initialized = true;
+                return;
+            }
+            else {
+                while (ptr.parent != null) {
+                    ptr = ptr.parent;
+                    // Check if id in scope
+                    if (ptr.value.table.hasOwnProperty(node.value.value)) {
+                        // Mark as initialized
+                        ptr.value.table[node.value.value].initialized = true;
+                        return;
+                    }
+                }
+            }
+        };
+        /**
          * Checks to see if id is declared in current or parent scope
          * @param node the node whose value we're checking is in scope or not
          * @return the scope object if any
          */
         SemanticAnalyzer.prototype.checkScopes = function (node) {
-            console.log("checking scope");
             // pointer to current position in scope tree
             var ptr = this.scopeTree.curr;
             console.log(node);
@@ -247,7 +277,6 @@ var TSC;
          * @param targetType the type that is being assigned to id
          */
         SemanticAnalyzer.prototype.checkTypeMatch = function (id, idType, targetType, idLine, idCol, targetLine, targetCol) {
-            console.log("checking for type mismatch");
             if (targetType != null && idType != null) {
                 if (idType.value != targetType) {
                     this.error = true;
@@ -256,6 +285,24 @@ var TSC;
                     err.setTypes(idType, targetType);
                     this.errors.push(err);
                 }
+            }
+        };
+        /**
+         * Traverses the scope tree in preorder fashion to find warnings to generate
+         */
+        SemanticAnalyzer.prototype.findWarnings = function (node) {
+            // Look for declared but uninitialized variables
+            // Iterate through object 
+            for (var key in node.value.table) {
+                if (node.value.table[key].initialized == false) {
+                    // variable is uninitialized
+                    var war = new TSC.Warning(TSC.WarningType.UninitializedVariable, key, node.value.table[key].value.lineNumber, node.value.table[key].value.colNumber);
+                    this.warnings.push(war);
+                }
+            }
+            // Continue traversing in preorder fashion
+            for (var i = 0; i < node.children.length; i++) {
+                this.findWarnings(node.children[i]);
             }
         };
         return SemanticAnalyzer;

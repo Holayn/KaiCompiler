@@ -13,6 +13,7 @@ module TSC {
 
         warnings: Array<Warning>; // array to hold warnings
         errors: Array<Error>; // array to hold errors
+        log: Array<String>; // array to hold log message from semantic analyzer
         ast: Tree; // pointer to the ast
         scopeTree: Tree; // pointer to the scope tree, which will just be a 
         error: boolean; // flag for error
@@ -39,11 +40,14 @@ module TSC {
             // Traverse the CST in a preorder fashion
             // If we find something "important", add it to the CST
             this.traverse(parseResult.cst.root);
+            // Traverse scope tree to generate warnings
+            this.findWarnings(this.scopeTree.root);
             return {
                 "ast": this.ast,
                 "scopeTree": this.scopeTree,
                 "errors": this.errors,
                 "error": this.error,
+                "warnings": this.warnings,
                 "symbols": this.symbols
             }
         }
@@ -138,6 +142,8 @@ module TSC {
                     this.ast.ascendTree();
                     // Check for type match
                     this.checkTypeMatch(node.children[0].children[0].value, idType, expressionType, node.children[0].children[0].lineNumber, node.children[0].children[0].colNumber, node.children[2].lineNumber, node.children[2].colNumber);
+                    // Update scope tree node object initialized flag. variable has been initialized.
+                    // TODO:
                     break;
                 case Production.WhileStmt:
                     this.ast.addNode(Production.WhileStmt);
@@ -228,12 +234,38 @@ module TSC {
             }
         }
         /**
+         * Marks an id as initialized in current or parent scope
+         * We must stop if we find in current scope, because variable can be redeclared in child scope
+         */
+        public markAsInitialized(node){
+            // pointer to current position in scope tree
+            let ptr = this.scopeTree.curr;
+            console.log(node);
+            // Check current scope
+            if(ptr.value.table.hasOwnProperty(node.value.value)){
+                // Mark as initialized
+                ptr.value.table[node.value.value].initialized = true;
+                return;
+            }
+            // Check parent scopes
+            else{
+                while(ptr.parent != null){
+                    ptr = ptr.parent;
+                    // Check if id in scope
+                    if(ptr.value.table.hasOwnProperty(node.value.value)){
+                        // Mark as initialized
+                        ptr.value.table[node.value.value].initialized = true;
+                        return;
+                    }
+                }
+            }
+        }
+        /**
          * Checks to see if id is declared in current or parent scope
          * @param node the node whose value we're checking is in scope or not
          * @return the scope object if any
          */
         public checkScopes(node){
-            console.log("checking scope");
             // pointer to current position in scope tree
             let ptr = this.scopeTree.curr;
             console.log(node);
@@ -263,7 +295,6 @@ module TSC {
          * @param targetType the type that is being assigned to id
          */
         public checkTypeMatch(id, idType, targetType, idLine, idCol, targetLine, targetCol) {
-            console.log("checking for type mismatch");
             if(targetType != null && idType != null){
                 if(idType.value != targetType){
                     this.error = true;
@@ -272,6 +303,25 @@ module TSC {
                     err.setTypes(idType, targetType);
                     this.errors.push(err);
                 }
+            }
+        }
+
+        /**
+         * Traverses the scope tree in preorder fashion to find warnings to generate
+         */
+        public findWarnings(node){
+            // Look for declared but uninitialized variables
+            // Iterate through object 
+            for(var key in node.value.table){
+                if(node.value.table[key].initialized == false){
+                    // variable is uninitialized
+                    let war = new Warning(WarningType.UninitializedVariable, key, node.value.table[key].value.lineNumber, node.value.table[key].value.colNumber);
+                    this.warnings.push(war);
+                }
+            }
+            // Continue traversing in preorder fashion
+            for(var i=0; i<node.children.length; i++){
+                this.findWarnings(node.children[i]);
             }
         }
     }

@@ -546,7 +546,15 @@
 			// Display AST visually with Treant.js
 			var ast_visual = new Treant(ast.treant);
 			// Print warnings
-
+			for(var i=0; i<res.warnings.length; i++){
+				var warningMsg = res.warnings[i];
+				switch(warningMsg.type){
+					case TSC.WarningType.UninitializedVariable:
+						putMessage("S.ANALYZE -> | WARNING: Variable [" + warningMsg.value + "] on line " + warningMsg.lineNumber + " col " + warningMsg.colNumber + " has been declared but may not have been initialized.");
+						break;
+				}
+				Materialize.toast('Program ' + programCounter + ': Semantic warning!', 4000, 'toastcolor');
+			}
 			if(res.error){
 				putMessage("\n");
 				// Print errors
