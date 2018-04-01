@@ -30,11 +30,11 @@ module TSC {
     export class Token {
 
         type: TokenType;
-        value: String;
+        value: any;
         lineNumber: number;
         colNumber: number;
 
-        constructor(tokenType: TokenType, value: String, lineNumber: number, colNumber: number) {
+        constructor(tokenType: TokenType, value: any, lineNumber: number, colNumber: number) {
             this.type = tokenType;
             this.value = value;
             this.lineNumber = lineNumber;

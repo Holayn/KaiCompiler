@@ -1,6 +1,6 @@
 module TSC {
     export class ScopeObject {
-        type: any;
+        value: any;
         initialized: boolean;
         constructor(){
             this.initialized = false;

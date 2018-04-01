@@ -560,6 +560,9 @@
 						case TSC.ErrorType.UndeclaredVariable:
 							putMessage("S.ANALYZE -> | ERROR: Variable " + errorMsg.value.value + " on line " + errorMsg.lineNumber + " col " + errorMsg.colNumber + " has not been previously declared in current scope on line " + errorMsg.scopeLine + " col " + errorMsg.scopeCol + " or parent scopes");
 							break;
+						case TSC.ErrorType.TypeMismatch:
+							putMessage("S.ANALYZE -> | ERROR: The type of variable " + errorMsg.value.value + " declared on line " + errorMsg.value.lineNumber + " col " + errorMsg.value.colnumber + " does not match the type " + errorMsg.targetType + " that is being assigned to it on line " + errorMsg.lineNumber + " col " + errorMsg.colNumber);
+							break;
 					}
 				}
 				putMessage("\n");

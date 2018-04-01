@@ -9,7 +9,8 @@ module TSC {
         InvalidCharacterInString = "InvalidCharacterInString",
         MissingStringEndQuote = "MissingStringEndQuote",
         DuplicateVariable = "DuplicateVariable",
-        UndeclaredVariable = "UndeclaredVariable"
+        UndeclaredVariable = "UndeclaredVariable",
+        TypeMismatch = "TypeMismatch"
     }
     export class Error {
         type: ErrorType;
@@ -32,6 +33,13 @@ module TSC {
         public setScopeLineCol(scopeLine, scopeCol){
             this.scopeLine = scopeLine;
             this.scopeCol = scopeCol;
+        }
+    }
+    export class TypeError extends Error {
+        targetType: VariableType;
+        super(){}
+        public setTargetType(targetType){
+            this.targetType = targetType;
         }
     }
 }

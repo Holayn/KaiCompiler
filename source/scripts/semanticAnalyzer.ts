@@ -4,6 +4,11 @@
  * Validates types and scopes.
  */
 module TSC {
+    export enum VariableType {
+        Boolean = "Boolean",
+        Int = "Int",
+        String = "String"
+    }
     export class SemanticAnalyzer {
 
         warnings: Array<Warning>; // array to hold warnings
@@ -48,6 +53,7 @@ module TSC {
          * Creates scope tree along with AST creation
          */
         public traverse(node){
+            let variableType: VariableType; // the type of the expression, if applicable
             // Check if "important". If so, add to AST, descend AST.
             switch(node.value){
                 case Production.Block:
@@ -82,8 +88,8 @@ module TSC {
                     this.ast.addNode(Production.VarDecl);
                     // We now need to get its children and add to AST
                     // Get the type
-                    let type = node.children[0].children[0].value
-                    this.ast.addNode(type);
+                    let token = node.children[0].children[0].value
+                    this.ast.addNode(token.value);
                     this.ast.ascendTree();
                     // Get the id
                     let id = node.children[1].children[0].value
@@ -94,9 +100,9 @@ module TSC {
                     // Check if already declared in current scope
                     if(!this.scopeTree.curr.value.table.hasOwnProperty(id.value)){
                         this.scopeTree.curr.value.table[id.value] = new ScopeObject();
-                        this.scopeTree.curr.value.table[id.value].type = type;
+                        this.scopeTree.curr.value.table[id.value].value = token;
                         // Add to symbol table
-                        this.symbol["type"] = type.value;
+                        this.symbol["type"] = token.value;
                         this.symbol["key"] = id.value;
                         this.symbol["line"] = node.children[1].children[0].lineNumber;
                         this.symbol["scope"] = this.scopeTree.curr.value.id;
@@ -124,12 +130,16 @@ module TSC {
                     this.ast.addNode(Production.AssignStmt);
                     // Get the id
                     this.ast.addNode(node.children[0].children[0].value);
-                    // Check if id is in scope
-                    this.checkScopes(node.children[0].children[0]);
+                    // Check if id is in scope and get its type
+                    var idType = this.checkScopes(node.children[0].children[0]);
                     this.ast.ascendTree();
-                    // figure out the expression
-                    this.traverse(node.children[2]);
+                    // figure out the expression and get the type returned by the expression
+                    var expressionType = this.traverse(node.children[2]);
+                    console.log("HEY");
+                    console.log(expressionType);
                     this.ast.ascendTree();
+                    // Check for type match
+                    this.checkTypeMatch(node.children[0].children[0].value, idType, expressionType, node.children[0].children[0].lineNumber, node.children[0].children[0].colNumber, node.children[2].lineNumber, node.children[2].colNumber);
                     break;
                 case Production.WhileStmt:
                     this.ast.addNode(Production.WhileStmt);
@@ -145,8 +155,10 @@ module TSC {
                     this.ast.addNode(node.children[0].value);
                     this.ast.ascendTree();
                     // Check if variable declared in current or parent scopes
-                    this.checkScopes(node.children[0]);
-                    break;
+                    // If we find it in scope, return the type of the variable
+                    let foundType = this.checkScopes(node.children[0]);
+                    // return the id's type
+                    return foundType;
                 case Production.IntExpr:
                     // figure out which intexpr this is
                     // more than just a digit
@@ -163,7 +175,8 @@ module TSC {
                         this.ast.addNode(node.children[0].children[0].value);
                         this.ast.ascendTree();
                     }
-                    break;
+                    // return the type returned by intexpr
+                    return VariableType.Int;
                 case Production.BooleanExpr:
                     // figure out which boolexpr this is.
                     // more than just a boolval
@@ -183,7 +196,8 @@ module TSC {
                         this.ast.addNode(node.children[0].children[0].value);
                         this.ast.ascendTree();
                     }
-                    break;
+                    // return the type returned by boolexpr
+                    return VariableType.Boolean;
                 case Production.StringExpr:
                     // we have to generate string until we reach the end of the charlist
                     let stringBuilder = [];
@@ -200,44 +214,68 @@ module TSC {
                     let resString = stringBuilder.join("");
                     this.ast.addNode(resString);
                     this.ast.ascendTree();
-                    break;
+                    // return the type returned by stringexpr
+                    return VariableType.String;
                 default:
                     // Traverse node's children
                     for(var i=0; i<node.children.length; i++){
+                        // If node is an Expression, return, so we can properly
+                        // return the type of the expression
+                        if(node.value == Production.Expr){
+                            return this.traverse(node.children[i]);
+                        }
                         this.traverse(node.children[i]);
                     }
                     break;
             }
         }
         /**
-         * Checks to see if id is in current or parent scope
+         * Checks to see if id is declared in current or parent scope
          * @param node the node whose value we're checking is in scope or not
+         * @return the scope object if any
          */
-        public checkScopes(node): boolean{
+        public checkScopes(node){
             console.log("checking scope");
             // pointer to current position in scope tree
             let ptr = this.scopeTree.curr;
             console.log(node);
             // Check current scope
-            if(this.scopeTree.curr.value.table.hasOwnProperty(node.value.value)){
-                return true;
+            if(ptr.value.table.hasOwnProperty(node.value.value)){
+                return ptr.value.table[node.value.value].value;
             }
             // Check parent scopes
             else{
                 while(ptr.parent != null){
                     ptr = ptr.parent;
                     // Check if id in scope
-                    if(this.scopeTree.curr.value.table.hasOwnProperty(node.value.value)){
-                        return true;
+                    if(ptr.value.table.hasOwnProperty(node.value.value)){
+                        return ptr.value.table[node.value.value].value;
                     }
                 }
                 // Didn't find id in scope, push error and return false
                 this.error = true;
                 let err = new ScopeError(ErrorType.UndeclaredVariable, node.value, node.lineNumber, node.colNumber);
                 // Couldn't make this part of the constructor for some reason
-                err.setScopeLineCol(this.scopeTree.curr.value.lineNumber, this.scopeTree.curr.value.colNumber);
+                err.setScopeLineCol(ptr.value.lineNumber, ptr.value.colNumber);
                 this.errors.push(err);
-                return false;
+            }
+        }
+        
+        /**
+         * Checks to see if the id type matches its target type
+         * @param idType the type of the id being assigned to
+         * @param targetType the type that is being assigned to id
+         */
+        public checkTypeMatch(id, idType, targetType, idLine, idCol, targetLine, targetCol) {
+            console.log("checking for type mismatch");
+            if(targetType != null){
+                if(idType.value != targetType){
+                    this.error = true;
+                    let err = new TypeError(ErrorType.TypeMismatch, id, idLine, idCol);
+                    // Couldn't make this part of the constructor for some reason
+                    err.setTargetType(targetType);
+                    this.errors.push(err);
+                }
             }
         }
     }

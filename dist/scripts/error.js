@@ -22,6 +22,7 @@ var TSC;
         ErrorType["MissingStringEndQuote"] = "MissingStringEndQuote";
         ErrorType["DuplicateVariable"] = "DuplicateVariable";
         ErrorType["UndeclaredVariable"] = "UndeclaredVariable";
+        ErrorType["TypeMismatch"] = "TypeMismatch";
     })(ErrorType = TSC.ErrorType || (TSC.ErrorType = {}));
     var Error = /** @class */ (function () {
         function Error(tokenType, value, lineNumber, colNumber) {
@@ -47,4 +48,16 @@ var TSC;
         return ScopeError;
     }(Error));
     TSC.ScopeError = ScopeError;
+    var TypeError = /** @class */ (function (_super) {
+        __extends(TypeError, _super);
+        function TypeError() {
+            return _super !== null && _super.apply(this, arguments) || this;
+        }
+        TypeError.prototype["super"] = function () { };
+        TypeError.prototype.setTargetType = function (targetType) {
+            this.targetType = targetType;
+        };
+        return TypeError;
+    }(Error));
+    TSC.TypeError = TypeError;
 })(TSC || (TSC = {}));

@@ -281,7 +281,7 @@ module TSC
 
 					// Test for Type Int
 					else if(rTYPEINT.test(sourceCode.substring(this.startLexemePtr, this.endLexemePtr))){
-						var token: Token = new Token(TSC.TokenType.TType, "int", this.lineNumber, this.colNumber-("int".length-1));
+						var token: Token = new Token(TSC.TokenType.TType, VariableType.Int, this.lineNumber, this.colNumber-("int".length-1));
 						// We have to remove the IDs that have been identified and added to the tokens array
 						// 2 ID tokens have been added - "i", "n" ... remove them from the array
 						this.tokens = this.tokens.slice(0, this.tokens.length - ("int".length - 1));
@@ -290,7 +290,7 @@ module TSC
 
 					// Test for Type Bool
 					else if(rTYPEBOOL.test(sourceCode.substring(this.startLexemePtr, this.endLexemePtr))){
-						var token: Token = new Token(TSC.TokenType.TType, "boolean", this.lineNumber, this.colNumber-("boolean".length-1));
+						var token: Token = new Token(TSC.TokenType.TType, VariableType.Boolean, this.lineNumber, this.colNumber-("boolean".length-1));
 						// We have to remove the IDs that have been identified and added to the tokens array
 						// 6 ID tokens have been added - "b", "o", "o", "l", "e", "a" ... remove them from the array
 						this.tokens = this.tokens.slice(0, this.tokens.length - ("boolean".length - 1));
@@ -299,7 +299,7 @@ module TSC
 
 					// Test for Type Str
 					else if(rTYPESTR.test(sourceCode.substring(this.startLexemePtr, this.endLexemePtr))){
-						var token: Token = new Token(TSC.TokenType.TType, "string", this.lineNumber, this.colNumber-("string".length-1));
+						var token: Token = new Token(TSC.TokenType.TType, VariableType.String, this.lineNumber, this.colNumber-("string".length-1));
 						// We have to remove the IDs that have been identified and added to the tokens array
 						// 5 ID tokens have been added - "s", "t", "r", "i", "n" ... remove them from the array
 						this.tokens = this.tokens.slice(0, this.tokens.length - ("string".length - 1));
