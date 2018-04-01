@@ -587,6 +587,9 @@
 						case TSC.ErrorType.IncorrectTypeComparison:
 							putMessage("S.ANALYZE -> | ERROR: The [" + errorMsg.value + "] on line " + errorMsg.lineNumber + " col " + errorMsg.colNumber + " is of type " + errorMsg.idType + " and is incompatibly compared to a type of " + errorMsg.targetType);
 							break;
+						case TSC.ErrorType.IncorrectIntegerExpression:
+							putMessage("S.ANALYZE -> | ERROR: The [" + errorMsg.value + "] on line " + errorMsg.lineNumber + " col " + errorMsg.colNumber + " is of type " + errorMsg.targetType + " which cannot be added to digits of type " + TSC.VariableType.Int);
+							break;
 					}
 				}
 				putMessage("\n");
@@ -612,7 +615,7 @@
 					colNumber.innerHTML = symbols[i].col;
 				}
 			}
-			putMessage("Semantic Analysis complete! " + res.errors.length + " ERROR(S)");
+			putMessage("Semantic Analysis complete! " + res.warnings.length + " WARNING(S), " + res.errors.length + " ERROR(S)");
         }
 		
     

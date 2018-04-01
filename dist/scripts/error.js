@@ -24,6 +24,7 @@ var TSC;
         ErrorType["UndeclaredVariable"] = "UndeclaredVariable";
         ErrorType["TypeMismatch"] = "TypeMismatch";
         ErrorType["IncorrectTypeComparison"] = "IncorrectTypeComparison";
+        ErrorType["IncorrectIntegerExpression"] = "IncorrectIntegerExpression";
     })(ErrorType = TSC.ErrorType || (TSC.ErrorType = {}));
     var Error = /** @class */ (function () {
         function Error(tokenType, value, lineNumber, colNumber) {

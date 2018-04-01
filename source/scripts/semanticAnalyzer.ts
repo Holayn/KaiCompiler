@@ -173,8 +173,16 @@ module TSC {
                         this.ast.addNode("Addition");
                         this.ast.addNode(node.children[0].children[0].value);
                         this.ast.ascendTree();
-                        // figure out expression
-                        this.traverse(node.children[2]);
+                        // figure out expression. make sure return type is int
+                        var exprType = this.traverse(node.children[2]);
+                        // handles case if traverse() returns a token
+                        if(exprType.value != null){
+                            exprType = exprType.value;
+                        }
+                        if(exprType != VariableType.Int){
+                            this.error = true;
+                            this.errors.push(new TypeError(ErrorType.IncorrectIntegerExpression, node.children[2].value, node.children[2].lineNumber, node.children[2].colNumber, exprType, VariableType.Int));
+                        }
                         this.ast.ascendTree();
                     }
                     // just a digit

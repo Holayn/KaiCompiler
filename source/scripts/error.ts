@@ -11,7 +11,8 @@ module TSC {
         DuplicateVariable = "DuplicateVariable",
         UndeclaredVariable = "UndeclaredVariable",
         TypeMismatch = "TypeMismatch",
-        IncorrectTypeComparison = "IncorrectTypeComparison"
+        IncorrectTypeComparison = "IncorrectTypeComparison",
+        IncorrectIntegerExpression = "IncorrectIntegerExpression"
     }
     export class Error {
         type: ErrorType;
