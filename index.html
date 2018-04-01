@@ -552,28 +552,31 @@
 					putMessage("S.ANALYZE -> | " + res.log[i]);
 				}
 			}
-			// Print warnings
+			// // Print warnings if no errors
+			// Just kidding, find all warnings and errors
 			putMessage("\n");
-			for(var i=0; i<res.warnings.length; i++){
-				var warningMsg = res.warnings[i];
-				console.log(warningMsg);
-				switch(warningMsg.type){
-					case TSC.WarningType.UninitializedVariable:
-						// putMessage("S.ANALYZE -> | WARNING: Variable [" + warningMsg.value + "] on line " + warningMsg.lineNumber + " col " + warningMsg.colNumber + " has been declared but is not initialized properly in scope " + warningMsg.scopeId + " on line " + warningMsg.scopeLine + " col " + warningMsg.scopeCol);
-						putMessage("S.ANALYZE -> | WARNING: Variable [" + warningMsg.value + "] on line " + warningMsg.lineNumber + " col " + warningMsg.colNumber + " has been declared but is not initialized properly.");
-						break;
-					case TSC.WarningType.UnusedVariable:
-						// putMessage("S.ANALYZE -> | WARNING: Variable [" + warningMsg.value + "] on line " + warningMsg.lineNumber + " col " + warningMsg.colNumber + " has been initialized in scope " + warningMsg.scopeId + " on line " + warningMsg.scopeLine + " col " + warningMsg.scopeCol + " but is not used in scope " + warningMsg.scopeId);
-						putMessage("S.ANALYZE -> | WARNING: Variable [" + warningMsg.value + "] on line " + warningMsg.lineNumber + " col " + warningMsg.colNumber + " has been initialized but is not used.");
-						break;
+			// if(!res.error){
+				for(var i=0; i<res.warnings.length; i++){
+					var warningMsg = res.warnings[i];
+					switch(warningMsg.type){
+						case TSC.WarningType.UninitializedVariable:
+							// putMessage("S.ANALYZE -> | WARNING: Variable [" + warningMsg.value + "] on line " + warningMsg.lineNumber + " col " + warningMsg.colNumber + " has been declared but is not initialized properly in scope " + warningMsg.scopeId + " on line " + warningMsg.scopeLine + " col " + warningMsg.scopeCol);
+							putMessage("S.ANALYZE -> | WARNING: Variable [" + warningMsg.value + "] on line " + warningMsg.lineNumber + " col " + warningMsg.colNumber + " has been declared but is not initialized properly.");
+							break;
+						case TSC.WarningType.UnusedVariable:
+							// putMessage("S.ANALYZE -> | WARNING: Variable [" + warningMsg.value + "] on line " + warningMsg.lineNumber + " col " + warningMsg.colNumber + " has been initialized in scope " + warningMsg.scopeId + " on line " + warningMsg.scopeLine + " col " + warningMsg.scopeCol + " but is not used in scope " + warningMsg.scopeId);
+							putMessage("S.ANALYZE -> | WARNING: Variable [" + warningMsg.value + "] on line " + warningMsg.lineNumber + " col " + warningMsg.colNumber + " has been initialized but is not used.");
+							break;
+					}
+					Materialize.toast('Program ' + programCounter + ': Semantic warning!', 4000, 'toastcolor');
 				}
-				Materialize.toast('Program ' + programCounter + ': Semantic warning!', 4000, 'toastcolor');
-			}
+			// }
 			if(res.error){
-				// Print errors
+				// // Print only the first error because some of the errors may not be valid if there were errors before it
+				// Just kidding, let's print all errors!
 				for(var i=0; i<res.errors.length; i++){
 					var errorMsg = res.errors[i];
-					console.log(errorMsg);
+					// var errorMsg = res.errors[0];
 					switch(errorMsg.type){
 						case TSC.ErrorType.DuplicateVariable:
 							putMessage("S.ANALYZE -> | ERROR: Variable [" + errorMsg.value.value + "] on line " + errorMsg.lineNumber + " col " + errorMsg.colNumber + " has already been declared in current scope at line " + errorMsg.firstDeclareLine + " col " + errorMsg.firstDeclareCol);
@@ -593,6 +596,8 @@
 					}
 				}
 				Materialize.toast('Program ' + programCounter + ': Semantic error!', 4000, 'toastcolor');
+				// putMessage("\n");
+				// putMessage("Semantic Analysis failed due to error.");
 			}
 			else{
 				// Display symbols in Symbol Table
@@ -613,12 +618,65 @@
 					var colNumber = row.insertCell(5);
 					colNumber.innerHTML = symbols[i].col;
 				}
+				// putMessage("\n");
+				// putMessage("Semantic Analysis complete! " + res.warnings.length + " WARNING(S), " + res.errors.length + " ERROR(S)");
 			}
 			putMessage("\n");
 			putMessage("Semantic Analysis complete! " + res.warnings.length + " WARNING(S), " + res.errors.length + " ERROR(S)");
         }
 		
     
-    </script>
+	</script>
+	<!-- https://stackoverflow.com/questions/6637341/use-tab-to-indent-in-textarea with my own edits -->
+	<script type="text/javascript">
+		$(document).delegate('#taSourceCode', 'keydown', function(e) {
+			var keyCode = e.keyCode || e.which;
+
+			if (keyCode == 9) {
+				e.preventDefault();
+				var start = this.selectionStart;
+				var end = this.selectionEnd;
+
+				// set textarea value to: text before caret + tab + text after caret
+				// insert 4 spaces
+				$(this).val($(this).val().substring(0, start)
+							+ "\x20" + "\x20" + "\x20" + "\x20"
+							+ $(this).val().substring(end));
+
+				// put caret at right position again
+				this.selectionStart =
+				this.selectionEnd = start + 4;
+			}
+			
+			// if enter, copy number of leading spaces in previous line
+			if (keyCode == 13) {
+				e.preventDefault();
+				console.log(document.getElementById('taSourceCode').rows);
+				var lines = $('textarea').val().split('\n');
+				console.log(lines);
+				// get line position of caret
+				var caretLine = 0;
+				var text = $('textarea').val();
+				for(var i=0; i<this.selectionEnd; i++){
+					if(text.charAt(i) == "\n"){
+						caretLine++;
+					}
+				}
+				// get number of leading spaces in previous line
+				var numSpaces = lines[caretLine].search(/\S/);
+				console.log(numSpaces);
+				// add spaces to new line
+				var spaces = "";
+				for(var i=0; i<numSpaces; i++){
+					spaces += "\x20";
+				}
+				var start = this.selectionStart;
+				var end = this.selectionEnd;
+				$(this).val($(this).val().substring(0, start) + "\n" + spaces + $(this).val().substring(end));
+				this.selectionStart =
+				this.selectionEnd = start + numSpaces + 1;
+			}
+		});
+	</script>
 </body>
 </html>
