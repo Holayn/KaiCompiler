@@ -104,9 +104,7 @@ var TSC;
                     }
                     else {
                         this.error = true;
-                        var err = new TSC.ScopeError(TSC.ErrorType.DuplicateVariable, id, node.children[1].children[0].lineNumber, node.children[1].children[0].colNumber);
-                        // Couldn't make this part of the constructor for some reason
-                        err.setFirstDeclareLineCol(this.scopeTree.curr.value.table[id.value].value.lineNumber, this.scopeTree.curr.value.table[id.value].value.colNumber);
+                        var err = new TSC.ScopeError(TSC.ErrorType.DuplicateVariable, id, node.children[1].children[0].lineNumber, node.children[1].children[0].colNumbe, this.scopeTree.curr.value.table[id.value].value.lineNumber, this.scopeTree.curr.value.table[id.value].value.colNumber);
                         this.errors.push(err);
                     }
                     break;
@@ -130,7 +128,7 @@ var TSC;
                     // Check for type match
                     this.checkTypeMatch(node.children[0].children[0].value, idType, expressionType, node.children[0].children[0].lineNumber, node.children[0].children[0].colNumber, node.children[2].lineNumber, node.children[2].colNumber);
                     // Update scope tree node object initialized flag. variable has been initialized.
-                    // TODO:
+                    this.markAsInitialized(node.children[0].children[0].value);
                     break;
                 case TSC.Production.WhileStmt:
                     this.ast.addNode(TSC.Production.WhileStmt);
@@ -148,6 +146,8 @@ var TSC;
                     // Check if variable declared in current or parent scopes
                     // If we find it in scope, return the type of the variable
                     var foundType = this.checkScopes(node.children[0]);
+                    // Mark id as used
+                    this.markAsUsed(node.children[0].value);
                     // return the id's type
                     return foundType;
                 case TSC.Production.IntExpr:
@@ -219,32 +219,6 @@ var TSC;
             }
         };
         /**
-         * Marks an id as initialized in current or parent scope
-         * We must stop if we find in current scope, because variable can be redeclared in child scope
-         */
-        SemanticAnalyzer.prototype.markAsInitialized = function (node) {
-            // pointer to current position in scope tree
-            var ptr = this.scopeTree.curr;
-            console.log(node);
-            // Check current scope
-            if (ptr.value.table.hasOwnProperty(node.value.value)) {
-                // Mark as initialized
-                ptr.value.table[node.value.value].initialized = true;
-                return;
-            }
-            else {
-                while (ptr.parent != null) {
-                    ptr = ptr.parent;
-                    // Check if id in scope
-                    if (ptr.value.table.hasOwnProperty(node.value.value)) {
-                        // Mark as initialized
-                        ptr.value.table[node.value.value].initialized = true;
-                        return;
-                    }
-                }
-            }
-        };
-        /**
          * Checks to see if id is declared in current or parent scope
          * @param node the node whose value we're checking is in scope or not
          * @return the scope object if any
@@ -267,7 +241,7 @@ var TSC;
                 }
                 // Didn't find id in scope, push error and return false
                 this.error = true;
-                var err = new TSC.ScopeError(TSC.ErrorType.UndeclaredVariable, node.value, node.lineNumber, node.colNumber);
+                var err = new TSC.ScopeError(TSC.ErrorType.UndeclaredVariable, node.value, node.lineNumber, node.colNumber, null, null);
                 this.errors.push(err);
             }
         };
@@ -280,9 +254,7 @@ var TSC;
             if (targetType != null && idType != null) {
                 if (idType.value != targetType) {
                     this.error = true;
-                    var err = new TSC.TypeError(TSC.ErrorType.TypeMismatch, id, idLine, idCol);
-                    // Couldn't make this part of the constructor for some reason
-                    err.setTypes(idType, targetType);
+                    var err = new TSC.TypeError(TSC.ErrorType.TypeMismatch, id, idLine, idCol, idType, targetType);
                     this.errors.push(err);
                 }
             }
@@ -291,18 +263,81 @@ var TSC;
          * Traverses the scope tree in preorder fashion to find warnings to generate
          */
         SemanticAnalyzer.prototype.findWarnings = function (node) {
-            // Look for declared but uninitialized variables
+            console.log("FIND WARNINGS");
             // Iterate through object 
             for (var key in node.value.table) {
+                console.log(node.value.table[key]);
+                // Look for declared but uninitialized variables
                 if (node.value.table[key].initialized == false) {
                     // variable is uninitialized
-                    var war = new TSC.Warning(TSC.WarningType.UninitializedVariable, key, node.value.table[key].value.lineNumber, node.value.table[key].value.colNumber);
+                    var war = new TSC.ScopeWarning(TSC.WarningType.UninitializedVariable, key, node.value.table[key].value.lineNumber, node.value.table[key].value.colNumber, node.value);
+                    this.warnings.push(war);
+                }
+                // Look for unused variables
+                if (node.value.table[key].used == false) {
+                    // variable is unused
+                    var war = new TSC.ScopeWarning(TSC.WarningType.UnusedVariable, key, node.value.table[key].value.lineNumber, node.value.table[key].value.colNumber, node.value);
                     this.warnings.push(war);
                 }
             }
             // Continue traversing in preorder fashion
             for (var i = 0; i < node.children.length; i++) {
                 this.findWarnings(node.children[i]);
+            }
+        };
+        /**
+         * Marks an id as initialized in current or parent scope
+         * We must stop if we find in current scope, because variable can be redeclared in child scope
+         */
+        SemanticAnalyzer.prototype.markAsInitialized = function (token) {
+            console.log("MARKING AS INIT'D");
+            // pointer to current position in scope tree
+            var ptr = this.scopeTree.curr;
+            console.log(ptr);
+            // Check current scope
+            if (ptr.value.table.hasOwnProperty(token.value)) {
+                // Mark as initialized
+                ptr.value.table[token.value].initialized = true;
+                return;
+            }
+            else {
+                while (ptr.parent != null) {
+                    ptr = ptr.parent;
+                    // Check if id in scope
+                    if (ptr.value.table.hasOwnProperty(token.value)) {
+                        // Mark as initialized
+                        ptr.value.table[token.value].initialized = true;
+                        return;
+                    }
+                }
+            }
+        };
+        /**
+         * Marks an id as used in current or parent scope
+         * We must stop if we find in current scope, because variable can be redeclared in child scope
+         */
+        SemanticAnalyzer.prototype.markAsUsed = function (token) {
+            console.log("MARKING AS USED");
+            // pointer to current position in scope tree
+            var ptr = this.scopeTree.curr;
+            console.log(ptr);
+            console.log(token.value);
+            // Check current scope
+            if (ptr.value.table.hasOwnProperty(token.value)) {
+                // Mark as initialized
+                ptr.value.table[token.value].used = true;
+                return;
+            }
+            else {
+                while (ptr.parent != null) {
+                    ptr = ptr.parent;
+                    // Check if id in scope
+                    if (ptr.value.table.hasOwnProperty(token.value)) {
+                        // Mark as initialized
+                        ptr.value.table[token.value].used = true;
+                        return;
+                    }
+                }
             }
         };
         return SemanticAnalyzer;

@@ -29,9 +29,8 @@ module TSC {
     export class ScopeError extends Error {
         firstDeclareLine: number;
         firstDeclareCol: number;
-        super(){
-        }
-        public setFirstDeclareLineCol(firstDeclareLine, firstDeclareCol){
+        constructor(tokenType: ErrorType, value: String, lineNumber: number, colNumber: number, firstDeclareCol: number, firstDeclareLine: number) {
+            super(tokenType, value, lineNumber, colNumber);
             this.firstDeclareLine = firstDeclareLine;
             this.firstDeclareCol = firstDeclareCol;
         }
@@ -40,8 +39,8 @@ module TSC {
     export class TypeError extends Error {
         targetType: VariableType;
         idType: VariableType;
-        super(){}
-        public setTypes(idType, targetType){
+        constructor(tokenType: ErrorType, value: String, lineNumber: number, colNumber: number, targetType: VariableType, idType: VariableType) {
+            super(tokenType, value, lineNumber, colNumber);
             this.targetType = targetType;
             this.idType = idType;
         }

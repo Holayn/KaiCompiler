@@ -22,4 +22,16 @@ module TSC {
             this.colNumber = colNumber;
         }
     }
+
+    export class ScopeWarning extends Warning {
+        scopeLine: number;
+        scopeCol: number;
+        scopeId: number;
+        constructor(tokenType: WarningType, value: String, lineNumber: number, colNumber: number, node: ScopeNode){
+            super(tokenType, value, lineNumber, colNumber);
+            this.scopeLine = node.lineNumber;
+            this.scopeCol = node.colNumber;
+            this.scopeId = node.id;
+        }
+    }
 }

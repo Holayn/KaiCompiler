@@ -546,21 +546,26 @@
 			// Display AST visually with Treant.js
 			var ast_visual = new Treant(ast.treant);
 			// Print warnings
+			putMessage("\n");
 			for(var i=0; i<res.warnings.length; i++){
 				var warningMsg = res.warnings[i];
+				console.log(warningMsg);
 				switch(warningMsg.type){
 					case TSC.WarningType.UninitializedVariable:
-						putMessage("S.ANALYZE -> | WARNING: Variable [" + warningMsg.value + "] on line " + warningMsg.lineNumber + " col " + warningMsg.colNumber + " has been declared but may not have been initialized.");
+						// putMessage("S.ANALYZE -> | WARNING: Variable [" + warningMsg.value + "] on line " + warningMsg.lineNumber + " col " + warningMsg.colNumber + " has been declared but is not initialized properly in scope " + warningMsg.scopeId + " on line " + warningMsg.scopeLine + " col " + warningMsg.scopeCol);
+						putMessage("S.ANALYZE -> | WARNING: Variable [" + warningMsg.value + "] on line " + warningMsg.lineNumber + " col " + warningMsg.colNumber + " has been declared but is not initialized properly.");
+						break;
+					case TSC.WarningType.UnusedVariable:
+						// putMessage("S.ANALYZE -> | WARNING: Variable [" + warningMsg.value + "] on line " + warningMsg.lineNumber + " col " + warningMsg.colNumber + " has been initialized in scope " + warningMsg.scopeId + " on line " + warningMsg.scopeLine + " col " + warningMsg.scopeCol + " but is not used in scope " + warningMsg.scopeId);
+						putMessage("S.ANALYZE -> | WARNING: Variable [" + warningMsg.value + "] on line " + warningMsg.lineNumber + " col " + warningMsg.colNumber + " has been initialized but is not used.");
 						break;
 				}
 				Materialize.toast('Program ' + programCounter + ': Semantic warning!', 4000, 'toastcolor');
 			}
 			if(res.error){
-				putMessage("\n");
 				// Print errors
 				for(var i=0; i<res.errors.length; i++){
 					var errorMsg = res.errors[i];
-					console.log(errorMsg);
 					switch(errorMsg.type){
 						case TSC.ErrorType.DuplicateVariable:
 							putMessage("S.ANALYZE -> | ERROR: Variable [" + errorMsg.value.value + "] on line " + errorMsg.lineNumber + " col " + errorMsg.colNumber + " has already been declared in current scope at line " + errorMsg.firstDeclareLine + " col " + errorMsg.firstDeclareCol);

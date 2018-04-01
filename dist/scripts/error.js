@@ -37,29 +37,24 @@ var TSC;
     // For Duplicate Variable and Undeclared Variable
     var ScopeError = /** @class */ (function (_super) {
         __extends(ScopeError, _super);
-        function ScopeError() {
-            return _super !== null && _super.apply(this, arguments) || this;
+        function ScopeError(tokenType, value, lineNumber, colNumber, firstDeclareCol, firstDeclareLine) {
+            var _this = _super.call(this, tokenType, value, lineNumber, colNumber) || this;
+            _this.firstDeclareLine = firstDeclareLine;
+            _this.firstDeclareCol = firstDeclareCol;
+            return _this;
         }
-        ScopeError.prototype["super"] = function () {
-        };
-        ScopeError.prototype.setFirstDeclareLineCol = function (firstDeclareLine, firstDeclareCol) {
-            this.firstDeclareLine = firstDeclareLine;
-            this.firstDeclareCol = firstDeclareCol;
-        };
         return ScopeError;
     }(Error));
     TSC.ScopeError = ScopeError;
     // For Type Mismatch
     var TypeError = /** @class */ (function (_super) {
         __extends(TypeError, _super);
-        function TypeError() {
-            return _super !== null && _super.apply(this, arguments) || this;
+        function TypeError(tokenType, value, lineNumber, colNumber, targetType, idType) {
+            var _this = _super.call(this, tokenType, value, lineNumber, colNumber) || this;
+            _this.targetType = targetType;
+            _this.idType = idType;
+            return _this;
         }
-        TypeError.prototype["super"] = function () { };
-        TypeError.prototype.setTypes = function (idType, targetType) {
-            this.targetType = targetType;
-            this.idType = idType;
-        };
         return TypeError;
     }(Error));
     TSC.TypeError = TypeError;

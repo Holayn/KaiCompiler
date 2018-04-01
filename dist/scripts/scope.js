@@ -4,6 +4,7 @@ var TSC;
     var ScopeObject = /** @class */ (function () {
         function ScopeObject() {
             this.initialized = false;
+            this.used = false;
         }
         return ScopeObject;
     }());

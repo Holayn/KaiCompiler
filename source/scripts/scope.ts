@@ -6,6 +6,7 @@ module TSC {
         used: boolean; // flag for if used
         constructor(){
             this.initialized = false;
+            this.used = false;
         }
     }
     // makes up the scope tree
