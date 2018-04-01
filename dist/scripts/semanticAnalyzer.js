@@ -7,9 +7,9 @@ var TSC;
 (function (TSC) {
     var VariableType;
     (function (VariableType) {
-        VariableType["Boolean"] = "Boolean";
-        VariableType["Int"] = "Int";
-        VariableType["String"] = "String";
+        VariableType["Boolean"] = "boolean";
+        VariableType["Int"] = "int";
+        VariableType["String"] = "string";
     })(VariableType = TSC.VariableType || (TSC.VariableType = {}));
     var SemanticAnalyzer = /** @class */ (function () {
         function SemanticAnalyzer() {
@@ -101,9 +101,9 @@ var TSC;
                     }
                     else {
                         this.error = true;
-                        var err = new TSC.ScopeError(TSC.ErrorType.UndeclaredVariable, node.value, node.lineNumber, node.colNumber);
+                        var err = new TSC.ScopeError(TSC.ErrorType.DuplicateVariable, id, node.children[1].children[0].lineNumber, node.children[1].children[0].colNumber);
                         // Couldn't make this part of the constructor for some reason
-                        err.setScopeLineCol(this.scopeTree.curr.value.lineNumber, this.scopeTree.curr.value.colNumber);
+                        err.setFirstDeclareLineCol(this.scopeTree.curr.value.table[id.value].value.lineNumber, this.scopeTree.curr.value.table[id.value].value.colNumber);
                         this.errors.push(err);
                     }
                     break;
@@ -123,8 +123,6 @@ var TSC;
                     this.ast.ascendTree();
                     // figure out the expression and get the type returned by the expression
                     var expressionType = this.traverse(node.children[2]);
-                    console.log("HEY");
-                    console.log(expressionType);
                     this.ast.ascendTree();
                     // Check for type match
                     this.checkTypeMatch(node.children[0].children[0].value, idType, expressionType, node.children[0].children[0].lineNumber, node.children[0].children[0].colNumber, node.children[2].lineNumber, node.children[2].colNumber);
@@ -240,8 +238,6 @@ var TSC;
                 // Didn't find id in scope, push error and return false
                 this.error = true;
                 var err = new TSC.ScopeError(TSC.ErrorType.UndeclaredVariable, node.value, node.lineNumber, node.colNumber);
-                // Couldn't make this part of the constructor for some reason
-                err.setScopeLineCol(ptr.value.lineNumber, ptr.value.colNumber);
                 this.errors.push(err);
             }
         };
@@ -252,12 +248,12 @@ var TSC;
          */
         SemanticAnalyzer.prototype.checkTypeMatch = function (id, idType, targetType, idLine, idCol, targetLine, targetCol) {
             console.log("checking for type mismatch");
-            if (targetType != null) {
+            if (targetType != null && idType != null) {
                 if (idType.value != targetType) {
                     this.error = true;
                     var err = new TSC.TypeError(TSC.ErrorType.TypeMismatch, id, idLine, idCol);
                     // Couldn't make this part of the constructor for some reason
-                    err.setTargetType(targetType);
+                    err.setTypes(idType, targetType);
                     this.errors.push(err);
                 }
             }

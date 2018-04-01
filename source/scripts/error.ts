@@ -25,21 +25,25 @@ module TSC {
             this.colNumber = colNumber;
         }
     }
+    // For Duplicate Variable and Undeclared Variable
     export class ScopeError extends Error {
-        scopeLine: number;
-        scopeCol: number;
+        firstDeclareLine: number;
+        firstDeclareCol: number;
         super(){
         }
-        public setScopeLineCol(scopeLine, scopeCol){
-            this.scopeLine = scopeLine;
-            this.scopeCol = scopeCol;
+        public setFirstDeclareLineCol(firstDeclareLine, firstDeclareCol){
+            this.firstDeclareLine = firstDeclareLine;
+            this.firstDeclareCol = firstDeclareCol;
         }
     }
+    // For Type Mismatch
     export class TypeError extends Error {
         targetType: VariableType;
+        idType: VariableType;
         super(){}
-        public setTargetType(targetType){
+        public setTypes(idType, targetType){
             this.targetType = targetType;
+            this.idType = idType;
         }
     }
 }

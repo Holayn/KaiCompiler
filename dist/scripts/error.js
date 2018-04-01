@@ -34,6 +34,7 @@ var TSC;
         return Error;
     }());
     TSC.Error = Error;
+    // For Duplicate Variable and Undeclared Variable
     var ScopeError = /** @class */ (function (_super) {
         __extends(ScopeError, _super);
         function ScopeError() {
@@ -41,21 +42,23 @@ var TSC;
         }
         ScopeError.prototype["super"] = function () {
         };
-        ScopeError.prototype.setScopeLineCol = function (scopeLine, scopeCol) {
-            this.scopeLine = scopeLine;
-            this.scopeCol = scopeCol;
+        ScopeError.prototype.setFirstDeclareLineCol = function (firstDeclareLine, firstDeclareCol) {
+            this.firstDeclareLine = firstDeclareLine;
+            this.firstDeclareCol = firstDeclareCol;
         };
         return ScopeError;
     }(Error));
     TSC.ScopeError = ScopeError;
+    // For Type Mismatch
     var TypeError = /** @class */ (function (_super) {
         __extends(TypeError, _super);
         function TypeError() {
             return _super !== null && _super.apply(this, arguments) || this;
         }
         TypeError.prototype["super"] = function () { };
-        TypeError.prototype.setTargetType = function (targetType) {
+        TypeError.prototype.setTypes = function (idType, targetType) {
             this.targetType = targetType;
+            this.idType = idType;
         };
         return TypeError;
     }(Error));

@@ -69,11 +69,9 @@ var TSC;
             }
             // Return the parser log
             console.log(this.log);
-            console.log(this.productionSymbols);
             return {
                 "log": this.log,
                 "cst": this.cst,
-                "symbols": this.symbols,
                 "error": this.error
             };
         };
