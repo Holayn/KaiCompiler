@@ -534,7 +534,7 @@
 
         // Calls the semantic analyzer
         function analyze(parseResult, treantAST, programCounter) {
-            putMessage("Performing Semantic Analysis...");
+            putMessage("Performing Semantic Analysis...\n");
             let semanticAnalyzer = new TSC.SemanticAnalyzer();
 			var res = semanticAnalyzer.analyze(parseResult);
 			// Display AST regardless of error
@@ -545,6 +545,12 @@
 			}
 			// Display AST visually with Treant.js
 			var ast_visual = new Treant(ast.treant);
+			// Print log messages if verbose on
+			if(verboseOn){
+				for(var i=0; i<res.log.length; i++){
+					putMessage("S.ANALYZE -> | " + res.log[i]);
+				}
+			}
 			// Print warnings
 			putMessage("\n");
 			for(var i=0; i<res.warnings.length; i++){
