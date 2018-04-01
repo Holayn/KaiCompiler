@@ -99,6 +99,7 @@ var TSC;
                         this.symbol["type"] = token.value;
                         this.symbol["key"] = id.value;
                         this.symbol["line"] = node.children[1].children[0].lineNumber;
+                        this.symbol["col"] = node.children[1].children[0].colNumber;
                         this.symbol["scope"] = this.scopeTree.curr.value.id;
                         this.symbol["scopeLevel"] = this.scopeLevel;
                         this.symbols.push(this.symbol);
@@ -179,8 +180,13 @@ var TSC;
                         else {
                             this.ast.addNode("NotEqualTo");
                         }
-                        this.traverse(node.children[1]);
-                        this.traverse(node.children[3]);
+                        // Get types returned by the two Expr children and make sure they're the same
+                        var firstExprType = this.traverse(node.children[1]);
+                        var secondExprType = this.traverse(node.children[3]);
+                        if (firstExprType != secondExprType) {
+                            this.error = true;
+                            this.errors.push(new TSC.TypeError(TSC.ErrorType.IncorrectTypeComparison, node.children[1].value, node.children[1].lineNumber, node.children[1].colNumber, secondExprType, firstExprType));
+                        }
                         this.ast.ascendTree();
                     }
                     else {
@@ -277,14 +283,12 @@ var TSC;
                 // Look for declared but uninitialized variables
                 if (node.value.table[key].initialized == false) {
                     // variable is uninitialized
-                    var war = new TSC.ScopeWarning(TSC.WarningType.UninitializedVariable, key, node.value.table[key].value.lineNumber, node.value.table[key].value.colNumber, node.value);
-                    this.warnings.push(war);
+                    this.warnings.push(new TSC.ScopeWarning(TSC.WarningType.UninitializedVariable, key, node.value.table[key].value.lineNumber, node.value.table[key].value.colNumber, node.value));
                 }
                 // Look for unused variables
-                if (node.value.table[key].used == false) {
+                if (node.value.table[key].used == false && node.value.table[key].initialized == true) {
                     // variable is unused
-                    var war = new TSC.ScopeWarning(TSC.WarningType.UnusedVariable, key, node.value.table[key].value.lineNumber, node.value.table[key].value.colNumber, node.value);
-                    this.warnings.push(war);
+                    this.warnings.push(new TSC.ScopeWarning(TSC.WarningType.UnusedVariable, key, node.value.table[key].value.lineNumber, node.value.table[key].value.colNumber, node.value));
                 }
             }
             // Continue traversing in preorder fashion

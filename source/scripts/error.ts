@@ -10,7 +10,8 @@ module TSC {
         MissingStringEndQuote = "MissingStringEndQuote",
         DuplicateVariable = "DuplicateVariable",
         UndeclaredVariable = "UndeclaredVariable",
-        TypeMismatch = "TypeMismatch"
+        TypeMismatch = "TypeMismatch",
+        IncorrectTypeComparison = "IncorrectTypeComparison"
     }
     export class Error {
         type: ErrorType;
