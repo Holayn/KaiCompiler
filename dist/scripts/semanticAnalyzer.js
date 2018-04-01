@@ -107,7 +107,7 @@ var TSC;
                     }
                     else {
                         this.error = true;
-                        var err = new TSC.ScopeError(TSC.ErrorType.DuplicateVariable, id, node.children[1].children[0].lineNumber, node.children[1].children[0].colNumbe, this.scopeTree.curr.value.table[id.value].value.lineNumber, this.scopeTree.curr.value.table[id.value].value.colNumber);
+                        var err = new TSC.ScopeError(TSC.ErrorType.DuplicateVariable, id, node.children[1].children[0].lineNumber, node.children[1].children[0].colNumber, this.scopeTree.curr.value.table[id.value].value.lineNumber, this.scopeTree.curr.value.table[id.value].value.colNumber);
                         this.errors.push(err);
                     }
                     break;
@@ -191,6 +191,13 @@ var TSC;
                         // Get types returned by the two Expr children and make sure they're the same
                         var firstExprType = this.traverse(node.children[1]);
                         var secondExprType = this.traverse(node.children[3]);
+                        // handles case if traverse() returns a token
+                        if (firstExprType != null && firstExprType.value != null) {
+                            firstExprType = firstExprType.value;
+                        }
+                        if (secondExprType != null && secondExprType.value != null) {
+                            secondExprType = secondExprType.value;
+                        }
                         if (firstExprType != secondExprType) {
                             this.error = true;
                             this.errors.push(new TSC.TypeError(TSC.ErrorType.IncorrectTypeComparison, node.children[1].value, node.children[1].lineNumber, node.children[1].colNumber, secondExprType, firstExprType));

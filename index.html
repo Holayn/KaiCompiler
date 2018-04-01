@@ -582,7 +582,7 @@
 							putMessage("S.ANALYZE -> | ERROR: Variable [" + errorMsg.value.value + "] on line " + errorMsg.lineNumber + " col " + errorMsg.colNumber + " has not been previously declared.");
 							break;
 						case TSC.ErrorType.TypeMismatch:
-							putMessage("S.ANALYZE -> | ERROR: The variable [" + errorMsg.value.value + "] declared on line " + errorMsg.lineNumber + " col " + errorMsg.colNumber + " is of type " + errorMsg.idType.value + " and does not match the assignment type of " + errorMsg.targetType);
+							putMessage("S.ANALYZE -> | ERROR: The variable [" + errorMsg.value.value + "] declared on line " + errorMsg.lineNumber + " col " + errorMsg.colNumber + " is of type " + errorMsg.idType + " and does not match the assignment type of " + errorMsg.targetType.value);
 							break;
 						case TSC.ErrorType.IncorrectTypeComparison:
 							putMessage("S.ANALYZE -> | ERROR: The [" + errorMsg.value + "] on line " + errorMsg.lineNumber + " col " + errorMsg.colNumber + " is of type " + errorMsg.idType + " and is incompatibly compared to a type of " + errorMsg.targetType);
@@ -592,7 +592,6 @@
 							break;
 					}
 				}
-				putMessage("\n");
 				Materialize.toast('Program ' + programCounter + ': Semantic error!', 4000, 'toastcolor');
 			}
 			else{
@@ -615,6 +614,7 @@
 					colNumber.innerHTML = symbols[i].col;
 				}
 			}
+			putMessage("\n");
 			putMessage("Semantic Analysis complete! " + res.warnings.length + " WARNING(S), " + res.errors.length + " ERROR(S)");
         }
 		

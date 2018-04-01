@@ -39,7 +39,7 @@ var TSC;
     // For Duplicate Variable and Undeclared Variable
     var ScopeError = /** @class */ (function (_super) {
         __extends(ScopeError, _super);
-        function ScopeError(tokenType, value, lineNumber, colNumber, firstDeclareCol, firstDeclareLine) {
+        function ScopeError(tokenType, value, lineNumber, colNumber, firstDeclareLine, firstDeclareCol) {
             var _this = _super.call(this, tokenType, value, lineNumber, colNumber) || this;
             _this.firstDeclareLine = firstDeclareLine;
             _this.firstDeclareCol = firstDeclareCol;

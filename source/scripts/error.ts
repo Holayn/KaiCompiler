@@ -31,7 +31,7 @@ module TSC {
     export class ScopeError extends Error {
         firstDeclareLine: number;
         firstDeclareCol: number;
-        constructor(tokenType: ErrorType, value: String, lineNumber: number, colNumber: number, firstDeclareCol: number, firstDeclareLine: number) {
+        constructor(tokenType: ErrorType, value: String, lineNumber: number, colNumber: number, firstDeclareLine: number, firstDeclareCol: number) {
             super(tokenType, value, lineNumber, colNumber);
             this.firstDeclareLine = firstDeclareLine;
             this.firstDeclareCol = firstDeclareCol;
