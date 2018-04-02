@@ -46,7 +46,6 @@ module TSC
 		        var sourceCode = (<HTMLInputElement>document.getElementById("taSourceCode")).value;
 		        // Trim the leading and trailing spaces.
 				sourceCode = TSC.Utils.trim(sourceCode);
-                console.log("Source code: " + sourceCode);
                 
 				// We need to recognize different tokens.
 				// Thus, we need to have the different patterns for each token defined.
@@ -126,8 +125,6 @@ module TSC
 						this.errors = [];
 						this.warnings = [];
 					}
-					console.log(sourceCode.substring(this.startLexemePtr, this.endLexemePtr));
-					console.log(this.endLexemePtr);
 					
 					//We're iterating through the program, so that means we haven't found the EOP
 					this.foundEOP = false;
@@ -137,7 +134,6 @@ module TSC
 					if(this.inComment){
 						// We have to keep track of newlines
 						if(rNEWLINE.test(sourceCode.substring(this.startLexemePtr, this.endLexemePtr))){
-							console.log("NEWLINE");
 							this.lineNumber++;
 							this.colNumber = 0;
 						}
@@ -174,7 +170,6 @@ module TSC
 								continue;
 							}
 							// If we run into a character that does not match a Character, throw an error
-							console.log("ERROR: Invalid character in String");
 							let char = sourceCode.charAt(this.endLexemePtr-1)
 							if(char == "\n"){
 								char = "\\n";
@@ -351,9 +346,7 @@ module TSC
 					// If whitespace, "clear" the buffer, aka set startLexemePtr to endLexemePtr
 					// We ignore whitespace
 					else if(rWHITE.test(sourceCode.substring(this.startLexemePtr, this.endLexemePtr))){
-						console.log("WHITESPACE");
 						if(rNEWLINE.test(sourceCode.substring(this.startLexemePtr, this.endLexemePtr))){
-							console.log("NEWLINE");
 							this.lineNumber++;
 							this.colNumber = -1;
 						}
@@ -363,7 +356,6 @@ module TSC
 					// If EOP, "clear" the buffer, aka set startLexemePtr to endLexemePtr
 					// Also, add a EOP token
 					else if(rEOP.test(sourceCode.substring(this.startLexemePtr, this.endLexemePtr))){
-						console.log("EOP");
 						var token: Token = new Token(TSC.TokenType.TEop, sourceCode.charAt(this.endLexemePtr-1), this.lineNumber, this.colNumber);
 						this.tokens.push(token);
 						this.startLexemePtr = this.endLexemePtr;
@@ -416,7 +408,6 @@ module TSC
 								this.errors.push(new Error(TSC.ErrorType.MissingCommentEnd, "*/", this.startCommentLine, this.startCommentCol));
 							}
 							else{
-								console.log("ERROR TOKEN");
 								this.errors.push(new Error(TSC.ErrorType.InvalidToken, sourceCode.charAt(this.endLexemePtr-1), this.lineNumber, this.colNumber));
 							}
 							break;
@@ -439,7 +430,6 @@ module TSC
 							this.startCommentLine = this.lineNumber;
 						}
 						else{
-							console.log("ERROR TOKEN");
 							this.errors.push(new Error(TSC.ErrorType.InvalidToken, sourceCode.charAt(this.endLexemePtr-2), this.lineNumber, this.colNumber));
 							break;
 						}
@@ -481,8 +471,6 @@ module TSC
 				
 				// We've reached end of source code
 				this.isComplete = true;
-
-				console.log(this.tokens);
 
 				// Define an object to return values in
 				this.lexAnalysisRes = {

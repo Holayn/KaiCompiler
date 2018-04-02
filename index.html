@@ -365,7 +365,6 @@
 			else{
 				verboseOn = true;
 			}
-			console.log(verboseOn);
 			
 		}
 
@@ -427,9 +426,7 @@
             // We're compiling programs in sequence.
             // For every program, lex, parse, perform semantic analysis, etc...
             while(!isLexComplete){
-				console.log("Starting another lex");
 				lexAnalysis = lexer.lex(prevProgramError);
-				console.log(lexAnalysis);
 				// Attempt to lex . . 
 				// If we get an error, report it
 				// Then, try to lex again by having lexer look for next EOP token, then lexing from there
@@ -670,9 +667,7 @@
 			// if enter, copy number of leading spaces in previous line
 			if (keyCode == 13) {
 				e.preventDefault();
-				console.log(document.getElementById('taSourceCode').rows);
 				var lines = $('textarea').val().split('\n');
-				console.log(lines);
 				// get line position of caret
 				var caretLine = 0;
 				var text = $('textarea').val();
@@ -683,7 +678,6 @@
 				}
 				// get number of leading spaces in previous line
 				var numSpaces = lines[caretLine].search(/\S/);
-				console.log(numSpaces);
 				// add spaces to new line
 				var spaces = "";
 				for(var i=0; i<numSpaces; i++){

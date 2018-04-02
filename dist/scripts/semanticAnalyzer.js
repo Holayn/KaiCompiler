@@ -45,9 +45,9 @@ var TSC;
         /**
          * Performs preorder traversal given a CST node
          * Creates scope tree along with AST creation
+         * @return the type if any
          */
         SemanticAnalyzer.prototype.traverse = function (node) {
-            var variableType; // the type of the expression, if applicable
             // Check if "important". If so, add to AST, descend AST.
             switch (node.value) {
                 case TSC.Production.Block:
@@ -195,8 +195,6 @@ var TSC;
                         if (firstExprType != null && firstExprType.value != null) {
                             firstExprType = firstExprType.value;
                         }
-                        console.log("FUCK ME");
-                        console.log(secondExprType);
                         if (secondExprType != null && secondExprType.value != null) {
                             secondExprType = secondExprType.value;
                         }
@@ -214,6 +212,7 @@ var TSC;
                     return VariableType.Boolean;
                 case TSC.Production.StringExpr:
                     // we have to generate string until we reach the end of the charlist
+                    // surround string in quotes
                     var stringBuilder = ["\""];
                     var currCharList = node.children[1];
                     var lastCharList = false;
@@ -294,6 +293,7 @@ var TSC;
         };
         /**
          * Traverses the scope tree in preorder fashion to find warnings to generate
+         * @param node the node in tree we're starting at
          */
         SemanticAnalyzer.prototype.findWarnings = function (node) {
             // Iterate through object 

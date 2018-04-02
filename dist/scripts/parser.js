@@ -61,14 +61,7 @@ var TSC;
          * Starts the parse of tokens passed in from the lexer
          */
         Parser.prototype.parse = function () {
-            if (this.parseProgram()) {
-                console.log("PARSER: success!");
-            }
-            else {
-                console.log("PARSER: error");
-            }
-            // Return the parser log
-            console.log(this.log);
+            this.parseProgram();
             return {
                 "log": this.log,
                 "cst": this.cst,

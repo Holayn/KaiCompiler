@@ -15,7 +15,7 @@ module TSC {
         errors: Array<Error>; // array to hold errors
         log: Array<String>; // array to hold log message from semantic analyzer
         ast: Tree; // pointer to the ast
-        scopeTree: Tree; // pointer to the scope tree, which will just be a 
+        scopeTree: Tree; // pointer to the scope tree
         error: boolean; // flag for error
         declaredScopes: number; // keeps track of number of scopes declared so we can assign new scopes proper ids
         scopeLevel: number; // keeps track of current level of the scope that we're on
@@ -57,9 +57,9 @@ module TSC {
         /**
          * Performs preorder traversal given a CST node
          * Creates scope tree along with AST creation
+         * @return the type if any
          */
         public traverse(node){
-            let variableType: VariableType; // the type of the expression, if applicable
             // Check if "important". If so, add to AST, descend AST.
             switch(node.value){
                 case Production.Block:
@@ -209,8 +209,6 @@ module TSC {
                         if(firstExprType != null && firstExprType.value != null){
                             firstExprType = firstExprType.value;
                         }
-                        console.log("FUCK ME");
-                        console.log(secondExprType);
                         if(secondExprType != null && secondExprType.value != null){
                             secondExprType = secondExprType.value;
                         }
@@ -229,6 +227,7 @@ module TSC {
                     return VariableType.Boolean;
                 case Production.StringExpr:
                     // we have to generate string until we reach the end of the charlist
+                    // surround string in quotes
                     let stringBuilder = ["\""];
                     let currCharList = node.children[1];
                     let lastCharList = false;
@@ -312,6 +311,7 @@ module TSC {
 
         /**
          * Traverses the scope tree in preorder fashion to find warnings to generate
+         * @param node the node in tree we're starting at
          */
         public findWarnings(node){
             // Iterate through object 

@@ -42,7 +42,6 @@ var TSC;
             var sourceCode = document.getElementById("taSourceCode").value;
             // Trim the leading and trailing spaces.
             sourceCode = TSC.Utils.trim(sourceCode);
-            console.log("Source code: " + sourceCode);
             // We need to recognize different tokens.
             // Thus, we need to have the different patterns for each token defined.
             // A lexeme is a sequence of characters in the source that we match to a pattern for a token.
@@ -118,8 +117,6 @@ var TSC;
                     this.errors = [];
                     this.warnings = [];
                 }
-                console.log(sourceCode.substring(this.startLexemePtr, this.endLexemePtr));
-                console.log(this.endLexemePtr);
                 //We're iterating through the program, so that means we haven't found the EOP
                 this.foundEOP = false;
                 // If the lexer is currently looking in a comment block, just ignore input
@@ -127,7 +124,6 @@ var TSC;
                 if (this.inComment) {
                     // We have to keep track of newlines
                     if (rNEWLINE.test(sourceCode.substring(this.startLexemePtr, this.endLexemePtr))) {
-                        console.log("NEWLINE");
                         this.lineNumber++;
                         this.colNumber = 0;
                     }
@@ -163,7 +159,6 @@ var TSC;
                             continue;
                         }
                         // If we run into a character that does not match a Character, throw an error
-                        console.log("ERROR: Invalid character in String");
                         var char = sourceCode.charAt(this.endLexemePtr - 1);
                         if (char == "\n") {
                             char = "\\n";
@@ -298,16 +293,13 @@ var TSC;
                     this.tokens.push(token);
                 }
                 else if (rWHITE.test(sourceCode.substring(this.startLexemePtr, this.endLexemePtr))) {
-                    console.log("WHITESPACE");
                     if (rNEWLINE.test(sourceCode.substring(this.startLexemePtr, this.endLexemePtr))) {
-                        console.log("NEWLINE");
                         this.lineNumber++;
                         this.colNumber = -1;
                     }
                     this.startLexemePtr = this.endLexemePtr;
                 }
                 else if (rEOP.test(sourceCode.substring(this.startLexemePtr, this.endLexemePtr))) {
-                    console.log("EOP");
                     var token = new TSC.Token(TSC.TokenType.TEop, sourceCode.charAt(this.endLexemePtr - 1), this.lineNumber, this.colNumber);
                     this.tokens.push(token);
                     this.startLexemePtr = this.endLexemePtr;
@@ -355,7 +347,6 @@ var TSC;
                             this.errors.push(new TSC.Error(TSC.ErrorType.MissingCommentEnd, "*/", this.startCommentLine, this.startCommentCol));
                         }
                         else {
-                            console.log("ERROR TOKEN");
                             this.errors.push(new TSC.Error(TSC.ErrorType.InvalidToken, sourceCode.charAt(this.endLexemePtr - 1), this.lineNumber, this.colNumber));
                         }
                         break;
@@ -375,7 +366,6 @@ var TSC;
                         this.startCommentLine = this.lineNumber;
                     }
                     else {
-                        console.log("ERROR TOKEN");
                         this.errors.push(new TSC.Error(TSC.ErrorType.InvalidToken, sourceCode.charAt(this.endLexemePtr - 2), this.lineNumber, this.colNumber));
                         break;
                     }
@@ -410,7 +400,6 @@ var TSC;
             }
             // We've reached end of source code
             this.isComplete = true;
-            console.log(this.tokens);
             // Define an object to return values in
             this.lexAnalysisRes = {
                 "tokens": this.tokens,
