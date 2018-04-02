@@ -50,7 +50,7 @@ module TSC {
                 "error": this.error,
                 "warnings": this.warnings,
                 "symbols": this.symbols,
-                "log": this.log;
+                "log": this.log
             }
         }
 
