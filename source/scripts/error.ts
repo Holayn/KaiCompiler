@@ -41,7 +41,7 @@ module TSC {
     export class TypeError extends Error {
         targetType: VariableType;
         idType: VariableType;
-        constructor(tokenType: ErrorType, value: String, lineNumber: number, colNumber: number, targetType: VariableType, idType: VariableType) {
+        constructor(tokenType: ErrorType, value: String, lineNumber: number, colNumber: number, idType: VariableType, targetType: VariableType) {
             super(tokenType, value, lineNumber, colNumber);
             this.targetType = targetType;
             this.idType = idType;

@@ -225,6 +225,7 @@
 						<div class="collapsible-body">
 							<div class="collection">
 								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Missing EOP</a>
+								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Semantic Warnings</a>
 							</div>
 						</div>
 					</li>
@@ -251,6 +252,20 @@
 								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Invalid Print Pt. 2</a>
 								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Incomplete BooleanExpr</a>
 								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Incomplete IntExpr</a>
+							</div>
+						</div>
+					</li>
+					<li>
+						<div class="collapsible-header"><i class="material-icons">new_releases</i>Semantic Analysis Error Cases</div>
+						<div class="collapsible-body">
+							<div class="collection">
+								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Undeclared Variable</a>
+								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Duplicate Variable</a>
+								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Type Mismatch</a>
+								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Incorrect Type Comparisons</a>
+								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Incorrect Integer Expression</a>
+								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Tien Test</a>
+								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Tien Boolean Hell</a>
 							</div>
 						</div>
 					</li>
@@ -552,52 +567,50 @@
 					putMessage("S.ANALYZE -> | " + res.log[i]);
 				}
 			}
-			// // Print warnings if no errors
-			// Just kidding, find all warnings and errors
+			// Print warnings if no errors
 			putMessage("\n");
-			// if(!res.error){
+			if(!res.error){
 				for(var i=0; i<res.warnings.length; i++){
 					var warningMsg = res.warnings[i];
 					switch(warningMsg.type){
 						case TSC.WarningType.UninitializedVariable:
 							// putMessage("S.ANALYZE -> | WARNING: Variable [" + warningMsg.value + "] on line " + warningMsg.lineNumber + " col " + warningMsg.colNumber + " has been declared but is not initialized properly in scope " + warningMsg.scopeId + " on line " + warningMsg.scopeLine + " col " + warningMsg.scopeCol);
-							putMessage("S.ANALYZE -> | WARNING: Variable [" + warningMsg.value + "] on line " + warningMsg.lineNumber + " col " + warningMsg.colNumber + " has been declared but is not initialized properly.");
+							putMessage("S.ANALYZE -> | WARNING - Variable [" + warningMsg.value + "] on line " + warningMsg.lineNumber + " col " + warningMsg.colNumber + " has been declared but is not initialized properly.");
 							break;
 						case TSC.WarningType.UnusedVariable:
 							// putMessage("S.ANALYZE -> | WARNING: Variable [" + warningMsg.value + "] on line " + warningMsg.lineNumber + " col " + warningMsg.colNumber + " has been initialized in scope " + warningMsg.scopeId + " on line " + warningMsg.scopeLine + " col " + warningMsg.scopeCol + " but is not used in scope " + warningMsg.scopeId);
-							putMessage("S.ANALYZE -> | WARNING: Variable [" + warningMsg.value + "] on line " + warningMsg.lineNumber + " col " + warningMsg.colNumber + " has been initialized but is not used.");
+							putMessage("S.ANALYZE -> | WARNING - Variable [" + warningMsg.value + "] on line " + warningMsg.lineNumber + " col " + warningMsg.colNumber + " has been initialized but is not used.");
 							break;
 					}
 					Materialize.toast('Program ' + programCounter + ': Semantic warning!', 4000, 'toastcolor');
 				}
-			// }
+			}
 			if(res.error){
-				// // Print only the first error because some of the errors may not be valid if there were errors before it
-				// Just kidding, let's print all errors!
-				for(var i=0; i<res.errors.length; i++){
-					var errorMsg = res.errors[i];
-					// var errorMsg = res.errors[0];
-					switch(errorMsg.type){
-						case TSC.ErrorType.DuplicateVariable:
-							putMessage("S.ANALYZE -> | ERROR: Variable [" + errorMsg.value.value + "] on line " + errorMsg.lineNumber + " col " + errorMsg.colNumber + " has already been declared in current scope at line " + errorMsg.firstDeclareLine + " col " + errorMsg.firstDeclareCol);
-							break;
-						case TSC.ErrorType.UndeclaredVariable:
-							putMessage("S.ANALYZE -> | ERROR: Variable [" + errorMsg.value.value + "] on line " + errorMsg.lineNumber + " col " + errorMsg.colNumber + " has not been previously declared.");
-							break;
-						case TSC.ErrorType.TypeMismatch:
-							putMessage("S.ANALYZE -> | ERROR: The variable [" + errorMsg.value.value + "] declared on line " + errorMsg.lineNumber + " col " + errorMsg.colNumber + " is of type " + errorMsg.idType + " and does not match the assignment type of " + errorMsg.targetType.value);
-							break;
-						case TSC.ErrorType.IncorrectTypeComparison:
-							putMessage("S.ANALYZE -> | ERROR: The [" + errorMsg.value + "] on line " + errorMsg.lineNumber + " col " + errorMsg.colNumber + " is of type " + errorMsg.idType + " and is incompatibly compared to a type of " + errorMsg.targetType);
-							break;
-						case TSC.ErrorType.IncorrectIntegerExpression:
-							putMessage("S.ANALYZE -> | ERROR: The [" + errorMsg.value + "] on line " + errorMsg.lineNumber + " col " + errorMsg.colNumber + " is of type " + errorMsg.targetType + " which cannot be added to digits of type " + TSC.VariableType.Int);
-							break;
-					}
+				// Print only the first error because some of the errors may not be valid if there were errors before it
+				// for(var i=0; i<res.errors.length; i++){
+				// 	var errorMsg = res.errors[i];
+				var errorMsg = res.errors[0];
+				switch(errorMsg.type){
+					case TSC.ErrorType.DuplicateVariable:
+						putMessage("S.ANALYZE -> | ERROR - Variable [" + errorMsg.value.value + "] on line " + errorMsg.lineNumber + " col " + errorMsg.colNumber + " has already been declared in current scope at line " + errorMsg.firstDeclareLine + " col " + errorMsg.firstDeclareCol);
+						break;
+					case TSC.ErrorType.UndeclaredVariable:
+						putMessage("S.ANALYZE -> | ERROR - Variable [" + errorMsg.value.value + "] on line " + errorMsg.lineNumber + " col " + errorMsg.colNumber + " has not been previously declared.");
+						break;
+					case TSC.ErrorType.TypeMismatch:
+						putMessage("S.ANALYZE -> | ERROR - The variable [" + errorMsg.value.value + "] declared on line " + errorMsg.lineNumber + " col " + errorMsg.colNumber + " is of type " + errorMsg.idType.value + " and does not match the assignment type of " + errorMsg.targetType);
+						break;
+					case TSC.ErrorType.IncorrectTypeComparison:
+						putMessage("S.ANALYZE -> | ERROR - The [" + errorMsg.value + "] on line " + errorMsg.lineNumber + " col " + errorMsg.colNumber + " is of type " + errorMsg.idType + " and is incompatibly compared to a type of " + errorMsg.targetType);
+						break;
+					case TSC.ErrorType.IncorrectIntegerExpression:
+						putMessage("S.ANALYZE -> | ERROR - The [" + errorMsg.value + "] on line " + errorMsg.lineNumber + " col " + errorMsg.colNumber + " is of type " + errorMsg.targetType + " which cannot be added to digits of type " + TSC.VariableType.Int);
+						break;
 				}
+				// }
 				Materialize.toast('Program ' + programCounter + ': Semantic error!', 4000, 'toastcolor');
-				// putMessage("\n");
-				// putMessage("Semantic Analysis failed due to error.");
+				putMessage("\n");
+				putMessage("Semantic Analysis failed due to error.");
 			}
 			else{
 				// Display symbols in Symbol Table
@@ -618,11 +631,11 @@
 					var colNumber = row.insertCell(5);
 					colNumber.innerHTML = symbols[i].col;
 				}
-				// putMessage("\n");
-				// putMessage("Semantic Analysis complete! " + res.warnings.length + " WARNING(S), " + res.errors.length + " ERROR(S)");
+				putMessage("\n");
+				putMessage("Semantic Analysis complete! " + res.warnings.length + " WARNING(S), " + res.errors.length + " ERROR(S)");
 			}
-			putMessage("\n");
-			putMessage("Semantic Analysis complete! " + res.warnings.length + " WARNING(S), " + res.errors.length + " ERROR(S)");
+			// putMessage("\n");
+			// putMessage("Semantic Analysis complete! " + res.warnings.length + " WARNING(S), " + res.errors.length + " ERROR(S)");
         }
 		
     

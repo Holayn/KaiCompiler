@@ -51,7 +51,7 @@ var TSC;
     // For Type Mismatch
     var TypeError = /** @class */ (function (_super) {
         __extends(TypeError, _super);
-        function TypeError(tokenType, value, lineNumber, colNumber, targetType, idType) {
+        function TypeError(tokenType, value, lineNumber, colNumber, idType, targetType) {
             var _this = _super.call(this, tokenType, value, lineNumber, colNumber) || this;
             _this.targetType = targetType;
             _this.idType = idType;

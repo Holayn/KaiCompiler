@@ -79,6 +79,30 @@ var TSC;
                 case "Incomplete IntExpr":
                     document.getElementById("taSourceCode").value = "/* Test case for incomplete IntExpr */\n{\n    int a\n    a = 1 +\n    print(a)\n}$";
                     break;
+                case "Semantic Warnings":
+                    document.getElementById("taSourceCode").value = "/* has unused and undeclared variables */\n{\n    int a\n    int b\n    a = 3\n    b = 4\n    {\n        string a\n        a = \"hey\"\n        print(a)\n        print(b)\n    }\n    print(b)\n    string s\n    {\n        boolean b\n        b = false\n    }\n    string r\n    r = \"hey\"\n}$";
+                    break;
+                case "Undeclared Variable":
+                    document.getElementById("taSourceCode").value = "/* Variables being used but not declared first */\n{\n    int a\n    b = 4\n}$";
+                    break;
+                case "Duplicate Variable":
+                    document.getElementById("taSourceCode").value = "/* Variables being declared again in same scope*/\n{\n    int a\n    {\n        string a\n        a = \"this is fine\"\n    }\n    boolean a /* this is not fine\" */\n}$";
+                    break;
+                case "Type Mismatch":
+                    document.getElementById("taSourceCode").value = "/* A variable's type is not compatible with its assignment*/\n{\n    string s\n    s = 4 + 3\n}$";
+                    break;
+                case "Incorrect Type Comparisons":
+                    document.getElementById("taSourceCode").value = "/* Types do not match in Boolean comparison*/\n{\n    if(4 == false){\n        print(\"this no good\")\n    }\n    if(4 == \"hey\"){\n        print(\"int to string\")\n    }\n    if(false != \"hey\"){\n        print(\"bool to string\")\n    }\n    if(4 != 3){\n        print(\"int to int\")\n    }\n}$";
+                    break;
+                case "Incorrect Integer Expression":
+                    document.getElementById("taSourceCode").value = "/* A digit is added to something other than a digit */\n{\nint a\na = 4 + false\n}$";
+                    break;
+                case "Tien Test":
+                    document.getElementById("taSourceCode").value = "/* Thx Tien. */       \n{\n    int a\n    a = 0\n    string z\n    z = \"bond\"\n    while (a != 9) {\n        if (a != 5) {\n            print(\"bond\")\n        }\n        {\n            a = 1 + a\n            string b\n            b = \"james bond\"\n            print(b)\n        }\n    }\n    {/*Holy Hell This is Disgusting*/}\n    boolean c\n    c = true\n    boolean d\n    d = (true == (true == false))\n    d = (a == b)\n    d = (1 == a)\n    d = (1 != 1)\n    d = (\"string\" == 1)\n    d = (a != \"string\")\n    d = (\"string\" != \"string\")\n    if (d == true) {\n        int c\n        c = 1 + d\n        if (c == 1) {\n            print(\"ugh\")\n        }\n    }\n    while (\"string\" == a) {\n        while (1 == true) {\n            a = 1 + \"string\"\n        }\n    }\n}$";
+                    break;
+                case "Tien Boolean Hell":
+                    document.getElementById("taSourceCode").value = "/* Thanks Tien. Assuming you get past Boolean Hell\n- there is a boolean being compared to\n- a string which will cause a type error */\n{\n    int a\n    a = 4\n    boolean b\n    b = true\n    boolean c\n    string d\n    d = \"there is no spoon\"\n    c = (d != \"there is a spoon\")\n    if(c == (false != (b == (true == (a == 3+1))))) {\n        print((b != d))\n    }\n}$";
+                    break;
             }
             document.getElementById("taOutput").value = "Inserted Program: " + testcase.innerHTML;
         };

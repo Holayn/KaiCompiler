@@ -181,7 +181,7 @@ module TSC {
                         }
                         if(exprType != VariableType.Int){
                             this.error = true;
-                            this.errors.push(new TypeError(ErrorType.IncorrectIntegerExpression, node.children[2].value, node.children[2].lineNumber, node.children[2].colNumber, exprType, VariableType.Int));
+                            this.errors.push(new TypeError(ErrorType.IncorrectIntegerExpression, node.children[2].value, node.children[2].lineNumber, node.children[2].colNumber, VariableType.Int, exprType));
                         }
                         this.ast.ascendTree();
                     }
@@ -209,12 +209,14 @@ module TSC {
                         if(firstExprType != null && firstExprType.value != null){
                             firstExprType = firstExprType.value;
                         }
+                        console.log("FUCK ME");
+                        console.log(secondExprType);
                         if(secondExprType != null && secondExprType.value != null){
                             secondExprType = secondExprType.value;
                         }
                         if(firstExprType != secondExprType){
                             this.error = true;
-                            this.errors.push(new TypeError(ErrorType.IncorrectTypeComparison, node.children[1].value, node.children[1].lineNumber, node.children[1].colNumber, secondExprType, firstExprType));
+                            this.errors.push(new TypeError(ErrorType.IncorrectTypeComparison, node.children[1].value, node.children[1].lineNumber, node.children[1].colNumber, firstExprType, secondExprType));
                         }
                         this.ast.ascendTree();
                     }
@@ -267,7 +269,7 @@ module TSC {
             // Check current scope
             if(ptr.value.table.hasOwnProperty(node.value.value)){
                 // report our gucciness to the log
-                this.log.push("VALID: Variable [" + node.value.value + "] on line " + node.lineNumber + " col " + node.colNumber + " has been declared.");
+                this.log.push("VALID - Variable [" + node.value.value + "] on line " + node.lineNumber + " col " + node.colNumber + " has been declared.");
                 return ptr.value.table[node.value.value].value;
             }
             // Check parent scopes
@@ -277,7 +279,7 @@ module TSC {
                     // Check if id in scope
                     if(ptr.value.table.hasOwnProperty(node.value.value)){
                         // report our gucciness to the log
-                        this.log.push("VALID: Variable [" + node.value.value + "] on line " + node.lineNumber + " col " + node.colNumber + " has been declared.");
+                        this.log.push("VALID - Variable [" + node.value.value + "] on line " + node.lineNumber + " col " + node.colNumber + " has been declared.");
                         return ptr.value.table[node.value.value].value;
                     }
                 }
@@ -302,7 +304,7 @@ module TSC {
                 }
                 else{
                     // report our gucciness to the log
-                    this.log.push("VALID: Variable [" + id.value + "] of type " + idType.value + " matches its assignment type of " + targetType + " at line " + targetLine + " col " + targetCol);
+                    this.log.push("VALID - Variable [" + id.value + "] of type " + idType.value + " matches its assignment type of " + targetType + " at line " + targetLine + " col " + targetCol);
                 }
             }
         }
@@ -343,7 +345,7 @@ module TSC {
                 // Mark as initialized
                 ptr.value.table[node.value.value].initialized = true;
                 // report our gucciness to the log
-                this.log.push("VALID: Variable [" + node.value.value + "] on line " + node.lineNumber + " col " + node.colNumber + " has been initialized.");
+                this.log.push("VALID - Variable [" + node.value.value + "] on line " + node.lineNumber + " col " + node.colNumber + " has been initialized.");
                 return;
             }
             // Check parent scopes
@@ -355,7 +357,7 @@ module TSC {
                         // Mark as initialized
                         ptr.value.table[node.value.value].initialized = true;
                         // report our gucciness to the log
-                        this.log.push("VALID: Variable [" + node.value.value + "] on line " + node.lineNumber + " col " + node.colNumber + " has been initialized.");
+                        this.log.push("VALID - Variable [" + node.value.value + "] on line " + node.lineNumber + " col " + node.colNumber + " has been initialized.");
                         return;
                     }
                 }
@@ -375,7 +377,7 @@ module TSC {
                 // Mark as initialized
                 ptr.value.table[node.value.value].used = true;
                 // report our gucciness to the log
-                this.log.push("VALID: Variable [" + node.value.value + "] on line " + node.lineNumber + " col " + node.colNumber + " has been used.");
+                this.log.push("VALID - Variable [" + node.value.value + "] on line " + node.lineNumber + " col " + node.colNumber + " has been used.");
                 return;
             }
             // Check parent scopes
@@ -387,7 +389,7 @@ module TSC {
                         // Mark as initialized
                         ptr.value.table[node.value.value].used = true;
                         // report our gucciness to the log
-                        this.log.push("VALID: Variable [" + node.value.value + "] on line " + node.lineNumber + " col " + node.colNumber + " has been used.");
+                        this.log.push("VALID - Variable [" + node.value.value + "] on line " + node.lineNumber + " col " + node.colNumber + " has been used.");
                         return;
                     }
                 }
