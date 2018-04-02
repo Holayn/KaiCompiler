@@ -20,7 +20,7 @@ var TSC;
             this.scopeTree = new TSC.Tree();
             this.symbols = [];
             this.declaredScopes = 0;
-            this.scopeLevel = 0;
+            this.scopeLevel = -1; // set to -1 as we first increase scope level before putting into symbol table
             this.log = [];
         }
         /**
@@ -214,7 +214,7 @@ var TSC;
                     return VariableType.Boolean;
                 case TSC.Production.StringExpr:
                     // we have to generate string until we reach the end of the charlist
-                    var stringBuilder = [];
+                    var stringBuilder = ["\""];
                     var currCharList = node.children[1];
                     var lastCharList = false;
                     while (!lastCharList) {
@@ -225,6 +225,7 @@ var TSC;
                         }
                         currCharList = currCharList.children[1];
                     }
+                    stringBuilder.push("\"");
                     var resString = stringBuilder.join("");
                     this.ast.addNode(resString);
                     this.ast.ascendTree();
