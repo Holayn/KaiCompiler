@@ -65,7 +65,7 @@ main {
 .tabs .indicator {
 	background-color: #26a69a !important;
 }
-#taCST, #taAST, #taSymbol, #taScope {
+#taCST, #taAST, #taSymbol {
 	font-family: "Courier";
 	border-color: white;
 	resize: none;

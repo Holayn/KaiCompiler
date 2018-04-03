@@ -374,28 +374,6 @@ var TSC;
                 }
             }
         };
-        /**
-         * Traverses the scope tree and returns a string representation
-         * @param node the node whose value we're adding to string rep
-         * @param arr array of arrays that represent tree
-         * @param level level of the tree we're currently at
-         */
-        SemanticAnalyzer.prototype.printScopeTree = function (node, arr, level) {
-            console.log(node);
-            // add level
-            if (arr.length == level) {
-                arr.push([]);
-            }
-            // add vars to array
-            for (var key in node.value.table) {
-                arr[level].push(key + " " + node.value.table[key]);
-            }
-            // traverse children
-            for (var i = 0; i < node.children.length; i++) {
-                node.children[i].printScopeTree();
-            }
-            return arr;
-        };
         return SemanticAnalyzer;
     }());
     TSC.SemanticAnalyzer = SemanticAnalyzer;
