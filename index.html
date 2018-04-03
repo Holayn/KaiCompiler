@@ -133,6 +133,7 @@
 					<ul class="tabs">
 						<li class="tab col s3"><a class="active" href="#cst">CST</a></li>
 						<li class="tab col s3"><a href="#ast">AST</a></li>
+						<li class="tab col s3"><a href="#scopeTree">Scope</a></li>
 					</ul>
 				</div>
 				<div class="col s6"></div>
@@ -146,6 +147,10 @@
 					<div id="ast" class="card-panel log">
 						<h5 class="light">AST<a id="btnAST" value="ast" href="#visual-ast" class="waves-effect waves-light btn right" style="bottom: 5px"/>View Visual AST</a></h5>
 						<textarea id="taAST" readonly disabled></textarea>
+					</div>
+					<div id="scopeTree" class="card-panel log">
+						<h5 class="light">Scope Tree</h5>
+						<textarea id="taScope" readonly disabled></textarea>
 					</div>
 				</div>
 				<div class="col s6">
@@ -636,6 +641,26 @@
 					var colNumber = row.insertCell(5);
 					colNumber.innerHTML = symbols[i].col;
 				}
+				// Fill out scope tree
+				var stringRep = "";
+				var scopeTreeArr = semanticAnalyzer.printScopeTree(res.scopeTree.root, [], 0);
+				for(var i=0; i<scopeTreeArr.length; i++){
+					// add appropriate number of dashes
+					for(var j=0; j<i; j++){
+						stringRep += "-";
+					}
+					// add from array to string
+					for(var j=0; j<scopeTreeArr[i].length; j++){
+						if(j+1 == scopeTreeArr[i].length){
+							stringRep += scopeTreeArr[j] + "\n";
+						}
+						else{
+							stringRep += scopeTreeArr[j] + ",";
+						}
+						
+					}
+				}
+				// document.getElementById("taScope").value += ast.tree[i] + "\n";
 				putMessage("\n");
 				putMessage("Semantic Analysis complete! " + res.warnings.length + " WARNING(S), " + res.errors.length + " ERROR(S)");
 			}
