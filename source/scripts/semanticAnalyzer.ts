@@ -320,6 +320,10 @@ module TSC {
                 if(node.value.table[key].initialized == false){
                     // variable is uninitialized
                     this.warnings.push(new ScopeWarning(WarningType.UninitializedVariable, key, node.value.table[key].value.lineNumber, node.value.table[key].value.colNumber, node.value));
+                    // if variable is uninitialized, but used, issue warning
+                    if(node.value.table[key].used == true){
+                        this.warnings.push(new ScopeWarning(WarningType.UsedUninitialized, key, node.value.table[key].value.lineNumber, node.value.table[key].value.colNumber, node.value));
+                    }
                 }
                 // Look for unused variables
                 if(node.value.table[key].used == false && node.value.table[key].initialized == true){

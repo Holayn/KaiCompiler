@@ -589,6 +589,10 @@
 							// putMessage("S.ANALYZE -> | WARNING: Variable [" + warningMsg.value + "] on line " + warningMsg.lineNumber + " col " + warningMsg.colNumber + " has been initialized in scope " + warningMsg.scopeId + " on line " + warningMsg.scopeLine + " col " + warningMsg.scopeCol + " but is not used in scope " + warningMsg.scopeId);
 							putMessage("S.ANALYZE -> | WARNING - Variable [" + warningMsg.value + "] on line " + warningMsg.lineNumber + " col " + warningMsg.colNumber + " has been initialized but is not used.");
 							break;
+						case TSC.WarningType.UsedUninitialized:
+							// putMessage("S.ANALYZE -> | WARNING: Variable [" + warningMsg.value + "] on line " + warningMsg.lineNumber + " col " + warningMsg.colNumber + " has been initialized in scope " + warningMsg.scopeId + " on line " + warningMsg.scopeLine + " col " + warningMsg.scopeCol + " but is not used in scope " + warningMsg.scopeId);
+							putMessage("S.ANALYZE -> | WARNING - Variable [" + warningMsg.value + "] on line " + warningMsg.lineNumber + " col " + warningMsg.colNumber + " has been used but is not initialized.");
+							break;
 					}
 					Materialize.toast('Program ' + programCounter + ': Semantic warning!', 4000, 'toastcolor');
 				}

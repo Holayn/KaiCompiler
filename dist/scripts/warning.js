@@ -20,6 +20,7 @@ var TSC;
         WarningType["MissingEOP"] = "MissingEOP";
         WarningType["UninitializedVariable"] = "UninitializedVariable";
         WarningType["UnusedVariable"] = "UnusedVariable";
+        WarningType["UsedUninitialized"] = "UsedUninitialized";
     })(WarningType = TSC.WarningType || (TSC.WarningType = {}));
     var Warning = /** @class */ (function () {
         function Warning(tokenType, value, lineNumber, colNumber) {
