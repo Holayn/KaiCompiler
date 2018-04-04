@@ -282,6 +282,8 @@ s = "hey there`;
     }
     string r
     r = "hey"
+    int d
+    print(d)
 }$`;
                     break;
                 case "Undeclared Variable":

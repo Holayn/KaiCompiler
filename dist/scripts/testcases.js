@@ -80,7 +80,7 @@ var TSC;
                     document.getElementById("taSourceCode").value = "/* Test case for incomplete IntExpr */\n{\n    int a\n    a = 1 +\n    print(a)\n}$";
                     break;
                 case "Semantic Warnings":
-                    document.getElementById("taSourceCode").value = "/* has unused and undeclared variables */\n{\n    int a\n    int b\n    a = 3\n    b = 4\n    {\n        string a\n        a = \"hey\"\n        print(a)\n        print(b)\n    }\n    print(b)\n    string s\n    {\n        boolean b\n        b = false\n    }\n    string r\n    r = \"hey\"\n}$";
+                    document.getElementById("taSourceCode").value = "/* has unused and undeclared variables */\n{\n    int a\n    int b\n    a = 3\n    b = 4\n    {\n        string a\n        a = \"hey\"\n        print(a)\n        print(b)\n    }\n    print(b)\n    string s\n    {\n        boolean b\n        b = false\n    }\n    string r\n    r = \"hey\"\n    int d\n    print(d)\n}$";
                     break;
                 case "Undeclared Variable":
                     document.getElementById("taSourceCode").value = "/* Variables being used but not declared first */\n{\n    int a\n    b = 4\n}$";
