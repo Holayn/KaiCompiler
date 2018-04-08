@@ -21,6 +21,7 @@ var TSC;
         WarningType["UninitializedVariable"] = "UninitializedVariable";
         WarningType["UnusedVariable"] = "UnusedVariable";
         WarningType["UsedUninitialized"] = "UsedUninitialized";
+        WarningType["UsedBeforeInit"] = "UsedBeforeInit";
     })(WarningType = TSC.WarningType || (TSC.WarningType = {}));
     var Warning = /** @class */ (function () {
         function Warning(tokenType, value, lineNumber, colNumber) {

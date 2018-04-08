@@ -284,6 +284,7 @@ s = "hey there`;
     r = "hey"
     int d
     print(d)
+    d = 3
 }$`;
                     break;
                 case "Undeclared Variable":

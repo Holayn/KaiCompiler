@@ -168,6 +168,8 @@ module TSC {
                     let foundType = this.checkScopes(node.children[0]);
                     // Mark id as used
                     this.markAsUsed(node.children[0]);
+                    // Look for used but uninitialized variables
+                    this.checkUsedUninit(node.children[0]);
                     // return the id's type
                     return foundType;
                 case Production.IntExpr:
@@ -330,9 +332,9 @@ module TSC {
                     // variable is uninitialized
                     this.warnings.push(new ScopeWarning(WarningType.UninitializedVariable, key, node.value.table[key].value.lineNumber, node.value.table[key].value.colNumber, node.value));
                     // if variable is uninitialized, but used, issue warning
-                    if(node.value.table[key].used == true){
-                        this.warnings.push(new ScopeWarning(WarningType.UsedUninitialized, key, node.value.table[key].value.lineNumber, node.value.table[key].value.colNumber, node.value));
-                    }
+                    // if(node.value.table[key].used == true){
+                    //     this.warnings.push(new ScopeWarning(WarningType.UsedUninitialized, key, node.value.table[key].value.lineNumber, node.value.table[key].value.colNumber, node.value));
+                    // }
                 }
                 // Look for unused variables
                 if(node.value.table[key].used == false && node.value.table[key].initialized == true){
@@ -404,6 +406,37 @@ module TSC {
                         ptr.value.table[node.value.value].used = true;
                         // report our gucciness to the log
                         this.log.push("VALID - Variable [" + node.value.value + "] on line " + node.lineNumber + " col " + node.colNumber + " has been used.");
+                        return;
+                    }
+                }
+            }
+        }
+
+        /**
+         * Checks to see if a variable is used before being initialized
+         * Look for used but uninitialized variables i.e. used and then initialized. I don't wanna allow this anymore.
+         * i.e. int a print(a) a = 4
+         * @param node the node in tree we're starting at
+         */
+        public checkUsedUninit(node){
+            // pointer to current position in scope tree
+            let ptr = this.scopeTree.curr;
+            // Check current scope
+            if(ptr.value.table.hasOwnProperty(node.value.value)){
+                if(ptr.value.table[node.value.value].initialized == false){
+                    this.warnings.push(new ScopeWarning(WarningType.UsedBeforeInit, node.value.value, node.value.lineNumber, node.value.colNumber, node.value));
+                }
+                return;
+            }
+            // Check parent scopes
+            else{
+                while(ptr.parent != null){
+                    ptr = ptr.parent;
+                    // Check if id in scope
+                    if(ptr.value.table.hasOwnProperty(node.value.value)){
+                        if(ptr.value.table[node.value.value].initialized == false){
+                            this.warnings.push(new ScopeWarning(WarningType.UsedBeforeInit, node.value.value, node.value.lineNumber, node.value.colNumber, node.value));
+                        }
                         return;
                     }
                 }

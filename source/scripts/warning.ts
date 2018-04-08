@@ -8,7 +8,8 @@ module TSC {
         MissingEOP = "MissingEOP",
         UninitializedVariable = "UninitializedVariable",
         UnusedVariable = "UnusedVariable",
-        UsedUninitialized = "UsedUninitialized"
+        UsedUninitialized = "UsedUninitialized",
+        UsedBeforeInit = "UsedBeforeInit"
     }
     export class Warning {
         type: WarningType;
