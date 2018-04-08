@@ -231,6 +231,11 @@ module TSC {
                     let stringBuilder = ["\""];
                     let currCharList = node.children[1];
                     let lastCharList = false;
+                    // check for empty string. if only 2 children, we know
+                    // there is an empty string, as there are only quotes
+                    if(node.children.length == 2){
+                        lastCharList = true;
+                    }
                     while(!lastCharList){
                         stringBuilder.push(currCharList.children[0].children[0].value.value);
                         if(currCharList.children.length == 1){
