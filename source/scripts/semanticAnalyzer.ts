@@ -142,6 +142,10 @@ module TSC {
                     var expressionType = this.traverse(node.children[2]);
                     this.ast.ascendTree();
                     // Check for type match
+                    // handles case if traverse() returns a token
+                    if(expressionType != null && expressionType.value != null){
+                        expressionType = expressionType.value;
+                    }
                     this.checkTypeMatch(node.children[0].children[0].value, idType, expressionType, node.children[0].children[0].lineNumber, node.children[0].children[0].colNumber, node.children[2].lineNumber, node.children[2].colNumber);
                     // Update scope tree node object initialized flag. variable has been initialized.
                     this.markAsInitialized(node.children[0].children[0]);
