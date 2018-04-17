@@ -1,7 +1,7 @@
 Kompailer
 =====================
 
-This is my Compilers project written in TypeScript with frontend HTML.
+This is my Compiler written in TypeScript with frontend HTML.
 See http://www.labouseur.com/courses/compilers/ for details.
 
 Setup TypeScript/Gulp
