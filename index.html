@@ -45,53 +45,7 @@
 				<div class="col s6">
 					<div class="card-panel input">
 						<h5 class="light">Editor</h5>
-						<textarea class="lined" id="taSourceCode">
-/* Test case for all productions - thx Tien */
-{
-    /* Int Declaration */
-    int a
-    int b
-    string s
-    boolean z
-    
-    z = true
-    s = "kai sucks"
-
-    a = 0
-    b = 0
-
-    /* While Loop */
-    while (a != 3) {
-        print(a)
-        while (b != 3) {
-                print(b)
-                b = 1 + b
-                if (b == 2) {
-                    /* Print Statement */
-                    print("kai sucks"/* This will do nothing */)
-                }
-        }
-
-        b = 0
-        a = 1 + a
-    }
-}$
-/* Second program with parse error */
-{
-    int a
-    a = a + 2
-}$
-/* Third program with lex error */
-{
-    print("hello there")
-    print("General Genobi")
-}$
-/* Fourth normal program */
-{
-    print("hello there")
-    print("general kenobi")
-}$
-</textarea>
+						<textarea class="lined" id="taSourceCode"></textarea>
 						<br>
 						<div class="fixed-action-btn horizontal click-to-toggle togglebutton">
 							<a class="btn-floating btn blue lighten-2">
@@ -519,7 +473,7 @@
 		
 		// Takes tokens from lexical analysis and passes them to parser
 		// Also passes Treant CST config so parser can construct CST or add on to existing CST
-	    function parse(lexAnalysis, treantCST, programCounter) {
+		function parse(lexAnalysis, treantCST, programCounter) {
 			putMessage("Parsing...");
 			putMessage("\n");
 			// Put tokens into parser for validation
@@ -672,7 +626,9 @@
 				putMessage("Semantic Analysis complete! " + res.warnings.length + " WARNING(S), " + res.errors.length + " ERROR(S)");
 			}
 			// putMessage("\n");
-			// putMessage("Semantic Analysis complete! " + res.warnings.length + " WARNING(S), " + res.errors.length + " ERROR(S)");
+            // putMessage("Semantic Analysis complete! " + res.warnings.length + " WARNING(S), " + res.errors.length + " ERROR(S)");
+            // Return the result of the semantic analyzer so that it can be used by the code generator
+            return res;
         }
 		
     
