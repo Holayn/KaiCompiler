@@ -274,7 +274,8 @@
 	<script type="text/javascript" src="dist/styles/Treant/vendor/raphael.js"></script>
     <script type="text/javascript" src="dist/styles/Treant/Treant.js"></script>
     <script type="text/javascript" src="dist/scripts/semanticAnalyzer.js"></script>
-    <script type="text/javascript" src="dist/scripts/scope.js"></script>
+	<script type="text/javascript" src="dist/scripts/scope.js"></script>
+	<script type="text/javascript" src="dist/scripts/codeGen.js"></script>
 	<script type="text/javascript">
 	
         var verboseOn = true;
@@ -414,7 +415,11 @@
 					var parseResult = parse(lexAnalysis, treantCST, programCounter);
 					// Do not continue to semantic analysis if parse error
 					if(!parseResult.error){
-						analyze(parseResult, treantAST, programCounter); // perform semantic analysis on the cst from the parse
+						var analyzeRes = analyze(parseResult, treantAST, programCounter); // perform semantic analysis on the cst from the parse
+						// Do not continue to code gen if semantic error
+						if(!analyzeRes.error){
+							codeGen(analyzeRes, programCounter);
+						}
 					}
                     programCounter++;
 				}
@@ -426,7 +431,7 @@
 					putMessage("Why are you trying to compile zero code? Cheese and crackers you dimwit go eat a sock.");
 				}
             }
-        }
+		}
 		
 		// Fills log with messages from lexer
 		function logLex(lexAnalysis, programCounter) {
@@ -629,7 +634,15 @@
             // putMessage("Semantic Analysis complete! " + res.warnings.length + " WARNING(S), " + res.errors.length + " ERROR(S)");
             // Return the result of the semantic analyzer so that it can be used by the code generator
             return res;
-        }
+		}
+
+		// Produces op codes from AST
+		function codeGen(analyzeRes, programCounter) {
+			putMessage("\n");
+			putMessage("Performing Code Generation...\n");
+            let codeGenerator = new TSC.CodeGenerator();
+			var res = codeGenerator.generateCode(analyzeRes);
+		}
 		
     
 	</script>

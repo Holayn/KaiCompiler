@@ -252,7 +252,7 @@ module TSC {
                     }
                     stringBuilder.push("\"");
                     let resString = stringBuilder.join("");
-                    this.ast.addNode(resString);
+                    this.ast.addNode(new Token(TokenType.TString, resString, null, null));
                     this.ast.ascendTree();
                     // return the type returned by stringexpr
                     return VariableType.String;

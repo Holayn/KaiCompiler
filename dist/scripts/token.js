@@ -25,6 +25,7 @@ var TSC;
         TokenType["TQuote"] = "TQuote";
         TokenType["TChar"] = "TChar";
         TokenType["TSpace"] = "TSpace";
+        TokenType["TString"] = "TString";
     })(TokenType = TSC.TokenType || (TSC.TokenType = {}));
     var Token = /** @class */ (function () {
         function Token(tokenType, value, lineNumber, colNumber) {

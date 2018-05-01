@@ -237,7 +237,7 @@ var TSC;
                     }
                     stringBuilder.push("\"");
                     var resString = stringBuilder.join("");
-                    this.ast.addNode(resString);
+                    this.ast.addNode(new TSC.Token(TSC.TokenType.TString, resString, null, null));
                     this.ast.ascendTree();
                     // return the type returned by stringexpr
                     return VariableType.String;
