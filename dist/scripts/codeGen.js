@@ -5,38 +5,16 @@ var TSC;
 (function (TSC) {
     var CodeGenerator = /** @class */ (function () {
         function CodeGenerator() {
-            /* structure object to represent a table of static variables
-            {
-                "temp":
-                "name":
-                "at":
-                "scope": scope id
-            }
-            */
-            this.staticTable = {};
-            /* structure object to represent the loop jumps
-            {
-                "temp":
-                "jump":
-            }
-            */
-            // id of static variable
-            // convert to hex? no need because not actually in op codes in the end
+            // id of static variable. convert to hex? no need because not actually in op codes in the end
             this.staticId = 0;
-            this.loopJumps = {};
-            /* structure object to represent the heap
-            {
-                "temp":
-                "name":
-                "ptr":
-            }
-            */
-            this.heapTable = {};
             // pointer to the start of the heap. initially at 0
             this.heapStartPtr = 256;
             // pointer representing where we are in op code array
             this.opPtr = 0;
             this.generatedCode = [];
+            this.staticMap = new Map();
+            this.jumpMap = new Map();
+            this.heapMap = new Map();
             // fill with 00's
             for (var i = 0; i < 256; i++) {
                 this.generatedCode.push("00");
@@ -74,6 +52,10 @@ var TSC;
          * @param node AST node
          */
         CodeGenerator.prototype.traverseAST = function (node) {
+            console.log("Current node: ");
+            console.log(node);
+            console.log("Static table");
+            console.log(this.staticMap);
             // Determine what kind of production the node is
             switch (node.value) {
                 // subtree root is block
@@ -126,25 +108,56 @@ var TSC;
                             this.generatedCode[this.opPtr++] = "FF";
                             break;
                     }
-                    console.log(node);
                     break;
                 // subtree root is var decl
                 case TSC.Production.VarDecl:
                     // need to make entry in static table for variable
-                    console.log(node);
                     var temp = "T" + this.staticId + "XX";
-                    this.staticTable[temp] = {
+                    this.staticMap.set(temp, {
                         "name": node.children[1].value.value,
                         "at": "",
                         "scope": node.children[1].value.scopeId
-                    };
-                    console.log(this.staticTable);
+                    });
                     // store in accumulator location temp 0, fill in later
                     this.generatedCode[this.opPtr++] = "8D";
                     this.generatedCode[this.opPtr++] = "T" + this.staticId;
                     this.generatedCode[this.opPtr++] = "XX";
                     // increase the static id
                     this.staticId++;
+                    break;
+                // subtree root is assignment
+                case TSC.Production.AssignStmt:
+                    // find temp address
+                    var variable = node.children[0].value.value;
+                    var scope = node.children[0].value.scope;
+                    var tempAddr = this.findVariableInStaticMap(variable, scope);
+                    // figure out what is being assigned to it
+                    switch (node.children[1].value.type) {
+                        case "TDigit":
+                            // load digit as constant into accumulator
+                            this.generatedCode[this.opPtr++] = "A9";
+                            this.generatedCode[this.opPtr++] = "0" + node.children[1].value.value;
+                            break;
+                    }
+                    // store whatever is in assumulator to memory
+                    this.generatedCode[this.opPtr++] = "8D";
+                    this.generatedCode[this.opPtr++] = tempAddr.substring(0, 2);
+                    this.generatedCode[this.opPtr++] = tempAddr.substring(2);
+            }
+        };
+        /**
+         * Given a variable and scope, looks for it in the static map
+         * @param variable the variable name
+         * @param scope the scope the variable is in
+         */
+        CodeGenerator.prototype.findVariableInStaticMap = function (variable, scope) {
+            var itr = this.staticMap.entries();
+            for (var i = 0; i < this.staticMap.size; i++) {
+                var staticObject = itr.next();
+                if (staticObject.value[1]["name"] == variable && staticObject.value[1]["scopeId"] == scope) {
+                    // when finding appropriate variable, return its temp address
+                    return staticObject.value[0].toString();
+                }
             }
         };
         /**

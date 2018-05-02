@@ -7,39 +7,38 @@ module TSC {
     export class CodeGenerator {
         // holds the generated op codes
         generatedCode: Array<String>;
-        /* structure object to represent a table of static variables
-        {
-            "temp":
+        /* structure of map to represent a table of static variables
+        "temp" : {
             "name":
             "at":
-            "scope": scope id
+            "scope":
         }
         */
-        staticTable: Object = {};
+        staticMap: Map<String, Object>;
+        // id of static variable. convert to hex? no need because not actually in op codes in the end
+        staticId: number = 0;
         /* structure object to represent the loop jumps
-        {
-            "temp":
+        "temp": {
             "jump":
         }
         */
-        // id of static variable
-        // convert to hex? no need because not actually in op codes in the end
-        staticId: number = 0;
-        loopJumps: Object = {};
-        /* structure object to represent the heap
-        {
-            "temp":
+        jumpMap: Map<String, Object>;
+        /* structure of map to represent the heap
+        "temp": {
             "name":
             "ptr":
         }
         */
-        heapTable: Object = {};
+        heapMap: Map<String, Object>;
         // pointer to the start of the heap. initially at 0
         heapStartPtr: number = 256;
         // pointer representing where we are in op code array
         opPtr: number = 0;
         constructor() {
             this.generatedCode = [];
+            this.staticMap = new Map<String, Object>();
+            this.jumpMap = new Map<String, Object>();
+            this.heapMap = new Map<String, Object>();
             // fill with 00's
             for(var i=0; i<256; i++){
                 this.generatedCode.push("00");
@@ -79,6 +78,10 @@ module TSC {
          * @param node AST node
          */
         public traverseAST(node) {
+            console.log("Current node: ");
+            console.log(node);
+            console.log("Static table");
+            console.log(this.staticMap);
             // Determine what kind of production the node is
             switch(node.value){
                 // subtree root is block
@@ -132,25 +135,57 @@ module TSC {
                             this.generatedCode[this.opPtr++] = "FF";
                             break;
                     }
-                    console.log(node);
                     break;
                 // subtree root is var decl
                 case TSC.Production.VarDecl:
                     // need to make entry in static table for variable
-                    console.log(node);
-                    let temp = "T" + this.staticId + "XX";
-                    this.staticTable[temp] = {
+                    var temp = "T" + this.staticId + "XX";
+                    this.staticMap.set(temp, {
                         "name": node.children[1].value.value,
                         "at": "",
                         "scope": node.children[1].value.scopeId
-                    }
-                    console.log(this.staticTable);
+                    })
                     // store in accumulator location temp 0, fill in later
                     this.generatedCode[this.opPtr++] = "8D";
                     this.generatedCode[this.opPtr++] = "T" + this.staticId;
                     this.generatedCode[this.opPtr++] = "XX";
                     // increase the static id
                     this.staticId++;
+                    break;
+                // subtree root is assignment
+                case TSC.Production.AssignStmt:
+                    // find temp address
+                    var variable = node.children[0].value.value;
+                    var scope = node.children[0].value.scope;
+                    var tempAddr = this.findVariableInStaticMap(variable, scope);
+                    // figure out what is being assigned to it
+                    switch(node.children[1].value.type){
+                        case "TDigit":
+                            // load digit as constant into accumulator
+                            this.generatedCode[this.opPtr++] = "A9";
+                            this.generatedCode[this.opPtr++] = "0" + node.children[1].value.value;
+                            break;
+                    }
+                    // store whatever is in assumulator to memory
+                    this.generatedCode[this.opPtr++] = "8D";
+                    this.generatedCode[this.opPtr++] = tempAddr.substring(0,2);
+                    this.generatedCode[this.opPtr++] = tempAddr.substring(2);
+            }
+        }
+        
+        /**
+         * Given a variable and scope, looks for it in the static map
+         * @param variable the variable name
+         * @param scope the scope the variable is in
+         */
+        private findVariableInStaticMap(variable, scope) {
+            var itr = this.staticMap.entries();
+            for(var i=0; i<this.staticMap.size; i++){
+                var staticObject = itr.next();
+                if(staticObject.value[1]["name"] == variable && staticObject.value[1]["scopeId"] == scope){
+                    // when finding appropriate variable, return its temp address
+                    return staticObject.value[0].toString();
+                }
             }
         }
 

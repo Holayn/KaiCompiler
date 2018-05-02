@@ -289,6 +289,7 @@
 			document.getElementById("taOutput").value = "";
 			document.getElementById("taCST").value = "";
 			document.getElementById("taAST").value = "";
+            document.getElementById("taCodeOutput").innerHTML = "";
 			// Clear symbol table
 			var table = document.getElementById("symbolTable");
 			// Leave header in place
@@ -648,8 +649,6 @@
             var res = codeGenerator.generateCode(analyzeRes);
             // put generated code into box
             var generatedCode = res;
-            // reset input first
-            document.getElementById("taCodeOutput").innerHTML = "";
             for(var i=0; i<generatedCode.length; i++){
                 document.getElementById("taCodeOutput").innerHTML += generatedCode[i];
                 if(i != generatedCode.length-1){

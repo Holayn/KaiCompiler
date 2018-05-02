@@ -122,7 +122,10 @@ var TSC;
                 case TSC.Production.AssignStmt:
                     // make the "root" an assign statement
                     this.ast.addNode(TSC.Production.AssignStmt);
-                    // Get the id
+                    // Get the id and also assign its scope
+                    var id = node.children[0].children[0].value;
+                    // Set the scope on the id
+                    id.scopeId = this.scopeTree.curr.value.id;
                     this.ast.addNode(node.children[0].children[0].value);
                     // Check if id is in scope and get its type
                     var idType = this.checkScopes(node.children[0].children[0]);

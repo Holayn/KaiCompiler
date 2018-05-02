@@ -94,11 +94,11 @@ module TSC {
                     this.ast.addNode(Production.VarDecl);
                     // We now need to get its children and add to AST
                     // Get the type
-                    let token = node.children[0].children[0].value
+                    let token = node.children[0].children[0].value;
                     this.ast.addNode(token.value);
                     this.ast.ascendTree();
                     // Get the id
-                    let id = node.children[1].children[0].value
+                    var id = node.children[1].children[0].value;
                     // Set the scope on the id
                     id.scopeId = this.scopeTree.curr.value.id;
                     this.ast.addNode(id);
@@ -135,7 +135,10 @@ module TSC {
                 case Production.AssignStmt:
                     // make the "root" an assign statement
                     this.ast.addNode(Production.AssignStmt);
-                    // Get the id
+                    // Get the id and also assign its scope
+                    var id = node.children[0].children[0].value;
+                    // Set the scope on the id
+                    id.scopeId = this.scopeTree.curr.value.id;
                     this.ast.addNode(node.children[0].children[0].value);
                     // Check if id is in scope and get its type
                     var idType = this.checkScopes(node.children[0].children[0]);
