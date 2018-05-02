@@ -42,4 +42,16 @@ module TSC {
             this.colNumber = colNumber;
         }
     }
+
+    /**
+     * This class is a special kind of Token for identifiers, which will keep track
+     * of what scope the identifier is in
+     */
+    export class IdentifierToken extends Token {
+        scopeId: number;
+        constructor(tokenType: TokenType, value: any, lineNumber: number, colNumber: number, scopeId: number){
+            super(tokenType, value, lineNumber, colNumber);
+            this.scopeId = scopeId;
+        }
+    }
 }

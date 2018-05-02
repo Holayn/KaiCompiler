@@ -289,7 +289,7 @@ var TSC;
                     this.tokens.push(token);
                 }
                 else if (rID.test(sourceCode.substring(this.startLexemePtr, this.endLexemePtr))) {
-                    var token = new TSC.Token(TSC.TokenType.TId, sourceCode.charAt(this.endLexemePtr - 1), this.lineNumber, this.colNumber);
+                    var token = new TSC.IdentifierToken(TSC.TokenType.TId, sourceCode.charAt(this.endLexemePtr - 1), this.lineNumber, this.colNumber, -1);
                     this.tokens.push(token);
                 }
                 else if (rWHITE.test(sourceCode.substring(this.startLexemePtr, this.endLexemePtr))) {

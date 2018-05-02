@@ -87,6 +87,8 @@ var TSC;
                     this.ast.ascendTree();
                     // Get the id
                     var id = node.children[1].children[0].value;
+                    // Set the scope on the id
+                    id.scopeId = this.scopeTree.curr.value.id;
                     this.ast.addNode(id);
                     this.ast.ascendTree();
                     this.ast.ascendTree();

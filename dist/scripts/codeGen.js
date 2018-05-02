@@ -10,6 +10,7 @@ var TSC;
                 "temp":
                 "name":
                 "at":
+                "scope": scope id
             }
             */
             this.staticTable = {};
@@ -19,6 +20,8 @@ var TSC;
                 "jump":
             }
             */
+            // id of static variable
+            this.staticId = 0;
             this.loopJumps = {};
             /* structure object to represent the heap
             {
@@ -124,6 +127,17 @@ var TSC;
                     }
                     console.log(node);
                     break;
+                // subtree root is var decl
+                case TSC.Production.VarDecl:
+                    // need to make entry in static table for variable
+                    console.log(node);
+                    this.staticTable["T" + this.staticId++ + "XX"] = {
+                        "name": node.children[0].value.value,
+                        "at": "",
+                        "scope": ""
+                    };
+                    // store in accumulator location temp 0, fill in later
+                    this.generatedCode[this.opPtr++];
             }
         };
         /**

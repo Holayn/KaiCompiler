@@ -339,7 +339,7 @@ module TSC
 
 					// Test for ID
 					else if(rID.test(sourceCode.substring(this.startLexemePtr, this.endLexemePtr))){
-						var token: Token = new Token(TSC.TokenType.TId, sourceCode.charAt(this.endLexemePtr-1), this.lineNumber, this.colNumber);
+						var token: Token = new IdentifierToken(TSC.TokenType.TId, sourceCode.charAt(this.endLexemePtr-1), this.lineNumber, this.colNumber, -1);
 						this.tokens.push(token);
 					}
 
