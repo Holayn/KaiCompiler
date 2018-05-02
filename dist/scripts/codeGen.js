@@ -21,6 +21,7 @@ var TSC;
             }
             */
             // id of static variable
+            // convert to hex? no need because not actually in op codes in the end
             this.staticId = 0;
             this.loopJumps = {};
             /* structure object to represent the heap
@@ -131,13 +132,19 @@ var TSC;
                 case TSC.Production.VarDecl:
                     // need to make entry in static table for variable
                     console.log(node);
-                    this.staticTable["T" + this.staticId++ + "XX"] = {
-                        "name": node.children[0].value.value,
+                    var temp = "T" + this.staticId + "XX";
+                    this.staticTable[temp] = {
+                        "name": node.children[1].value.value,
                         "at": "",
-                        "scope": ""
+                        "scope": node.children[1].value.scopeId
                     };
+                    console.log(this.staticTable);
                     // store in accumulator location temp 0, fill in later
-                    this.generatedCode[this.opPtr++];
+                    this.generatedCode[this.opPtr++] = "8D";
+                    this.generatedCode[this.opPtr++] = "T" + this.staticId;
+                    this.generatedCode[this.opPtr++] = "XX";
+                    // increase the static id
+                    this.staticId++;
             }
         };
         /**
