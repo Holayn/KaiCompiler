@@ -80,7 +80,11 @@
 				</div>
 			</div>	
 			<br>
-			<hr>
+            <hr>
+            <br>
+            <div class="card-panel">
+                <textarea id="taCodeOutput" readonly disabled></textarea>
+            </div>
 			<br>
 			<div class="row">
 				<div class="col s6">
@@ -641,7 +645,17 @@
 			putMessage("\n");
 			putMessage("Performing Code Generation...\n");
             let codeGenerator = new TSC.CodeGenerator();
-			var res = codeGenerator.generateCode(analyzeRes);
+            var res = codeGenerator.generateCode(analyzeRes);
+            // put generated code into box
+            var generatedCode = res;
+            // reset input first
+            document.getElementById("taCodeOutput").innerHTML = "";
+            for(var i=0; i<generatedCode.length; i++){
+                document.getElementById("taCodeOutput").innerHTML += generatedCode[i];
+                if(i != generatedCode.length-1){
+                    document.getElementById("taCodeOutput").innerHTML += " ";
+                }
+            }
 		}
 		
     

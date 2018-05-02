@@ -65,7 +65,7 @@ main {
 .tabs .indicator {
 	background-color: #26a69a !important;
 }
-#taCST, #taAST, #taSymbol {
+#taCST, #taAST, #taSymbol, #taCodeOutput {
 	font-family: "Courier";
 	border-color: white;
 	resize: none;
@@ -78,4 +78,7 @@ main {
 }
 .Treant {
 	overflow: scroll !important;
+}
+#taCodeOutput{
+	height: 150px;
 }

@@ -30,17 +30,30 @@ module TSC {
         }
         */
         heapTable: Object = {};
+        // pointer to the start of the heap. initially at 0
+        heapStartPtr: number = 256;
         // pointer representing where we are in op code array
         opPtr: number = 0;
-        public CodeGenerator() {
+        constructor() {
             this.generatedCode = [];
             // fill with 00's
             for(var i=0; i<256; i++){
-                this.generatedCode[i] = "00";
+                this.generatedCode.push("00");
             }
             // load accumulator with 0
-            this.generatedCode[this.opPtr] = "A9";
-            this.opPtr += 2;
+            this.generatedCode[this.opPtr++] = "A9";
+            this.generatedCode[this.opPtr++] = "00";
+            // front load accumulator with "true" and "false"
+            this.generatedCode[254] = "e".charCodeAt(0).toString(16).toUpperCase();
+            this.generatedCode[253] = "s".charCodeAt(0).toString(16).toUpperCase();
+            this.generatedCode[252] = "l".charCodeAt(0).toString(16).toUpperCase();
+            this.generatedCode[251] = "a".charCodeAt(0).toString(16).toUpperCase();
+            this.generatedCode[250] = "f".charCodeAt(0).toString(16).toUpperCase();
+            this.generatedCode[248] = "e".charCodeAt(0).toString(16).toUpperCase();
+            this.generatedCode[247] = "u".charCodeAt(0).toString(16).toUpperCase();
+            this.generatedCode[246] = "r".charCodeAt(0).toString(16).toUpperCase();
+            this.generatedCode[245] = "t".charCodeAt(0).toString(16).toUpperCase();
+            // update start of the heap
         }
 
         // traverse the ast in preorder fashion.
@@ -52,6 +65,8 @@ module TSC {
         public generateCode(analyzeRes) {
             let ast: Tree = analyzeRes.ast;
             this.traverseAST(ast.root);
+            // return generated code
+            return this.generatedCode;
         }
         
         /**
@@ -71,55 +86,56 @@ module TSC {
                 // subtree root is a print statement
                 case TSC.Production.PrintStmt:
                     // determine type of child
-                    if(node.children[0].value.type == "TDigit"){
-                        console.log("HA");
+                    switch(node.children[0].value.type){
+                        case "TDigit":
+                            // load y register with constant of value digit as string
+                            this.generatedCode[this.opPtr++] = "A0";
+                            this.generatedCode[this.opPtr++] = "0" + node.children[0].value.value;
+                            // load x regis with 1
+                            this.generatedCode[this.opPtr++] = "A2";
+                            this.generatedCode[this.opPtr++] = "01";
+                            // sys call
+                            this.generatedCode[this.opPtr++] = "FF";
+                            break;
+                        case "TString":
+                            // put str in heap and get ptr to it
+                            let strPtr = this.allocateStringInHeap(node.children[0].value.value);
+                            // load into y register as constant
+                            this.generatedCode[this.opPtr++] = "A0";
+                            this.generatedCode[this.opPtr++] = strPtr;
+                            // load x regis with 2
+                            this.generatedCode[this.opPtr++] = "A2";
+                            this.generatedCode[this.opPtr++] = "02";
+                            // sys call
+                            this.generatedCode[this.opPtr++] = "FF";
+                            break;
+                        case "TBoolval":
+                            break;
                     }
                     console.log(node);
                     break;
             }
         }
 
-
         /**
-         * Prints the tree in dfs for AST display
+         * Given a string, put it in the heap and return a pointer to beginning of string
+         * @param string the string to store
+         * @return hex string of pointer
          */
-        public traverseTreeAST(treantTree){
-            let tree: Array<String> = [];
-            let level: number = 0;
-            // if(this.root != null){
-            //     this.DFSAST(this.root, level, tree, "", treantTree['nodeStructure'].children);
-            // }
-            // Return array of nodes and tree config
-            return {"tree": tree, "treant": treantTree};
-        }
-        /**
-         * Helper for traverseTreeAST
-         */
-        private DFSAST(node, level, tree, dash, treantTree){
-            let child = {};
-            // Check if null to find appropriate value to place in tree
-            // Add new node to children array passed
-            // Pass reference to new children array to next call
-            if(node.value.value != null){
-                tree.push(dash + node.value.value);
-                child = {
-                    text: { name: node.value.value + " " },
-                    children: []
-                }
+        private allocateStringInHeap(string) {
+            // trim off quotes
+            string = string.substring(1, string.length-1);
+            // first determine length of string.
+            let len = string.length;
+            // subtract length + 1 from heapStartPtr, +1 because strings are 0 terminated
+            this.heapStartPtr = this.heapStartPtr - (len + 1);
+            let strPtr = this.heapStartPtr;
+            // put in characters converted to hex strings into heap
+            for(var i=this.heapStartPtr; i<this.heapStartPtr + len; i++){
+                this.generatedCode[i] = string.charCodeAt(i - this.heapStartPtr).toString(16);
             }
-            else{
-                tree.push(dash + node.value);
-                child = {
-                    text: { name: node.value + " " },
-                    children: []
-                }
-            }
-            treantTree.push(child);
-            for(var i=0; i<node.children.length; i++){
-                // to next call of DFS, increase level, pass the tree array, increase the dash by one dash, and pass
-                // the reference to the next children array
-                this.DFSAST(node.children[i], level + 1, tree, dash + "-", child['children']);
-            }
+            // return pointer to beginning of string. convert to hex string.
+            return strPtr.toString(16).toUpperCase();
         }
     }
 }
