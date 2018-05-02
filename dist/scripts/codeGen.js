@@ -51,6 +51,7 @@ var TSC;
             this.generatedCode[246] = "r".charCodeAt(0).toString(16).toUpperCase();
             this.generatedCode[245] = "t".charCodeAt(0).toString(16).toUpperCase();
             // update start of the heap
+            this.heapStartPtr = 245;
         }
         // traverse the ast in preorder fashion.
         // based on subtree root, perform certain action
@@ -105,6 +106,20 @@ var TSC;
                             this.generatedCode[this.opPtr++] = "FF";
                             break;
                         case "TBoolval":
+                            this.generatedCode[this.opPtr++] = "A0";
+                            if (node.children[0].value.value == "true") {
+                                // load into y register address of true in heap
+                                this.generatedCode[this.opPtr++] = (245).toString(16).toUpperCase();
+                            }
+                            else if (node.children[0].value.value == "false") {
+                                // load into y register address of false in heap
+                                this.generatedCode[this.opPtr++] = (250).toString(16).toUpperCase();
+                            }
+                            // load x regis with 2
+                            this.generatedCode[this.opPtr++] = "A2";
+                            this.generatedCode[this.opPtr++] = "02";
+                            // sys call
+                            this.generatedCode[this.opPtr++] = "FF";
                             break;
                     }
                     console.log(node);
