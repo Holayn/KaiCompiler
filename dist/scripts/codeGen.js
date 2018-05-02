@@ -138,6 +138,23 @@ var TSC;
                             this.generatedCode[this.opPtr++] = "A9";
                             this.generatedCode[this.opPtr++] = "0" + node.children[1].value.value;
                             break;
+                        case "TString":
+                            // put str in heap and get ptr to it
+                            var strPtr = this.allocateStringInHeap(node.children[1].value.value);
+                            // load into accumulator as constant
+                            this.generatedCode[this.opPtr++] = "A9";
+                            this.generatedCode[this.opPtr++] = strPtr;
+                        case "TBoolval":
+                            if (node.children[1].value.value == "true") {
+                                // load address of true in heap into accumulator as constant
+                                this.generatedCode[this.opPtr++] = "A9";
+                                this.generatedCode[this.opPtr++] = (245).toString(16).toUpperCase();
+                            }
+                            else if (node.children[1].value.value == "false") {
+                                // load address of false in heap into accumulator as constant
+                                this.generatedCode[this.opPtr++] = "A9";
+                                this.generatedCode[this.opPtr++] = (250).toString(16).toUpperCase();
+                            }
                     }
                     // store whatever is in assumulator to memory
                     this.generatedCode[this.opPtr++] = "8D";
