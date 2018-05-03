@@ -28,8 +28,7 @@ module TSC {
         jumpMap: Map<String, Object>;
         jumpId: number = 0;
         /* structure of map to represent the heap
-        "temp": {
-            "name":
+        "name": {
             "ptr":
         }
         */
@@ -89,6 +88,8 @@ module TSC {
             console.log(node);
             console.log("Static table");
             console.log(this.staticMap);
+            console.log("Heap");
+            console.log(this.heapMap);
             // Determine what kind of production the node is
             switch(node.value){
                 // subtree root is block
@@ -232,6 +233,7 @@ module TSC {
                     break;
                 // subtree root is if statement
                 case TSC.Production.IfStmt:
+                    // look at its left and right children
                     switch(node.children[0].value.type){
                         // if lhs is a boolean value, set zero flag to 1 if true, set zero flag to 0 if false
                         case "TBoolval":
@@ -251,6 +253,95 @@ module TSC {
                             this.generatedCode[this.opPtr++] = (245).toString(16).toUpperCase();
                             this.generatedCode[this.opPtr++] = "00";
                             break;
+                        // if lhs is a boolean expression equality 
+                        // might be null because equalto isn't stored in my ast with a type
+                        default:
+                            switch(node.children[0].value){
+                                case "EqualTo":
+                                    // LHS: load what is in lhs into x register
+                                    switch(node.children[0].children[0].value.type){
+                                        case "TDigit":
+                                            // load digit as constant into x register
+                                            this.generatedCode[this.opPtr++] = "A2";
+                                            this.generatedCode[this.opPtr++] = "0" + node.children[0].children[0].value.value;
+                                            break;
+                                        case "TString":
+                                            // we will compare strings based on what address is in heap
+                                            // put ptr of string in heap to x register
+                                            let strPtr = this.allocateStringInHeap(node.children[0].children[0].value.value);
+                                            this.generatedCode[this.opPtr++] = "AE";
+                                            this.generatedCode[this.opPtr++] = strPtr;
+                                            this.generatedCode[this.opPtr++] = "00";
+                                            break;
+                                        // case "TBoolval":
+                                        //     // put ptr of boolean val to x register
+                                        //     if(node.children[1].value.value == "true"){
+                                        //         // load address of true in heap into accumulator as constant
+                                        //         this.generatedCode[this.opPtr++] = "A9";
+                                        //         this.generatedCode[this.opPtr++] = (245).toString(16).toUpperCase();
+                                        //     }
+                                        //     else if(node.children[1].value.value == "false"){
+                                        //         // load address of false in heap into accumulator as constant
+                                        //         this.generatedCode[this.opPtr++] = "A9";
+                                        //         this.generatedCode[this.opPtr++] = (250).toString(16).toUpperCase();
+                                        //     }
+                                        //     break;
+                                        // case "TId":
+                                        //     // look up variable in static table, get its temp address
+                                        //     // load it into x register
+                                        //     this.generatedCode[this.opPtr++] = "AD";
+                                        //     var variable = node.children[1].value.value;
+                                        //     var scope = node.children[1].value.scope;
+                                        //     var tempAddr = this.findVariableInStaticMap(variable, scope);
+                                        //     this.generatedCode[this.opPtr++] = tempAddr;
+                                        //     this.generatedCode[this.opPtr++] = "00";
+                                        //     break;
+                                    }
+                                    // RHS: compare to address of what rhs is
+                                    switch(node.children[0].children[1].value.type){
+                                        case "TDigit":
+                                            // put this value into the accumulator, store it in somewhere
+                                            // need to make entry in static table for value
+                                            this.generatedCode[this.opPtr++] = "A9";
+                                            this.generatedCode[this.opPtr++] = "0" + node.children[0].children[1].value.value;
+                                            var temp = "T" + this.staticId;
+                                            this.staticMap.set(temp, {
+                                                "name": node.children[1].value.value,
+                                                "type": node.children[1].value.type,
+                                                "at": "",
+                                                "scope": ""
+                                            })
+                                            // store in accumulator location temp 0, fill in later
+                                            this.generatedCode[this.opPtr++] = "8D";
+                                            this.generatedCode[this.opPtr++] = temp;
+                                            this.generatedCode[this.opPtr++] = "00";
+                                            // increase the static id
+                                            this.staticId++;
+                                            // perform comparison of x register to this temp address
+                                            this.generatedCode[this.opPtr++] = "EC";
+                                            this.generatedCode[this.opPtr++] = temp;
+                                            this.generatedCode[this.opPtr++] = "00";
+                                            break;
+                                        case "TString":
+                                            // we will compare strings based on what address is in heap
+                                            // put ptr of string in heap to x register
+                                            let strPtr = this.allocateStringInHeap(node.children[0].children[1].value.value);
+                                            this.generatedCode[this.opPtr++] = "AE";
+                                            this.generatedCode[this.opPtr++] = strPtr;
+                                            this.generatedCode[this.opPtr++] = "00";
+                                            break;
+                                    }
+                                    break;
+                            }
+                            
+                            // // we need to determine what lhs is..digit, variable (load whatever stored in mem address), another boolean expr
+                            // if another boolean expr, need to generate whole set of opcodes for that boolean expr, then store result of that somewhere
+                            // in memory, then need to use that to compare to whatever is being compared to in boolean expr
+                            // probably can just allocate a single space maybe?
+                            // actually, we know this will always evaluate to a boolean val so can just return address of true/false, compare to addr of true
+                            // this.determineLHSEqualTo(node);
+                            break;
+                            
                     }
                     // jump
                     // need to make entry in jump table
@@ -354,6 +445,12 @@ module TSC {
         private allocateStringInHeap(string) {
             // trim off quotes
             string = string.substring(1, string.length-1);
+            // see if string already exists in heap. if so, return its address
+            console.log("ALLOCATING FOR " + string);
+            if(this.heapMap.has(string)){
+                console.log("STRING ALREADY IN HEAP");
+                return this.heapMap.get(string)["ptr"];
+            }
             // first determine length of string.
             let len = string.length;
             // subtract length + 1 from heapStartPtr, +1 because strings are 0 terminated
@@ -363,6 +460,10 @@ module TSC {
             for(var i=this.heapStartPtr; i<this.heapStartPtr + len; i++){
                 this.generatedCode[i] = string.charCodeAt(i - this.heapStartPtr).toString(16);
             }
+            // store in heap map
+            this.heapMap.set(string, {
+                "ptr": strPtr.toString(16).toUpperCase()
+            });
             // return pointer to beginning of string. convert to hex string.
             return strPtr.toString(16).toUpperCase();
         }
