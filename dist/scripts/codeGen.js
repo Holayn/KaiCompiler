@@ -9,6 +9,7 @@ var TSC;
             this.staticId = 0;
             // pointer to start of static area
             this.staticStartPtr = 0;
+            this.jumpId = 0;
             // pointer to the start of the heap. initially heap is size 0.
             this.heapStartPtr = 256;
             // pointer representing where we are in op code array
@@ -202,15 +203,61 @@ var TSC;
                     this.generatedCode[this.opPtr++] = tempAddr;
                     this.generatedCode[this.opPtr++] = "00";
                     break;
+                // subtree root is if statement
+                case TSC.Production.IfStmt:
+                    switch (node.children[0].value.type) {
+                        // if lhs is a boolean value, set zero flag to 1 if true, set zero flag to 0 if false
+                        case "TBoolval":
+                            // load heap address of true into x register
+                            if (node.children[0].value.value == "true") {
+                                this.generatedCode[this.opPtr++] = "AE";
+                                this.generatedCode[this.opPtr++] = (245).toString(16).toUpperCase();
+                                this.generatedCode[this.opPtr++] = "00";
+                            }
+                            else {
+                                this.generatedCode[this.opPtr++] = "AE";
+                                this.generatedCode[this.opPtr++] = (250).toString(16).toUpperCase();
+                                this.generatedCode[this.opPtr++] = "00";
+                            }
+                            // compare to address of true
+                            this.generatedCode[this.opPtr++] = "EC";
+                            this.generatedCode[this.opPtr++] = (245).toString(16).toUpperCase();
+                            this.generatedCode[this.opPtr++] = "00";
+                            break;
+                    }
+                    // jump
+                    // need to make entry in jump table
+                    var temp = "J" + this.jumpId;
+                    var startOfBranchPtr = this.opPtr;
+                    // store in accumulator location temp 0, fill in later
+                    this.generatedCode[this.opPtr++] = "D0";
+                    this.generatedCode[this.opPtr++] = temp;
+                    // increase the jump id
+                    this.jumpId++;
+                    // now we need to put op codes in to evaluate the block
+                    this.traverseAST(node.children[1]);
+                    // figure out how much to jump based on current opPtr and where the op code for the branch is
+                    // + 2 for offset because we use 2 op codes to store branch
+                    // store as hex value
+                    var jumpValue = (this.opPtr - (startOfBranchPtr + 2)).toString(16).toUpperCase();
+                    if (jumpValue.length < 2) {
+                        // pad with 0
+                        jumpValue = "0" + jumpValue;
+                    }
+                    this.jumpMap.set(temp, {
+                        "jump": jumpValue // needs to be a hex value
+                    });
+                    break;
             }
         };
         /**
          * Creates area after code in opcodes as static area
+         * Insert break between code and static area (hence opPtr + 1) so we can differentiate it
          * This area is after code but before heap
          * Makes sure does not run into heap ptr. If does, throw error, not enough static space for variables.
          */
         CodeGenerator.prototype.createStaticArea = function () {
-            this.staticStartPtr = this.opPtr;
+            this.staticStartPtr = this.opPtr + 1;
             // need to figure out how many variables we need to store in the static area. for now, size of map.
             var numberOfVariables = this.staticMap.size;
             // check if runs into heap ptr
@@ -234,13 +281,21 @@ var TSC;
         CodeGenerator.prototype.backPatch = function () {
             // When coming across placeholders for variables, lookup in map, replace with its "at"
             for (var i = 0; i < this.generatedCode.length; i++) {
-                // found a placeholder
+                // found a placeholder for static variable
                 if (this.generatedCode[i].charAt(0) == 'T') {
                     var temp = this.generatedCode[i];
                     // lookup in map and get mem address
                     var memAddr = this.staticMap.get(temp)["at"];
                     // replace
                     this.generatedCode[i] = memAddr;
+                }
+                // found a placeholder for jump
+                if (this.generatedCode[i].charAt(0) == 'J') {
+                    var temp = this.generatedCode[i];
+                    // lookup in map and get mem address
+                    var jumpAmount = this.jumpMap.get(temp)["jump"];
+                    // replace
+                    this.generatedCode[i] = jumpAmount;
                 }
             }
         };
