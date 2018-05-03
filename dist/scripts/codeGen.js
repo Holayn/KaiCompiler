@@ -232,6 +232,10 @@ var TSC;
                             this.generatedCode[this.opPtr++] = tempAddr;
                             this.generatedCode[this.opPtr++] = "00";
                             break;
+                        case "TAddition":
+                            // result ends up in accumulator
+                            this.generateAddition(node.children[1]);
+                            break;
                     }
                     // find temp address of variable we're assigning to
                     var variable = node.children[0].value.value;
@@ -242,13 +246,6 @@ var TSC;
                     this.generatedCode[this.opPtr++] = tempAddr;
                     this.generatedCode[this.opPtr++] = "00";
                     break;
-                // subtree root is addition
-                // case "Addition":
-                //     // process right subtree first
-                //     // if it is a digit, proceed normally
-                //     switch(node.children[0])
-                //     // if it is another addition, call this again
-                //     break;
                 // subtree root is if statement
                 case TSC.Production.IfStmt:
                     // look at its left and right children
@@ -351,6 +348,8 @@ var TSC;
                     this.generatedCode[this.opPtr++] = tempAddr;
                     this.generatedCode[this.opPtr++] = "00";
                     break;
+                case "TAddition":
+                    break; // TODO
                 case "TEquals":
                     // TODO: BOOLEAN HELL!
                     break;
