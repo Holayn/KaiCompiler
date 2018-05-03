@@ -10,6 +10,7 @@ module TSC {
         /* structure of map to represent a table of static variables
         "temp" : {
             "name":
+            "type":
             "at":
             "scope":
         }
@@ -133,6 +134,29 @@ module TSC {
                             // sys call
                             this.generatedCode[this.opPtr++] = "FF";
                             break;
+                        case "TId":
+                            // load the variable temporary address into y register
+                            this.generatedCode[this.opPtr++] = "AC";
+                            var variable = node.children[0].value.value;
+                            var scope = node.children[0].value.scope;
+                            var tempAddr = this.findVariableInStaticMap(variable, scope);
+                            this.generatedCode[this.opPtr++] = tempAddr.substring(0,2);
+                            this.generatedCode[this.opPtr++] = tempAddr.substring(2);
+                            // load 1 or 2 into x register depending on variable type being printed
+                            // check the type
+                            if(this.staticMap.get(tempAddr)["type"] == TSC.VariableType.String || this.staticMap.get(tempAddr)["type"] == TSC.VariableType.Boolean){
+                                // load x regis with 2
+                                this.generatedCode[this.opPtr++] = "A2";
+                                this.generatedCode[this.opPtr++] = "02";
+                            }
+                            else{
+                                // load x regis with 1
+                                this.generatedCode[this.opPtr++] = "A2";
+                                this.generatedCode[this.opPtr++] = "01";
+                            }
+                            // sys call
+                            this.generatedCode[this.opPtr++] = "FF";
+                            break;
                     }
                     break;
                 // subtree root is var decl
@@ -141,6 +165,7 @@ module TSC {
                     var temp = "T" + this.staticId + "XX";
                     this.staticMap.set(temp, {
                         "name": node.children[1].value.value,
+                        "type": node.children[0].value,
                         "at": "",
                         "scope": node.children[1].value.scopeId
                     })
@@ -170,6 +195,7 @@ module TSC {
                             // load into accumulator as constant
                             this.generatedCode[this.opPtr++] = "A9";
                             this.generatedCode[this.opPtr++] = strPtr;
+                            break;
                         case "TBoolval":
                             if(node.children[1].value.value == "true"){
                                 // load address of true in heap into accumulator as constant
@@ -181,6 +207,7 @@ module TSC {
                                 this.generatedCode[this.opPtr++] = "A9";
                                 this.generatedCode[this.opPtr++] = (250).toString(16).toUpperCase();
                             }
+                            break;
                     }
                     // store whatever is in assumulator to memory
                     this.generatedCode[this.opPtr++] = "8D";

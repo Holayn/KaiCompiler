@@ -166,6 +166,10 @@ module TSC {
                     this.traverse(node.children[2]);
                     break;
                 case Production.Id:
+                    // Get the id and also assign its scope
+                    var id = node.children[0].value;
+                    // Set the scope on the id
+                    id.scopeId = this.scopeTree.curr.value.id;
                     this.ast.addNode(node.children[0].value);
                     this.ast.ascendTree();
                     // Check if variable declared in current or parent scopes
