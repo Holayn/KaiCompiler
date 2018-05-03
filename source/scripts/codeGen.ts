@@ -382,7 +382,12 @@ module TSC {
                     this.generatedCode[this.opPtr++] = "00";
                     break;
                 case "TAddition":
-                    break;// TODO
+                    // load result of addition in accumulator (which was stored in static storage) to x register
+                    var memAddr = this.generateAddition(equalsNode.children[0]); // get mem addr of result from static storage
+                    this.generatedCode[this.opPtr++] = "AE";
+                    this.generatedCode[this.opPtr++] = memAddr;
+                    this.generatedCode[this.opPtr++] = "00";
+                    break;
                 case "TEquals":
                     // TODO: BOOLEAN HELL!
                     break;
@@ -480,6 +485,10 @@ module TSC {
                     var scope = equalsNode.children[1].value.scopeId;
                     var temp = this.findVariableInStaticMap(variable, scope);
                     return temp;
+                case "TAddition":
+                    // return result of addition in accumulator (which was stored in static storage)
+                    var memAddr = this.generateAddition(equalsNode.children[1]); // get mem addr of result from static storage
+                    return memAddr;
                 case "TEquals":
                     // TODO: BOOLEAN HELL!
                     break;
