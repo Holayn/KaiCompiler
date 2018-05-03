@@ -157,7 +157,37 @@ module TSC {
                             }
                             break;
                         case "TEquals":
-                            this.generateEquals(node.children[0]);
+                            // loads x register with lhs, gives back rhs
+                            var addr = this.generateEquals(node.children[0]);
+                            // perform comparison of x register to temp address
+                            this.generatedCode[this.opPtr++] = "EC";
+                            this.generatedCode[this.opPtr++] = addr;    
+                            this.generatedCode[this.opPtr++] = "00";
+                            // if equal, don't branch, print true
+                            // if not equal, branch to print false
+                            this.generatedCode[this.opPtr++] = "D0";
+                            this.generatedCode[this.opPtr++] = "0A";    
+                            // load y with true
+                            this.generatedCode[this.opPtr++] = "A0";
+                            this.generatedCode[this.opPtr++] = (245).toString(16).toUpperCase();
+                            // set x register to address, compare same address to x register to set z to zero
+                            // load 1 into acc, set x to 0, stores acc in some address
+                            // compares that address and x register, branches if unequal
+                            // we know last address and the address before will always be unequal, so compare those
+                            this.generatedCode[this.opPtr++] = "AE";
+                            this.generatedCode[this.opPtr++] = "FF";
+                            this.generatedCode[this.opPtr++] = "00";
+                            this.generatedCode[this.opPtr++] = "EC";
+                            this.generatedCode[this.opPtr++] = "FE";    
+                            this.generatedCode[this.opPtr++] = "00";
+                            this.generatedCode[this.opPtr++] = "D0";
+                            this.generatedCode[this.opPtr++] = "02";    
+                            // load y with false
+                            this.generatedCode[this.opPtr++] = "A0";
+                            this.generatedCode[this.opPtr++] = (250).toString(16).toUpperCase();
+                            // load x register with 2
+                            this.generatedCode[this.opPtr++] = "A2";
+                            this.generatedCode[this.opPtr++] = "02";
                             break;
                     }
                     // sys call
