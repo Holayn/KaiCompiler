@@ -246,6 +246,132 @@ var TSC;
                     this.generatedCode[this.opPtr++] = tempAddr;
                     this.generatedCode[this.opPtr++] = "00";
                     break;
+                // subtree root is while statement
+                case TSC.Production.WhileStmt:
+                    // keep ptr to start of while loop
+                    var whileStartPtr = this.opPtr;
+                    // evaluate lhs first, which is the boolean result
+                    var address;
+                    switch (node.children[0].value.type) {
+                        // if lhs is a boolean value, set zero flag to 1 if true, set zero flag to 0 if false
+                        case "TBoolval":
+                            // load heap address of true into x register
+                            if (node.children[0].value.value == "true") {
+                                address = (245).toString(16).toUpperCase();
+                                this.generatedCode[this.opPtr++] = "AE";
+                                this.generatedCode[this.opPtr++] = address;
+                                this.generatedCode[this.opPtr++] = "00";
+                            }
+                            else {
+                                address = (250).toString(16).toUpperCase();
+                                this.generatedCode[this.opPtr++] = "AE";
+                                this.generatedCode[this.opPtr++] = address;
+                                this.generatedCode[this.opPtr++] = "00";
+                            }
+                            // compare to address of true. we need to set z flag if not equal later
+                            this.generatedCode[this.opPtr++] = "EC";
+                            this.generatedCode[this.opPtr++] = (245).toString(16).toUpperCase();
+                            this.generatedCode[this.opPtr++] = "00";
+                            break;
+                        // if lhs is a boolean expression equality
+                        case "TEquals":
+                            // get back the address we're comparing to the x register, which is already loaded
+                            address = this.generateEquals(node.children[0]);
+                            // perform comparison of x register to temp address
+                            this.generatedCode[this.opPtr++] = "EC";
+                            this.generatedCode[this.opPtr++] = address;
+                            this.generatedCode[this.opPtr++] = "00";
+                            break;
+                    }
+                    // z flag has now been assigned, set acc to 1
+                    this.generatedCode[this.opPtr++] = "A9";
+                    this.generatedCode[this.opPtr++] = "01";
+                    // branch if not equal
+                    this.generatedCode[this.opPtr++] = "D0";
+                    this.generatedCode[this.opPtr++] = "02";
+                    // (if equal, then set accumulator to zero)
+                    this.generatedCode[this.opPtr++] = "A9";
+                    this.generatedCode[this.opPtr++] = "00";
+                    // set x register to 0
+                    this.generatedCode[this.opPtr++] = "A2";
+                    this.generatedCode[this.opPtr++] = "00";
+                    // store acc in new address so we can compare its value with x register
+                    var temp = "T" + this.staticId;
+                    this.staticMap.set(temp, {
+                        "name": "",
+                        "type": "",
+                        "at": "",
+                        "scopeId": ""
+                    });
+                    this.staticId++;
+                    this.generatedCode[this.opPtr++] = "8D";
+                    this.generatedCode[this.opPtr++] = temp;
+                    this.generatedCode[this.opPtr++] = "00";
+                    // compare address to x register, branch if unequal
+                    this.generatedCode[this.opPtr++] = "EC";
+                    this.generatedCode[this.opPtr++] = temp;
+                    this.generatedCode[this.opPtr++] = "00";
+                    // jump
+                    // need to make entry in jump table
+                    var endWhileJump = "J" + this.jumpId;
+                    this.jumpId++;
+                    var startOfBranchPtr = this.opPtr;
+                    // store in accumulator location temp 0, fill in later
+                    this.generatedCode[this.opPtr++] = "D0";
+                    this.generatedCode[this.opPtr++] = endWhileJump;
+                    // increase the jump id
+                    // now we need to put op codes in to evaluate the block
+                    // evaluate the RHS, which is just recursing to generate proper codes
+                    this.traverseAST(node.children[1]);
+                    // generate end of while loop codes, which is the unconditional jump to top of loop
+                    // load 0 into acc
+                    this.generatedCode[this.opPtr++] = "A9";
+                    this.generatedCode[this.opPtr++] = "00";
+                    // store 0 value in accumulator to some new address in memory
+                    var uncond = "T" + this.staticId;
+                    this.staticMap.set(uncond, {
+                        "name": "",
+                        "type": "",
+                        "at": "",
+                        "scopeId": ""
+                    });
+                    this.staticId++;
+                    this.generatedCode[this.opPtr++] = "8D";
+                    this.generatedCode[this.opPtr++] = uncond;
+                    this.generatedCode[this.opPtr++] = "00";
+                    // load 1 into x reg
+                    this.generatedCode[this.opPtr++] = "A2";
+                    this.generatedCode[this.opPtr++] = "01";
+                    // compare x reg and uncond to always branch
+                    this.generatedCode[this.opPtr++] = "EC";
+                    this.generatedCode[this.opPtr++] = uncond;
+                    this.generatedCode[this.opPtr++] = "00";
+                    var whileJump = "J" + this.jumpId;
+                    this.jumpId++;
+                    this.generatedCode[this.opPtr++] = "D0";
+                    this.generatedCode[this.opPtr++] = whileJump;
+                    // figure out how much to jump based on current opPtr and where the op codes for the while loop start
+                    // (size-current) + start. OS will take care of modulus
+                    // store as hex value
+                    var jumpValue = ((this.generatedCode.length - (this.opPtr)) + whileStartPtr).toString(16).toUpperCase();
+                    if (jumpValue.length < 2) {
+                        // pad with 0
+                        jumpValue = "0" + jumpValue;
+                    }
+                    this.jumpMap.set(whileJump, {
+                        "jump": jumpValue // needs to be a hex value
+                    });
+                    // insert jump value for end of while loop
+                    // we have to account for d0 and xx so hence +2
+                    jumpValue = (this.opPtr - (startOfBranchPtr + 2)).toString(16).toUpperCase();
+                    if (jumpValue.length < 2) {
+                        // pad with 0
+                        jumpValue = "0" + jumpValue;
+                    }
+                    this.jumpMap.set(endWhileJump, {
+                        "jump": jumpValue // needs to be a hex value
+                    });
+                    break;
                 // subtree root is if statement
                 case TSC.Production.IfStmt:
                     // look at its left and right children
@@ -359,7 +485,7 @@ var TSC;
                     // TODO: BOOLEAN HELL!
                     break;
             }
-            // RHS: compare to address of what rhs is
+            // RHS: compare to address of what rhs is. actually, just return mem address of rhs
             switch (equalsNode.children[1].value.type) {
                 case "TDigit":
                     // put this value into the accumulator, store it in somewhere
@@ -402,7 +528,7 @@ var TSC;
                     this.staticId++;
                     return temp;
                 case "TBoolval":
-                    // compare to x register with address of boolval
+                    // generate address to hold address to true/false
                     if (equalsNode.children[1].value.value == "true") {
                         // compare to address of true 
                         // need to store address of true into memory
@@ -621,7 +747,7 @@ var TSC;
             var strPtr = this.heapStartPtr;
             // put in characters converted to hex strings into heap
             for (var i = this.heapStartPtr; i < this.heapStartPtr + len; i++) {
-                this.generatedCode[i] = string.charCodeAt(i - this.heapStartPtr).toString(16);
+                this.generatedCode[i] = string.charCodeAt(i - this.heapStartPtr).toString(16).toUpperCase();
             }
             // store in heap map
             this.heapMap.set(string, {

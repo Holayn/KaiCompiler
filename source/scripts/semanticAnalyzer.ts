@@ -159,11 +159,13 @@ module TSC {
                     this.ast.addNode(Production.WhileStmt);
                     this.traverse(node.children[1]);
                     this.traverse(node.children[2]);
+                    this.ast.ascendTree();
                     break;
                 case Production.IfStmt:
                     this.ast.addNode(Production.IfStmt);
                     this.traverse(node.children[1]);
                     this.traverse(node.children[2]);
+                    this.ast.ascendTree();
                     break;
                 case Production.Id:
                     // Get the id and also assign its scope

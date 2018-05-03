@@ -146,11 +146,13 @@ var TSC;
                     this.ast.addNode(TSC.Production.WhileStmt);
                     this.traverse(node.children[1]);
                     this.traverse(node.children[2]);
+                    this.ast.ascendTree();
                     break;
                 case TSC.Production.IfStmt:
                     this.ast.addNode(TSC.Production.IfStmt);
                     this.traverse(node.children[1]);
                     this.traverse(node.children[2]);
+                    this.ast.ascendTree();
                     break;
                 case TSC.Production.Id:
                     // Get the id and also assign its scope
