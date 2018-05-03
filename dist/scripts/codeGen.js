@@ -241,11 +241,10 @@ var TSC;
                                             break;
                                         case "TString":
                                             // we will compare strings based on what address is in heap
-                                            // put ptr of string in heap to x register
+                                            // put ptr of string in heap to x register as constant
                                             var strPtr = this.allocateStringInHeap(node.children[0].children[0].value.value);
-                                            this.generatedCode[this.opPtr++] = "AE";
+                                            this.generatedCode[this.opPtr++] = "A2";
                                             this.generatedCode[this.opPtr++] = strPtr;
-                                            this.generatedCode[this.opPtr++] = "00";
                                             break;
                                     }
                                     // RHS: compare to address of what rhs is
@@ -257,12 +256,12 @@ var TSC;
                                             this.generatedCode[this.opPtr++] = "0" + node.children[0].children[1].value.value;
                                             var temp = "T" + this.staticId;
                                             this.staticMap.set(temp, {
-                                                "name": node.children[1].value.value,
-                                                "type": node.children[1].value.type,
+                                                "name": node.children[0].children[1].value.value,
+                                                "type": node.children[0].children[1].value.type,
                                                 "at": "",
                                                 "scope": ""
                                             });
-                                            // store in accumulator location temp 0, fill in later
+                                            // store in accumulator location temp, fill in later
                                             this.generatedCode[this.opPtr++] = "8D";
                                             this.generatedCode[this.opPtr++] = temp;
                                             this.generatedCode[this.opPtr++] = "00";
@@ -275,10 +274,27 @@ var TSC;
                                             break;
                                         case "TString":
                                             // we will compare strings based on what address is in heap
-                                            // put ptr of string in heap to x register
+                                            // perform comparison of x register to this temp address
                                             var strPtr = this.allocateStringInHeap(node.children[0].children[1].value.value);
-                                            this.generatedCode[this.opPtr++] = "AE";
+                                            // need to make entry in static table for value
+                                            this.generatedCode[this.opPtr++] = "A9";
                                             this.generatedCode[this.opPtr++] = strPtr;
+                                            var temp = "T" + this.staticId;
+                                            this.staticMap.set(temp, {
+                                                "name": node.children[0].children[1].value.value,
+                                                "type": node.children[0].children[1].value.type,
+                                                "at": "",
+                                                "scope": ""
+                                            });
+                                            // store in accumulator location temp, fill in later
+                                            this.generatedCode[this.opPtr++] = "8D";
+                                            this.generatedCode[this.opPtr++] = temp;
+                                            this.generatedCode[this.opPtr++] = "00";
+                                            // increase the static id
+                                            this.staticId++;
+                                            // perform comparison of x register to this temp address
+                                            this.generatedCode[this.opPtr++] = "EC";
+                                            this.generatedCode[this.opPtr++] = temp;
                                             this.generatedCode[this.opPtr++] = "00";
                                             break;
                                     }
