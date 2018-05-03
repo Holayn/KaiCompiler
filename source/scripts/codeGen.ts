@@ -189,6 +189,16 @@ module TSC {
                             this.generatedCode[this.opPtr++] = "A2";
                             this.generatedCode[this.opPtr++] = "02";
                             break;
+                        case "TAddition":
+                            var temp = this.generateAddition(node.children[0]);
+                            // print what is in accumulator, by storing result (in memory) into y register
+                            // load y register from memory
+                            this.generatedCode[this.opPtr++] = "AC";
+                            this.generatedCode[this.opPtr++] = temp;
+                            this.generatedCode[this.opPtr++] = "00";
+                            // set x reg to 1
+                            this.generatedCode[this.opPtr++] = "A2";
+                            this.generatedCode[this.opPtr++] = "01";
                     }
                     // sys call
                     this.generatedCode[this.opPtr++] = "FF";
@@ -374,6 +384,9 @@ module TSC {
                     this.generatedCode[this.opPtr++] = tempAddr;
                     this.generatedCode[this.opPtr++] = "00";
                     break;
+                case "TEquals":
+                    // TODO: BOOLEAN HELL!
+                    break;
             }
             // RHS: compare to address of what rhs is
             switch(equalsNode.children[1].value.type){
@@ -468,7 +481,80 @@ module TSC {
                     var scope = equalsNode.children[1].value.scopeId;
                     var temp = this.findVariableInStaticMap(variable, scope);
                     return temp;
+                case "TEquals":
+                    // TODO: BOOLEAN HELL!
+                    break;
             }
+        }
+
+        /**
+         * Generates op codes for an addition node
+         * We evaluate from right-left
+         * @param node the addition node
+         */
+        private generateAddition(additionNode) {
+            // RHS: load whatever it is into some new address in static memory
+            var temp = "T" + this.staticId;
+            this.staticMap.set(temp, {
+                "name": additionNode.children[1].value.value,
+                "type": additionNode.children[1].value.type,
+                "at": "",
+                "scopeId": ""
+            });
+            this.staticId++;
+            switch(additionNode.children[1].value.type){
+                case "TDigit":
+                    this.generatedCode[this.opPtr++] = "A9";
+                    this.generatedCode[this.opPtr++] = "0" + additionNode.children[1].value.value;
+                    this.generatedCode[this.opPtr++] = "8D";
+                    this.generatedCode[this.opPtr++] = temp;
+                    this.generatedCode[this.opPtr++] = "00";
+                    break;
+                case "TId":
+                    var variable = additionNode.children[1].value.value;
+                    var scope = additionNode.children[1].value.scopeId;
+                    var addr = this.findVariableInStaticMap(variable, scope);
+                    this.generatedCode[this.opPtr++] = "AD";
+                    this.generatedCode[this.opPtr++] = addr;
+                    this.generatedCode[this.opPtr++] = "00";
+                    this.generatedCode[this.opPtr++] = "8D";
+                    this.generatedCode[this.opPtr++] = temp;
+                    this.generatedCode[this.opPtr++] = "00";
+                    break;
+                case "TAddition":
+                    // well, we're going to have to generate those op codes first ?
+                    // generate op codes, which will generate that result in the accumulator
+                    // use that result and add it to lhs of current (current is loaded into accumulator)
+                    // so we have to put accumulator result in some memory address? then access it?
+                    // call generateAddition on rhs, get back memory address holding result of it
+                    var memAddrResult = this.generateAddition(additionNode.children[1]);
+                    temp = memAddrResult;
+            }
+            // LHS: can only be a digit
+            switch(additionNode.children[0].value.type){
+                case "TDigit":
+                    this.generatedCode[this.opPtr++] = "A9";
+                    this.generatedCode[this.opPtr++] = "0" + additionNode.children[0].value.value;
+                    break;
+            }
+            // addition opcodes - add what in temp address to accumulator
+            this.generatedCode[this.opPtr++] = "6D";
+            this.generatedCode[this.opPtr++] = temp;
+            this.generatedCode[this.opPtr++] = "00";
+            // store acc in memory
+            var temp = "T" + this.staticId;
+            this.staticMap.set(temp, {
+                "name":"",
+                "type": "",
+                "at": "",
+                "scopeId": ""
+            });
+            this.staticId++;
+            this.generatedCode[this.opPtr++] = "8D";
+            this.generatedCode[this.opPtr++] = temp;
+            this.generatedCode[this.opPtr++] = "00";
+            // return temp
+            return temp;
         }
 
         /**
