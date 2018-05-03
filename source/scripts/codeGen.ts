@@ -145,8 +145,8 @@ module TSC {
                             var variable = node.children[0].value.value;
                             var scope = node.children[0].value.scope;
                             var tempAddr = this.findVariableInStaticMap(variable, scope);
-                            this.generatedCode[this.opPtr++] = tempAddr.substring(0,2);
-                            this.generatedCode[this.opPtr++] = tempAddr.substring(2);
+                            this.generatedCode[this.opPtr++] = tempAddr;
+                            this.generatedCode[this.opPtr++] = "00";
                             // load 1 or 2 into x register depending on variable type being printed
                             // check the type
                             if(this.staticMap.get(tempAddr)["type"] == TSC.VariableType.String || this.staticMap.get(tempAddr)["type"] == TSC.VariableType.Boolean){
@@ -167,7 +167,7 @@ module TSC {
                 // subtree root is var decl
                 case TSC.Production.VarDecl:
                     // need to make entry in static table for variable
-                    var temp = "T" + this.staticId + "00";
+                    var temp = "T" + this.staticId;
                     this.staticMap.set(temp, {
                         "name": node.children[1].value.value,
                         "type": node.children[0].value,
@@ -213,11 +213,21 @@ module TSC {
                                 this.generatedCode[this.opPtr++] = (250).toString(16).toUpperCase();
                             }
                             break;
+                        case "TId":
+                            // look up variable we're assigning to something else in static table, get its temp address
+                            // load it into accumulator
+                            this.generatedCode[this.opPtr++] = "AD";
+                            var variable = node.children[1].value.value;
+                            var scope = node.children[1].value.scope;
+                            var tempAddr = this.findVariableInStaticMap(variable, scope);
+                            this.generatedCode[this.opPtr++] = tempAddr;
+                            this.generatedCode[this.opPtr++] = "00";
+                            break;
                     }
-                    // store whatever is in assumulator to memory
+                    // store whatever is in accumulator to memory
                     this.generatedCode[this.opPtr++] = "8D";
-                    this.generatedCode[this.opPtr++] = tempAddr.substring(0,2);
-                    this.generatedCode[this.opPtr++] = tempAddr.substring(2);
+                    this.generatedCode[this.opPtr++] = tempAddr;
+                    this.generatedCode[this.opPtr++] = "00";
             }
         }
 
@@ -240,7 +250,6 @@ module TSC {
              var itr = this.staticMap.keys();
              for(var i=0; i<this.staticMap.size; i++){
                  var temp = itr.next();
-                //  console.log(staticObject);
                  this.staticMap.get(temp.value)["at"] = this.staticStartPtr.toString(16).toUpperCase(); // convert to hex string
                  this.staticStartPtr++;
              }
@@ -255,7 +264,7 @@ module TSC {
             for(var i=0; i<this.generatedCode.length; i++){
                 // found a placeholder
                 if(this.generatedCode[i].charAt(0) == 'T'){
-                    var temp = this.generatedCode[i] + "00";
+                    var temp = this.generatedCode[i];
                     // lookup in map and get mem address
                     var memAddr = this.staticMap.get(temp)["at"];
                     // replace
