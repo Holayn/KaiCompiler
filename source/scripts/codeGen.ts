@@ -272,29 +272,29 @@ module TSC {
                                             this.generatedCode[this.opPtr++] = "A2";
                                             this.generatedCode[this.opPtr++] = strPtr;
                                             break;
-                                        // case "TBoolval":
-                                        //     // put ptr of boolean val to x register
-                                        //     if(node.children[1].value.value == "true"){
-                                        //         // load address of true in heap into accumulator as constant
-                                        //         this.generatedCode[this.opPtr++] = "A9";
-                                        //         this.generatedCode[this.opPtr++] = (245).toString(16).toUpperCase();
-                                        //     }
-                                        //     else if(node.children[1].value.value == "false"){
-                                        //         // load address of false in heap into accumulator as constant
-                                        //         this.generatedCode[this.opPtr++] = "A9";
-                                        //         this.generatedCode[this.opPtr++] = (250).toString(16).toUpperCase();
-                                        //     }
-                                        //     break;
-                                        // case "TId":
-                                        //     // look up variable in static table, get its temp address
-                                        //     // load it into x register
-                                        //     this.generatedCode[this.opPtr++] = "AD";
-                                        //     var variable = node.children[1].value.value;
-                                        //     var scope = node.children[1].value.scope;
-                                        //     var tempAddr = this.findVariableInStaticMap(variable, scope);
-                                        //     this.generatedCode[this.opPtr++] = tempAddr;
-                                        //     this.generatedCode[this.opPtr++] = "00";
-                                        //     break;
+                                        case "TBoolval":
+                                            // put ptr of boolean val to x register as constant
+                                            if(node.children[0].children[0].value.value == "true"){
+                                                // load address of true 
+                                                this.generatedCode[this.opPtr++] = "A2";
+                                                this.generatedCode[this.opPtr++] = (245).toString(16).toUpperCase();
+                                            }
+                                            else if(node.children[0].children[0].value.value == "false"){
+                                                // load address of false
+                                                this.generatedCode[this.opPtr++] = "A2";
+                                                this.generatedCode[this.opPtr++] = (250).toString(16).toUpperCase();
+                                            }
+                                            break;
+                                        case "TId":
+                                            // look up variable in static table, get its temp address
+                                            // load it into x register 
+                                            this.generatedCode[this.opPtr++] = "AD";
+                                            var variable = node.children[1].value.value;
+                                            var scope = node.children[1].value.scope;
+                                            var tempAddr = this.findVariableInStaticMap(variable, scope);
+                                            this.generatedCode[this.opPtr++] = tempAddr;
+                                            this.generatedCode[this.opPtr++] = "00";
+                                            break;
                                     }
                                     // RHS: compare to address of what rhs is
                                     switch(node.children[0].children[1].value.type){
@@ -323,7 +323,7 @@ module TSC {
                                             break;
                                         case "TString":
                                             // we will compare strings based on what address is in heap
-                                             // perform comparison of x register to this temp address
+                                            // perform comparison of x register to this temp address
                                             let strPtr = this.allocateStringInHeap(node.children[0].children[1].value.value);
                                             // need to make entry in static table for value
                                             this.generatedCode[this.opPtr++] = "A9";
@@ -345,6 +345,55 @@ module TSC {
                                             this.generatedCode[this.opPtr++] = "EC";
                                             this.generatedCode[this.opPtr++] = temp;
                                             this.generatedCode[this.opPtr++] = "00";
+                                            break;
+                                        case "TBoolval":
+                                            // compare to x register with address of boolval
+                                            if(node.children[0].children[1].value.value == "true"){
+                                                // compare to address of true 
+                                                // need to store address of true into memory
+                                                // need to make entry in static table for value
+                                                this.generatedCode[this.opPtr++] = "A9";
+                                                this.generatedCode[this.opPtr++] = (245).toString(16).toUpperCase();
+                                                var temp = "T" + this.staticId;
+                                                this.staticMap.set(temp, {
+                                                    "name": node.children[0].children[1].value.value,
+                                                    "type": node.children[0].children[1].value.type,
+                                                    "at": "",
+                                                    "scope": ""
+                                                })
+                                                // store in accumulator location temp, fill in later
+                                                this.generatedCode[this.opPtr++] = "8D";
+                                                this.generatedCode[this.opPtr++] = temp;
+                                                this.generatedCode[this.opPtr++] = "00";
+                                                // increase the static id
+                                                this.staticId++;
+                                                this.generatedCode[this.opPtr++] = "EC";
+                                                this.generatedCode[this.opPtr++] = temp;
+                                                this.generatedCode[this.opPtr++] = "00";
+                                            }
+                                            else if(node.children[0].children[1].value.value == "false"){
+                                                // compare to address of false
+                                                // need to store address of false into memory
+                                                // need to make entry in static table for value
+                                                this.generatedCode[this.opPtr++] = "A9";
+                                                this.generatedCode[this.opPtr++] = (250).toString(16).toUpperCase();
+                                                var temp = "T" + this.staticId;
+                                                this.staticMap.set(temp, {
+                                                    "name": node.children[0].children[1].value.value,
+                                                    "type": node.children[0].children[1].value.type,
+                                                    "at": "",
+                                                    "scope": ""
+                                                });
+                                                 // store in accumulator location temp, fill in later
+                                                 this.generatedCode[this.opPtr++] = "8D";
+                                                 this.generatedCode[this.opPtr++] = temp;
+                                                 this.generatedCode[this.opPtr++] = "00";
+                                                // increase the static id
+                                                this.staticId++;
+                                                this.generatedCode[this.opPtr++] = "EC";
+                                                this.generatedCode[this.opPtr++] = temp;
+                                                this.generatedCode[this.opPtr++] = "00";
+                                            }
                                             break;
                                     }
                                     break;
