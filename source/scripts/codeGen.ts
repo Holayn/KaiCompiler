@@ -110,8 +110,6 @@ module TSC {
                             // load x regis with 1
                             this.generatedCode[this.opPtr++] = "A2";
                             this.generatedCode[this.opPtr++] = "01";
-                            // sys call
-                            this.generatedCode[this.opPtr++] = "FF";
                             break;
                         case "TString":
                             // put str in heap and get ptr to it
@@ -122,8 +120,6 @@ module TSC {
                             // load x regis with 2
                             this.generatedCode[this.opPtr++] = "A2";
                             this.generatedCode[this.opPtr++] = "02";
-                            // sys call
-                            this.generatedCode[this.opPtr++] = "FF";
                             break;
                         case "TBoolval":
                             this.generatedCode[this.opPtr++] = "A0";
@@ -138,8 +134,6 @@ module TSC {
                             // load x regis with 2
                             this.generatedCode[this.opPtr++] = "A2";
                             this.generatedCode[this.opPtr++] = "02";
-                            // sys call
-                            this.generatedCode[this.opPtr++] = "FF";
                             break;
                         case "TId":
                             // load the variable temporary address into y register
@@ -161,10 +155,13 @@ module TSC {
                                 this.generatedCode[this.opPtr++] = "A2";
                                 this.generatedCode[this.opPtr++] = "01";
                             }
-                            // sys call
-                            this.generatedCode[this.opPtr++] = "FF";
+                            break;
+                        case "TEquals":
+                            this.generateEquals(node.children[0]);
                             break;
                     }
+                    // sys call
+                    this.generatedCode[this.opPtr++] = "FF";
                     break;
                 // subtree root is var decl
                 case TSC.Production.VarDecl:
@@ -231,6 +228,13 @@ module TSC {
                     this.generatedCode[this.opPtr++] = tempAddr;
                     this.generatedCode[this.opPtr++] = "00";
                     break;
+                // subtree root is addition
+                // case "Addition":
+                //     // process right subtree first
+                //     // if it is a digit, proceed normally
+                //     switch(node.children[0])
+                //     // if it is another addition, call this again
+                //     break;
                 // subtree root is if statement
                 case TSC.Production.IfStmt:
                     // look at its left and right children
@@ -255,167 +259,20 @@ module TSC {
                             break;
                         // if lhs is a boolean expression equality 
                         // might be null because equalto isn't stored in my ast with a type
-                        default:
-                            switch(node.children[0].value){
-                                case "EqualTo":
-                                    // LHS: load what is in lhs into x register
-                                    switch(node.children[0].children[0].value.type){
-                                        case "TDigit":
-                                            // load digit as constant into x register
-                                            this.generatedCode[this.opPtr++] = "A2";
-                                            this.generatedCode[this.opPtr++] = "0" + node.children[0].children[0].value.value;
-                                            break;
-                                        case "TString":
-                                            // we will compare strings based on what address is in heap
-                                            // put ptr of string in heap to x register as constant
-                                            let strPtr = this.allocateStringInHeap(node.children[0].children[0].value.value);
-                                            this.generatedCode[this.opPtr++] = "A2";
-                                            this.generatedCode[this.opPtr++] = strPtr;
-                                            break;
-                                        case "TBoolval":
-                                            // put ptr of boolean val to x register as constant
-                                            if(node.children[0].children[0].value.value == "true"){
-                                                // load address of true 
-                                                this.generatedCode[this.opPtr++] = "A2";
-                                                this.generatedCode[this.opPtr++] = (245).toString(16).toUpperCase();
-                                            }
-                                            else if(node.children[0].children[0].value.value == "false"){
-                                                // load address of false
-                                                this.generatedCode[this.opPtr++] = "A2";
-                                                this.generatedCode[this.opPtr++] = (250).toString(16).toUpperCase();
-                                            }
-                                            break;
-                                        case "TId":
-                                            // look up variable in static table, get its temp address
-                                            // load it into x register 
-                                            this.generatedCode[this.opPtr++] = "AE";
-                                            var variable = node.children[0].children[0].value.value;
-                                            var scope = node.children[0].children[0].value.scopeId;
-                                            var tempAddr = this.findVariableInStaticMap(variable, scope);
-                                            this.generatedCode[this.opPtr++] = tempAddr;
-                                            this.generatedCode[this.opPtr++] = "00";
-                                            break;
-                                    }
-                                    // RHS: compare to address of what rhs is
-                                    switch(node.children[0].children[1].value.type){
-                                        case "TDigit":
-                                            // put this value into the accumulator, store it in somewhere
-                                            // need to make entry in static table for value
-                                            this.generatedCode[this.opPtr++] = "A9";
-                                            this.generatedCode[this.opPtr++] = "0" + node.children[0].children[1].value.value;
-                                            var temp = "T" + this.staticId;
-                                            this.staticMap.set(temp, {
-                                                "name": node.children[0].children[1].value.value,
-                                                "type": node.children[0].children[1].value.type,
-                                                "at": "",
-                                                "scopeId": ""
-                                            })
-                                            // store in accumulator location temp, fill in later
-                                            this.generatedCode[this.opPtr++] = "8D";
-                                            this.generatedCode[this.opPtr++] = temp;
-                                            this.generatedCode[this.opPtr++] = "00";
-                                            // increase the static id
-                                            this.staticId++;
-                                            // perform comparison of x register to this temp address
-                                            this.generatedCode[this.opPtr++] = "EC";
-                                            this.generatedCode[this.opPtr++] = temp;
-                                            this.generatedCode[this.opPtr++] = "00";
-                                            break;
-                                        case "TString":
-                                            // we will compare strings based on what address is in heap
-                                            // perform comparison of x register to this temp address
-                                            let strPtr = this.allocateStringInHeap(node.children[0].children[1].value.value);
-                                            // need to make entry in static table for value
-                                            this.generatedCode[this.opPtr++] = "A9";
-                                            this.generatedCode[this.opPtr++] = strPtr;
-                                            var temp = "T" + this.staticId;
-                                            this.staticMap.set(temp, {
-                                                "name": node.children[0].children[1].value.value,
-                                                "type": node.children[0].children[1].value.type,
-                                                "at": "",
-                                                "scopeId": ""
-                                            })
-                                            // store in accumulator location temp, fill in later
-                                            this.generatedCode[this.opPtr++] = "8D";
-                                            this.generatedCode[this.opPtr++] = temp;
-                                            this.generatedCode[this.opPtr++] = "00";
-                                            // increase the static id
-                                            this.staticId++;
-                                            // perform comparison of x register to this temp address
-                                            this.generatedCode[this.opPtr++] = "EC";
-                                            this.generatedCode[this.opPtr++] = temp;
-                                            this.generatedCode[this.opPtr++] = "00";
-                                            break;
-                                        case "TBoolval":
-                                            // compare to x register with address of boolval
-                                            if(node.children[0].children[1].value.value == "true"){
-                                                // compare to address of true 
-                                                // need to store address of true into memory
-                                                // need to make entry in static table for value
-                                                this.generatedCode[this.opPtr++] = "A9";
-                                                this.generatedCode[this.opPtr++] = (245).toString(16).toUpperCase();
-                                                var temp = "T" + this.staticId;
-                                                this.staticMap.set(temp, {
-                                                    "name": node.children[0].children[1].value.value,
-                                                    "type": node.children[0].children[1].value.type,
-                                                    "at": "",
-                                                    "scopeId": ""
-                                                })
-                                                // store in accumulator location temp, fill in later
-                                                this.generatedCode[this.opPtr++] = "8D";
-                                                this.generatedCode[this.opPtr++] = temp;
-                                                this.generatedCode[this.opPtr++] = "00";
-                                                // increase the static id
-                                                this.staticId++;
-                                                this.generatedCode[this.opPtr++] = "EC";
-                                                this.generatedCode[this.opPtr++] = temp;
-                                                this.generatedCode[this.opPtr++] = "00";
-                                            }
-                                            else if(node.children[0].children[1].value.value == "false"){
-                                                // compare to address of false
-                                                // need to store address of false into memory
-                                                // need to make entry in static table for value
-                                                this.generatedCode[this.opPtr++] = "A9";
-                                                this.generatedCode[this.opPtr++] = (250).toString(16).toUpperCase();
-                                                var temp = "T" + this.staticId;
-                                                this.staticMap.set(temp, {
-                                                    "name": node.children[0].children[1].value.value,
-                                                    "type": node.children[0].children[1].value.type,
-                                                    "at": "",
-                                                    "scopeId": ""
-                                                });
-                                                 // store in accumulator location temp, fill in later
-                                                this.generatedCode[this.opPtr++] = "8D";
-                                                this.generatedCode[this.opPtr++] = temp;
-                                                this.generatedCode[this.opPtr++] = "00";
-                                                // increase the static id
-                                                this.staticId++;
-                                                this.generatedCode[this.opPtr++] = "EC";
-                                                this.generatedCode[this.opPtr++] = temp;
-                                                this.generatedCode[this.opPtr++] = "00";
-                                            }
-                                            break;
-                                        case "TId":
-                                            // compare x register to address of id
-                                            var variable = node.children[0].children[1].value.value;
-                                            var scope = node.children[0].children[1].value.scopeId;
-                                            var temp = this.findVariableInStaticMap(variable, scope);
-                                            this.generatedCode[this.opPtr++] = "EC";
-                                            this.generatedCode[this.opPtr++] = temp;
-                                            this.generatedCode[this.opPtr++] = "00";
-                                            break;
-                                    }
-                                    break;
-                            }
-                            
-                            // // we need to determine what lhs is..digit, variable (load whatever stored in mem address), another boolean expr
-                            // if another boolean expr, need to generate whole set of opcodes for that boolean expr, then store result of that somewhere
-                            // in memory, then need to use that to compare to whatever is being compared to in boolean expr
-                            // probably can just allocate a single space maybe?
-                            // actually, we know this will always evaluate to a boolean val so can just return address of true/false, compare to addr of true
-                            // this.determineLHSEqualTo(node);
+                        case "TEquals":
+                            // get back the address we're comparing to the x register
+                            var addr = this.generateEquals(node.children[0]);
+                            // perform comparison of x register to temp address
+                            this.generatedCode[this.opPtr++] = "EC";
+                            this.generatedCode[this.opPtr++] = addr;    
+                            this.generatedCode[this.opPtr++] = "00";
                             break;
-                            
+                        // // we need to determine what lhs is..digit, variable (load whatever stored in mem address), another boolean expr
+                        // if another boolean expr, need to generate whole set of opcodes for that boolean expr, then store result of that somewhere
+                        // in memory, then need to use that to compare to whatever is being compared to in boolean expr
+                        // probably can just allocate a single space maybe?
+                        // actually, we know this will always evaluate to a boolean val so can just return address of true/false, compare to addr of true
+                        // this.determineLHSEqualTo(node);
                     }
                     // jump
                     // need to make entry in jump table
@@ -442,6 +299,147 @@ module TSC {
                     break;
             }
         }
+        
+        /**
+         * Generates opcodes for an Equals expression
+         * @param equalsNode takes in the equals node
+         */
+        private generateEquals(equalsNode) {
+            console.log("HEY");
+            console.log(equalsNode);
+            // LHS: load what is in lhs into x register
+            switch(equalsNode.children[0].value.type){
+                case "TDigit":
+                    // load digit as constant into x register
+                    this.generatedCode[this.opPtr++] = "A2";
+                    this.generatedCode[this.opPtr++] = "0" + equalsNode.children[0].value.value;
+                    break;
+                case "TString":
+                    // we will compare strings based on what address is in heap
+                    // put ptr of string in heap to x register as constant
+                    let strPtr = this.allocateStringInHeap(equalsNode.children[0].value.value);
+                    this.generatedCode[this.opPtr++] = "A2";
+                    this.generatedCode[this.opPtr++] = strPtr;
+                    break;
+                case "TBoolval":
+                    // put ptr of boolean val to x register as constant
+                    if(equalsNode.children[0].value.value == "true"){
+                        // load address of true 
+                        this.generatedCode[this.opPtr++] = "A2";
+                        this.generatedCode[this.opPtr++] = (245).toString(16).toUpperCase();
+                    }
+                    else if(equalsNode.children[0].value.value == "false"){
+                        // load address of false
+                        this.generatedCode[this.opPtr++] = "A2";
+                        this.generatedCode[this.opPtr++] = (250).toString(16).toUpperCase();
+                    }
+                    break;
+                case "TId":
+                    // look up variable in static table, get its temp address
+                    // load it into x register 
+                    this.generatedCode[this.opPtr++] = "AE";
+                    var variable = equalsNode.children[0].value.value;
+                    var scope = equalsNode.children[0].value.scopeId;
+                    var tempAddr = this.findVariableInStaticMap(variable, scope);
+                    this.generatedCode[this.opPtr++] = tempAddr;
+                    this.generatedCode[this.opPtr++] = "00";
+                    break;
+            }
+            // RHS: compare to address of what rhs is
+            switch(equalsNode.children[1].value.type){
+                case "TDigit":
+                    // put this value into the accumulator, store it in somewhere
+                    // need to make entry in static table for value
+                    this.generatedCode[this.opPtr++] = "A9";
+                    this.generatedCode[this.opPtr++] = "0" + equalsNode.children[1].value.value;
+                    var temp = "T" + this.staticId;
+                    this.staticMap.set(temp, {
+                        "name": equalsNode.children[1].value.value,
+                        "type": equalsNode.children[1].value.type,
+                        "at": "",
+                        "scopeId": ""
+                    })
+                    // store in accumulator location temp, fill in later
+                    this.generatedCode[this.opPtr++] = "8D";
+                    this.generatedCode[this.opPtr++] = temp;
+                    this.generatedCode[this.opPtr++] = "00";
+                    // increase the static id
+                    this.staticId++;
+                    return temp;
+                case "TString":
+                    // we will compare strings based on what address is in heap
+                    // perform comparison of x register to this temp address
+                    let strPtr = this.allocateStringInHeap(equalsNode.children[1].value.value);
+                    // need to make entry in static table for value
+                    this.generatedCode[this.opPtr++] = "A9";
+                    this.generatedCode[this.opPtr++] = strPtr;
+                    var temp = "T" + this.staticId;
+                    this.staticMap.set(temp, {
+                        "name": equalsNode.children[1].value.value,
+                        "type": equalsNode.children[1].value.type,
+                        "at": "",
+                        "scopeId": ""
+                    })
+                    // store in accumulator location temp, fill in later
+                    this.generatedCode[this.opPtr++] = "8D";
+                    this.generatedCode[this.opPtr++] = temp;
+                    this.generatedCode[this.opPtr++] = "00";
+                    // increase the static id
+                    this.staticId++;
+                    return temp;
+                case "TBoolval":
+                    // compare to x register with address of boolval
+                    if(equalsNode.children[1].value.value == "true"){
+                        // compare to address of true 
+                        // need to store address of true into memory
+                        // need to make entry in static table for value
+                        this.generatedCode[this.opPtr++] = "A9";
+                        this.generatedCode[this.opPtr++] = (245).toString(16).toUpperCase();
+                        var temp = "T" + this.staticId;
+                        this.staticMap.set(temp, {
+                            "name": equalsNode.children[1].value.value,
+                            "type": equalsNode.children[1].value.type,
+                            "at": "",
+                            "scopeId": ""
+                        })
+                        // store in accumulator location temp, fill in later
+                        this.generatedCode[this.opPtr++] = "8D";
+                        this.generatedCode[this.opPtr++] = temp;
+                        this.generatedCode[this.opPtr++] = "00";
+                        // increase the static id
+                        this.staticId++;
+                        return temp;
+                    }
+                    else if(equalsNode.children[1].value.value == "false"){
+                        // compare to address of false
+                        // need to store address of false into memory
+                        // need to make entry in static table for value
+                        this.generatedCode[this.opPtr++] = "A9";
+                        this.generatedCode[this.opPtr++] = (250).toString(16).toUpperCase();
+                        var temp = "T" + this.staticId;
+                        this.staticMap.set(temp, {
+                            "name": equalsNode.children[1].value.value,
+                            "type": equalsNode.children[1].value.type,
+                            "at": "",
+                            "scopeId": ""
+                        });
+                        // store in accumulator location temp, fill in later
+                        this.generatedCode[this.opPtr++] = "8D";
+                        this.generatedCode[this.opPtr++] = temp;
+                        this.generatedCode[this.opPtr++] = "00";
+                        // increase the static id
+                        this.staticId++;
+                        return temp;
+                    }
+                    break;
+                case "TId":
+                    // compare x register to address of id
+                    var variable = equalsNode.children[1].value.value;
+                    var scope = equalsNode.children[1].value.scopeId;
+                    var temp = this.findVariableInStaticMap(variable, scope);
+                    return temp;
+            }
+        }
 
         /**
          * Creates area after code in opcodes as static area
@@ -463,7 +461,12 @@ module TSC {
              var itr = this.staticMap.keys();
              for(var i=0; i<this.staticMap.size; i++){
                  var temp = itr.next();
-                 this.staticMap.get(temp.value)["at"] = this.staticStartPtr.toString(16).toUpperCase(); // convert to hex string
+                 var newAddr = this.staticStartPtr.toString(16).toUpperCase(); // convert to hex string
+                 // pad with 0 with necessary
+                 if(newAddr.length < 2){
+                     newAddr = "0" + newAddr;
+                 }
+                 this.staticMap.get(temp.value)["at"] = newAddr;
                  this.staticStartPtr++;
              }
         }

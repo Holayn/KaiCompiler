@@ -185,7 +185,7 @@ module TSC {
                     // figure out which intexpr this is
                     // more than just a digit
                     if(node.children.length > 1){
-                        this.ast.addNode("Addition");
+                        this.ast.addNode(new Token(TokenType.TAddition, "Addition", null, null));
                         this.ast.addNode(node.children[0].children[0].value);
                         this.ast.ascendTree();
                         // figure out expression. make sure return type is int
@@ -212,10 +212,10 @@ module TSC {
                     // more than just a boolval
                     if(node.children.length > 1){
                         if(node.children[2].children[0].value.value == "=="){
-                            this.ast.addNode("EqualTo");
+                            this.ast.addNode(new Token(TokenType.TEquals, "TEquals", null, null));
                         }
                         else{
-                            this.ast.addNode("NotEqualTo");
+                            this.ast.addNode(new Token(TokenType.TNotEquals, "TNotEquals", null, null));
                         }
                         // Get types returned by the two Expr children and make sure they're the same
                         var firstExprType = this.traverse(node.children[1]);
