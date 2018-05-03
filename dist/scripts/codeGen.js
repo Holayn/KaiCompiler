@@ -119,7 +119,7 @@ var TSC;
                             // load the variable temporary address into y register
                             this.generatedCode[this.opPtr++] = "AC";
                             var variable = node.children[0].value.value;
-                            var scope = node.children[0].value.scope;
+                            var scope = node.children[0].value.scopeId;
                             var tempAddr = this.findVariableInStaticMap(variable, scope);
                             this.generatedCode[this.opPtr++] = tempAddr;
                             this.generatedCode[this.opPtr++] = "00";
@@ -148,7 +148,7 @@ var TSC;
                         "name": node.children[1].value.value,
                         "type": node.children[0].value,
                         "at": "",
-                        "scope": node.children[1].value.scopeId
+                        "scopeId": node.children[1].value.scopeId
                     });
                     // store in accumulator location temp 0, fill in later
                     this.generatedCode[this.opPtr++] = "8D";
@@ -190,7 +190,7 @@ var TSC;
                             // load it into accumulator
                             this.generatedCode[this.opPtr++] = "AD";
                             var variable = node.children[1].value.value;
-                            var scope = node.children[1].value.scope;
+                            var scope = node.children[1].value.scopeId;
                             var tempAddr = this.findVariableInStaticMap(variable, scope);
                             this.generatedCode[this.opPtr++] = tempAddr;
                             this.generatedCode[this.opPtr++] = "00";
@@ -198,7 +198,7 @@ var TSC;
                     }
                     // find temp address of variable we're assigning to
                     var variable = node.children[0].value.value;
-                    var scope = node.children[0].value.scope;
+                    var scope = node.children[0].value.scopeId;
                     var tempAddr = this.findVariableInStaticMap(variable, scope);
                     // store whatever is in accumulator to memory
                     this.generatedCode[this.opPtr++] = "8D";
@@ -262,9 +262,9 @@ var TSC;
                                         case "TId":
                                             // look up variable in static table, get its temp address
                                             // load it into x register 
-                                            this.generatedCode[this.opPtr++] = "AD";
-                                            var variable = node.children[1].value.value;
-                                            var scope = node.children[1].value.scope;
+                                            this.generatedCode[this.opPtr++] = "AE";
+                                            var variable = node.children[0].children[0].value.value;
+                                            var scope = node.children[0].children[0].value.scopeId;
                                             var tempAddr = this.findVariableInStaticMap(variable, scope);
                                             this.generatedCode[this.opPtr++] = tempAddr;
                                             this.generatedCode[this.opPtr++] = "00";
@@ -282,7 +282,7 @@ var TSC;
                                                 "name": node.children[0].children[1].value.value,
                                                 "type": node.children[0].children[1].value.type,
                                                 "at": "",
-                                                "scope": ""
+                                                "scopeId": ""
                                             });
                                             // store in accumulator location temp, fill in later
                                             this.generatedCode[this.opPtr++] = "8D";
@@ -307,7 +307,7 @@ var TSC;
                                                 "name": node.children[0].children[1].value.value,
                                                 "type": node.children[0].children[1].value.type,
                                                 "at": "",
-                                                "scope": ""
+                                                "scopeId": ""
                                             });
                                             // store in accumulator location temp, fill in later
                                             this.generatedCode[this.opPtr++] = "8D";
@@ -333,7 +333,7 @@ var TSC;
                                                     "name": node.children[0].children[1].value.value,
                                                     "type": node.children[0].children[1].value.type,
                                                     "at": "",
-                                                    "scope": ""
+                                                    "scopeId": ""
                                                 });
                                                 // store in accumulator location temp, fill in later
                                                 this.generatedCode[this.opPtr++] = "8D";
@@ -356,7 +356,7 @@ var TSC;
                                                     "name": node.children[0].children[1].value.value,
                                                     "type": node.children[0].children[1].value.type,
                                                     "at": "",
-                                                    "scope": ""
+                                                    "scopeId": ""
                                                 });
                                                 // store in accumulator location temp, fill in later
                                                 this.generatedCode[this.opPtr++] = "8D";
@@ -368,6 +368,15 @@ var TSC;
                                                 this.generatedCode[this.opPtr++] = temp;
                                                 this.generatedCode[this.opPtr++] = "00";
                                             }
+                                            break;
+                                        case "TId":
+                                            // compare x register to address of id
+                                            var variable = node.children[0].children[1].value.value;
+                                            var scope = node.children[0].children[1].value.scopeId;
+                                            var temp = this.findVariableInStaticMap(variable, scope);
+                                            this.generatedCode[this.opPtr++] = "EC";
+                                            this.generatedCode[this.opPtr++] = temp;
+                                            this.generatedCode[this.opPtr++] = "00";
                                             break;
                                     }
                                     break;
