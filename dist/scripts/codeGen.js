@@ -156,10 +156,6 @@ var TSC;
                     break;
                 // subtree root is assignment
                 case TSC.Production.AssignStmt:
-                    // find temp address
-                    var variable = node.children[0].value.value;
-                    var scope = node.children[0].value.scope;
-                    var tempAddr = this.findVariableInStaticMap(variable, scope);
                     // figure out what is being assigned to it
                     switch (node.children[1].value.type) {
                         case "TDigit":
@@ -197,10 +193,15 @@ var TSC;
                             this.generatedCode[this.opPtr++] = "00";
                             break;
                     }
+                    // find temp address of variable we're assigning to
+                    var variable = node.children[0].value.value;
+                    var scope = node.children[0].value.scope;
+                    var tempAddr = this.findVariableInStaticMap(variable, scope);
                     // store whatever is in accumulator to memory
                     this.generatedCode[this.opPtr++] = "8D";
                     this.generatedCode[this.opPtr++] = tempAddr;
                     this.generatedCode[this.opPtr++] = "00";
+                    break;
             }
         };
         /**
