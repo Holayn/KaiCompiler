@@ -28,6 +28,7 @@ var TSC;
         ErrorType["NoMoreStackMemory"] = "NoMoreStackMemory";
         ErrorType["NoMoreHeapMemory"] = "NoMoreHeapMemory";
         ErrorType["NoMoreCodeMemory"] = "NoMoreCodeMemory";
+        ErrorType["NestedBoolean"] = "NestedBoolean";
     })(ErrorType = TSC.ErrorType || (TSC.ErrorType = {}));
     var Error = /** @class */ (function () {
         function Error(tokenType, value, lineNumber, colNumber) {

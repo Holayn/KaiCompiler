@@ -15,7 +15,8 @@ module TSC {
         IncorrectIntegerExpression = "IncorrectIntegerExpression",
         NoMoreStackMemory = "NoMoreStackMemory",
         NoMoreHeapMemory = "NoMoreHeapMemory",
-        NoMoreCodeMemory = "NoMoreCodeMemory"
+        NoMoreCodeMemory = "NoMoreCodeMemory",
+        NestedBoolean = "NestedBoolean"
     }
     export class Error {
         type: ErrorType;

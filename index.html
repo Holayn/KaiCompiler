@@ -83,9 +83,7 @@
             <hr>
             <br>
             <div class="card-panel">
-				<button data-clipboard-target="#taCodeOutput" onclick="copyText()" type="button" class="waves-effect waves-light btn">Copy</button>
-				<br>
-				<br>
+				<!-- <button data-clipboard-target="#taCodeOutput" onclick="copyText()" type="button" class="waves-effect waves-light btn">Copy</button> -->
                 <textarea id="taCodeOutput" readonly></textarea>
             </div>
 			<br>
@@ -678,13 +676,15 @@
 				return;
 			}
             // put generated code into box
-            var generatedCode = res;
+			var generatedCode = res;
+			document.getElementById("taCodeOutput").innerHTML += "Program " + programCounter + ":\n";
             for(var i=0; i<generatedCode.length; i++){
                 document.getElementById("taCodeOutput").innerHTML += generatedCode[i];
                 if(i != generatedCode.length-1){
                     document.getElementById("taCodeOutput").innerHTML += " ";
                 }
 			}
+			document.getElementById("taCodeOutput").innerHTML += "\n";
 			// put code gen log messages into log box
 			if(verboseOn){
 				for(var i=0; i<codeGenerator.getLog().length; i++){

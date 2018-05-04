@@ -344,8 +344,66 @@ module TSC {
                             break;
                         //TODO
                         case TSC.TokenType.TEquals:
+                            // get back the address we're comparing to the x register, which is already loaded
+                            address = this.generateEquals(astNode.children[1]);
+                            // perform comparison of x register to temp address
+                            this.setCode("EC");
+                            this.setCode(address);    
+                            this.setCode("00");
+                            // if vals are equal, should get 1 in z flag
+                            // generate code to store address of true/false in accumulator
+                            this.setCode("A9");
+                            this.setCode((250).toString(16).toUpperCase());
+                            // branch if vals are unequal
+                            this.setCode("D0");
+                            this.setCode("02");
+                            this.setCode("A9");
+                            this.setCode((245).toString(16).toUpperCase());
                             break;
                         case TSC.TokenType.TNotEquals:
+                            // get back the address we're comparing to the x register
+                            var addr = this.generateEquals(astNode.children[1]);
+                            // perform comparison of x register to temp address
+                            this.setCode("EC");
+                            this.setCode(addr);    
+                            this.setCode("00");
+                            // assign acc to 0
+                            this.setCode("A9");
+                            this.setCode("00");
+                            // branch if not equal
+                            this.setCode("D0");
+                            this.setCode("02");
+                            // if equal, set acc to 1
+                            this.setCode("A9");
+                            this.setCode("01");
+                            // set x register to 0
+                            this.setCode("A2");
+                            this.setCode("00");
+                            // store acc in an address
+                            // store acc in new address so we can compare its value with x register
+                            var temp = "T" + this.staticId;
+                            this.staticMap.set(temp, {
+                                "name":"",
+                                "type": "",
+                                "at": "",
+                                "scopeId": ""
+                            });
+                            this.staticId++;
+                            this.setCode("8D");
+                            this.setCode(temp);
+                            this.setCode("00");
+                            // compare x and temp
+                            this.setCode("EC");
+                            this.setCode(temp);
+                            this.setCode("00");
+                            // generate code to store address of true/false in accumulator
+                            this.setCode("A9");
+                            this.setCode((250).toString(16).toUpperCase());
+                            // branch if vals are equal
+                            this.setCode("D0");
+                            this.setCode("02");
+                            this.setCode("A9");
+                            this.setCode((245).toString(16).toUpperCase());
                             break;
                     }
                     // find temp address of variable we're assigning to
@@ -691,6 +749,15 @@ module TSC {
                     break;
                 case TSC.TokenType.TEquals:
                     // TODO: BOOLEAN HELL!
+                    // for now, throw error showing nonsupport
+                    this.hasError = true;
+                    this.error = new Error(TSC.ErrorType.NestedBoolean, "", 0, 0);
+                    break;
+                case TSC.TokenType.TNotEquals:
+                    // TODO: BOOLEAN HELL!
+                    // for now, throw error showing nonsupport
+                    this.hasError = true;
+                    this.error = new Error(TSC.ErrorType.NestedBoolean, "", 0, 0);
                     break;
             }
             // RHS: compare to address of what rhs is. actually, just return mem address of rhs
@@ -792,12 +859,21 @@ module TSC {
                     return memAddr;
                 case TSC.TokenType.TEquals:
                     // TODO: BOOLEAN HELL!
+                    // for now, throw error showing nonsupport
+                    this.hasError = true;
+                    this.error = new Error(TSC.ErrorType.NestedBoolean, "", 0, 0);
                     // // we need to determine what lhs is..digit, variable (load whatever stored in mem address), another boolean expr
                         // if another boolean expr, need to generate whole set of opcodes for that boolean expr, then store result of that somewhere
                         // in memory, then need to use that to compare to whatever is being compared to in boolean expr
                         // probably can just allocate a single space maybe?
                         // actually, we know this will always evaluate to a boolean val so can just return address of true/false, compare to addr of true
                         // this.determineLHSEqualTo(node);
+                    break;
+                case TSC.TokenType.TNotEquals:
+                    // TODO: BOOLEAN HELL!
+                    // for now, throw error showing nonsupport
+                    this.hasError = true;
+                    this.error = new Error(TSC.ErrorType.NestedBoolean, "", 0, 0);
                     break;
             }
         }
