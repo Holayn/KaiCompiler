@@ -654,7 +654,13 @@
                 if(i != generatedCode.length-1){
                     document.getElementById("taCodeOutput").innerHTML += " ";
                 }
-            }
+			}
+			// put code gen log messages into log box
+			if(verboseOn){
+				for(var i=0; i<codeGenerator.getLog().length; i++){
+					putMessage("C.GEN -> | " + codeGenerator.getLog()[i]);
+				}
+			}
 		}
 		
     
