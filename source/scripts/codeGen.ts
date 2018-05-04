@@ -364,15 +364,55 @@ module TSC {
                             this.generatedCode[this.opPtr++] = "EC";
                             this.generatedCode[this.opPtr++] = address;    
                             this.generatedCode[this.opPtr++] = "00";
+                            // if vals are equal, should get 1 in z flag
+                            break;
+                        // if lhs is boolean expression inequality
+                        case "TNotEquals":
+                            // get back the address we're comparing to the x register
+                            var addr = this.generateEquals(astNode.children[0]);
+                            // perform comparison of x register to temp address
+                            this.generatedCode[this.opPtr++] = "EC";
+                            this.generatedCode[this.opPtr++] = addr;    
+                            this.generatedCode[this.opPtr++] = "00";
+                            // assign acc to 0
+                            this.generatedCode[this.opPtr++] = "A9";
+                            this.generatedCode[this.opPtr++] = "00";
+                            // branch if not equal
+                            this.generatedCode[this.opPtr++] = "D0";
+                            this.generatedCode[this.opPtr++] = "02";
+                            // if equal, set acc to 1
+                            this.generatedCode[this.opPtr++] = "A9";
+                            this.generatedCode[this.opPtr++] = "01";
+                            // set x register to 0
+                            this.generatedCode[this.opPtr++] = "A2";
+                            this.generatedCode[this.opPtr++] = "00";
+                            // store acc in an address
+                            // store acc in new address so we can compare its value with x register
+                            var temp = "T" + this.staticId;
+                            this.staticMap.set(temp, {
+                                "name":"",
+                                "type": "",
+                                "at": "",
+                                "scopeId": ""
+                            });
+                            this.staticId++;
+                            this.generatedCode[this.opPtr++] = "8D";
+                            this.generatedCode[this.opPtr++] = temp;
+                            this.generatedCode[this.opPtr++] = "00";
+                            // compare x and temp
+                            this.generatedCode[this.opPtr++] = "EC";
+                            this.generatedCode[this.opPtr++] = temp;
+                            this.generatedCode[this.opPtr++] = "00";
+                            // if vals are equal, should get 1 in z flag
                             break;
                     }
-                    // z flag has now been assigned, set acc to 1
+                    // z flag has now been assigned. set acc to 1
                     this.generatedCode[this.opPtr++] = "A9";
                     this.generatedCode[this.opPtr++] = "01";
-                    // branch if not equal
+                    // branch if z flag is 0
                     this.generatedCode[this.opPtr++] = "D0";
                     this.generatedCode[this.opPtr++] = "02";
-                    // (if equal, then set accumulator to zero)
+                    // (if z flag is 1, then set accumulator to zero)
                     this.generatedCode[this.opPtr++] = "A9";
                     this.generatedCode[this.opPtr++] = "00";
                     // set x register to 0
@@ -487,6 +527,43 @@ module TSC {
                             this.generatedCode[this.opPtr++] = addr;    
                             this.generatedCode[this.opPtr++] = "00";
                             break;
+                        case "TNotEquals":
+                            // get back the address we're comparing to the x register
+                            var addr = this.generateEquals(astNode.children[0]);
+                            // perform comparison of x register to temp address
+                            this.generatedCode[this.opPtr++] = "EC";
+                            this.generatedCode[this.opPtr++] = addr;    
+                            this.generatedCode[this.opPtr++] = "00";
+                            // assign acc to 0
+                            this.generatedCode[this.opPtr++] = "A9";
+                            this.generatedCode[this.opPtr++] = "00";
+                            // branch if not equal
+                            this.generatedCode[this.opPtr++] = "D0";
+                            this.generatedCode[this.opPtr++] = "02";
+                            // if equal, set acc to 1
+                            this.generatedCode[this.opPtr++] = "A9";
+                            this.generatedCode[this.opPtr++] = "01";
+                            // set x register to 0
+                            this.generatedCode[this.opPtr++] = "A2";
+                            this.generatedCode[this.opPtr++] = "00";
+                            // store acc in an address
+                            // store acc in new address so we can compare its value with x register
+                            var temp = "T" + this.staticId;
+                            this.staticMap.set(temp, {
+                                "name":"",
+                                "type": "",
+                                "at": "",
+                                "scopeId": ""
+                            });
+                            this.staticId++;
+                            this.generatedCode[this.opPtr++] = "8D";
+                            this.generatedCode[this.opPtr++] = temp;
+                            this.generatedCode[this.opPtr++] = "00";
+                            // compare x and temp
+                            this.generatedCode[this.opPtr++] = "EC";
+                            this.generatedCode[this.opPtr++] = temp;
+                            this.generatedCode[this.opPtr++] = "00";
+                            break;
                         // // we need to determine what lhs is..digit, variable (load whatever stored in mem address), another boolean expr
                         // if another boolean expr, need to generate whole set of opcodes for that boolean expr, then store result of that somewhere
                         // in memory, then need to use that to compare to whatever is being compared to in boolean expr
@@ -525,6 +602,8 @@ module TSC {
          * @param equalsNode takes in the equals node
          */
         private generateEquals(equalsNode) {
+            console.log("GENERATE");
+            console.log(equalsNode);
             // LHS: load what is in lhs into x register
             switch(equalsNode.children[0].value.type){
                 case "TDigit":
