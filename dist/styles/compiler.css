@@ -82,3 +82,4 @@ main {
 #taCodeOutput{
 	height: 150px;
 }
+textarea, input, button { outline: none; }

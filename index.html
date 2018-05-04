@@ -83,7 +83,10 @@
             <hr>
             <br>
             <div class="card-panel">
-                <textarea id="taCodeOutput" readonly disabled></textarea>
+				<button data-clipboard-target="#taCodeOutput" onclick="copyText()" type="button" class="waves-effect waves-light btn">Copy</button>
+				<br>
+				<br>
+                <textarea id="taCodeOutput" readonly></textarea>
             </div>
 			<br>
 			<div class="row">
@@ -265,7 +268,8 @@
 
 
     <!-- Client-side code down here, per the YSlow advice. 
-         (http://developer.yahoo.com/performance/rules.html#js_bottom) -->
+		 (http://developer.yahoo.com/performance/rules.html#js_bottom) -->
+	<script src="dist/clipboard.min.js"></script>
 	<script type="text/javascript" src="dist/scripts/utils.js"></script>	
 	<script type="text/javascript" src="dist/scripts/lexer.js"></script>	
 	<script type="text/javascript" src="dist/scripts/parser.js"></script>
@@ -281,8 +285,17 @@
 	<script type="text/javascript" src="dist/scripts/scope.js"></script>
 	<script type="text/javascript" src="dist/scripts/codeGen.js"></script>
 	<script type="text/javascript">
+
+		new ClipboardJS('.btn');
 	
-        var verboseOn = true;
+		var verboseOn = true;
+		
+		function copyText() {
+			// var copyText = document.getElementById("taCodeOutput");
+			// console.log(copyText);
+			// copyText.select();
+			// document.execCommand('copy');
+		}
 
 		function init() {
             // Clear the log and the CST.
