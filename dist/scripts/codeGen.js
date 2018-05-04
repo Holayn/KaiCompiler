@@ -153,55 +153,6 @@ var TSC;
                             this.generatedCode[this.opPtr++] = "EC";
                             this.generatedCode[this.opPtr++] = addr;
                             this.generatedCode[this.opPtr++] = "00";
-                            // if equal, don't branch, print true
-                            // if not equal, branch to print false
-                            // z flag has now been assigned, set acc to 1
-                            this.generatedCode[this.opPtr++] = "A9";
-                            this.generatedCode[this.opPtr++] = "01";
-                            // branch if not equal
-                            this.generatedCode[this.opPtr++] = "D0";
-                            this.generatedCode[this.opPtr++] = "02";
-                            // (if equal, then set accumulator to zero)
-                            this.generatedCode[this.opPtr++] = "A9";
-                            this.generatedCode[this.opPtr++] = "00";
-                            // set x register to 0
-                            this.generatedCode[this.opPtr++] = "A2";
-                            this.generatedCode[this.opPtr++] = "00";
-                            // store acc in new address so we can compare its value with x register
-                            var temp = "T" + this.staticId;
-                            this.staticMap.set(temp, {
-                                "name": "",
-                                "type": "",
-                                "at": "",
-                                "scopeId": ""
-                            });
-                            this.staticId++;
-                            this.generatedCode[this.opPtr++] = "8D";
-                            this.generatedCode[this.opPtr++] = temp;
-                            this.generatedCode[this.opPtr++] = "00";
-                            // compare address to x register, branch if unequal
-                            this.generatedCode[this.opPtr++] = "EC";
-                            this.generatedCode[this.opPtr++] = temp;
-                            this.generatedCode[this.opPtr++] = "00";
-                            // load y with false if unequal
-                            this.generatedCode[this.opPtr++] = "A0";
-                            this.generatedCode[this.opPtr++] = (250).toString(16).toUpperCase();
-                            // load y with true if equal
-                            this.generatedCode[this.opPtr++] = "D0";
-                            this.generatedCode[this.opPtr++] = "02";
-                            this.generatedCode[this.opPtr++] = "A0";
-                            this.generatedCode[this.opPtr++] = (245).toString(16).toUpperCase();
-                            // load x register with 2
-                            this.generatedCode[this.opPtr++] = "A2";
-                            this.generatedCode[this.opPtr++] = "02";
-                            break;
-                        case "TNotEquals":
-                            // loads x register with lhs, gives back rhs
-                            var addr = this.generateEquals(astNode.children[0]);
-                            // perform comparison of x register to temp address
-                            this.generatedCode[this.opPtr++] = "EC";
-                            this.generatedCode[this.opPtr++] = addr;
-                            this.generatedCode[this.opPtr++] = "00";
                             // if equal, branch, print true
                             // if not equal, don't branch to print false
                             this.generatedCode[this.opPtr++] = "D0";
@@ -224,6 +175,39 @@ var TSC;
                             // load y with false
                             this.generatedCode[this.opPtr++] = "A0";
                             this.generatedCode[this.opPtr++] = (250).toString(16).toUpperCase();
+                            // load x register with 2
+                            this.generatedCode[this.opPtr++] = "A2";
+                            this.generatedCode[this.opPtr++] = "02";
+                            break;
+                        case "TNotEquals":
+                            // loads x register with lhs, gives back rhs
+                            var addr = this.generateEquals(astNode.children[0]);
+                            // perform comparison of x register to temp address
+                            this.generatedCode[this.opPtr++] = "EC";
+                            this.generatedCode[this.opPtr++] = addr;
+                            this.generatedCode[this.opPtr++] = "00";
+                            // if equal, branch, print true
+                            // if not equal, don't branch to print false
+                            this.generatedCode[this.opPtr++] = "D0";
+                            this.generatedCode[this.opPtr++] = "0A";
+                            // load y with false
+                            this.generatedCode[this.opPtr++] = "A0";
+                            this.generatedCode[this.opPtr++] = (250).toString(16).toUpperCase();
+                            // set x register to address, compare same address to x register to set z to zero
+                            // load 1 into acc, set x to 0, stores acc in some address
+                            // compares that address and x register, branches if unequal
+                            // we know last address and the address before will always be unequal, so compare those
+                            this.generatedCode[this.opPtr++] = "AE";
+                            this.generatedCode[this.opPtr++] = "FF";
+                            this.generatedCode[this.opPtr++] = "00";
+                            this.generatedCode[this.opPtr++] = "EC";
+                            this.generatedCode[this.opPtr++] = "FE";
+                            this.generatedCode[this.opPtr++] = "00";
+                            this.generatedCode[this.opPtr++] = "D0";
+                            this.generatedCode[this.opPtr++] = "02";
+                            // load y with true
+                            this.generatedCode[this.opPtr++] = "A0";
+                            this.generatedCode[this.opPtr++] = (245).toString(16).toUpperCase();
                             // load x register with 2
                             this.generatedCode[this.opPtr++] = "A2";
                             this.generatedCode[this.opPtr++] = "02";
@@ -300,6 +284,11 @@ var TSC;
                         case "TAddition":
                             // result ends up in accumulator
                             this.generateAddition(astNode.children[1]);
+                            break;
+                        //TODO
+                        case "TEquals":
+                            break;
+                        case "TNotEquals":
                             break;
                     }
                     // find temp address of variable we're assigning to
