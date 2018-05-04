@@ -25,10 +25,10 @@ module TSC {
         TQuote = "TQuote",
         TChar = "TChar",
         TSpace = "TSpace",
-        TString = "TString",
-        TAddition = "TAddition",
-        TEquals = "TEquals",
-        TNotEquals = "TNotEquals"
+        TString = "String",
+        TAddition = "Addition",
+        TEquals = "Equals",
+        TNotEquals = "NotEquals"
     }
 
     export class Token {

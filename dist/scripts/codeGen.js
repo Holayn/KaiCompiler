@@ -67,8 +67,6 @@ var TSC;
         CodeGenerator.prototype.getLog = function () {
             return this.log;
         };
-        CodeGenerator.prototype.nextScopeNode = function (scopeNode) {
-        };
         // TODO: define code, static, heap areas. throw error if code goes into heap area, code becomes too big, etc.
         /**
          * Helper to generateCode, performs actual traversing and code generation
@@ -101,20 +99,19 @@ var TSC;
                     break;
                 // subtree root is a print statement
                 case TSC.Production.PrintStmt:
-                    this.log.push("Generating op codes for [" + TSC.Production.PrintStmt + "]");
+                    this.log.push("Generating op codes for [" + TSC.Production.PrintStmt + "] in scope " + this.scopeNodes[this.scopePtr].value.id);
+                    this.log.push("Generating op codes for printing a(n) " + astNode.children[0].value.type);
                     // determine type of child
                     switch (astNode.children[0].value.type) {
-                        case "TDigit":
-                            rootType = TSC.TokenType.TDigit;
+                        case TSC.TokenType.TDigit:
                             // load y register with constant of value digit as string
                             this.setCode("A0");
                             this.setCode("0" + astNode.children[0].value.value);
                             // load x regis with 1
                             this.setCode("A2");
                             this.setCode("01");
-                            numOpCodes += 4;
                             break;
-                        case "TString":
+                        case TSC.TokenType.TString:
                             rootType = TSC.TokenType.TString;
                             // put str in heap and get ptr to it
                             var strPtr = this.allocateStringInHeap(astNode.children[0].value.value);
@@ -124,9 +121,8 @@ var TSC;
                             // load x regis with 2
                             this.setCode("A2");
                             this.setCode("02");
-                            numOpCodes += 4;
                             break;
-                        case "TBoolval":
+                        case TSC.TokenType.TBoolval:
                             rootType = TSC.TokenType.TBoolval;
                             this.setCode("A0");
                             if (astNode.children[0].value.value == "true") {
@@ -140,9 +136,8 @@ var TSC;
                             // load x regis with 2
                             this.setCode("A2");
                             this.setCode("02");
-                            numOpCodes += 4;
                             break;
-                        case "TId":
+                        case TSC.TokenType.TId:
                             rootType = TSC.TokenType.TId;
                             // load the variable temporary address into y register
                             this.setCode("AC");
@@ -163,9 +158,8 @@ var TSC;
                                 this.setCode("A2");
                                 this.setCode("01");
                             }
-                            numOpCodes += 5;
                             break;
-                        case "TEquals":
+                        case TSC.TokenType.TEquals:
                             rootType = TSC.TokenType.TEquals;
                             // loads x register with lhs, gives back rhs
                             var addr = this.generateEquals(astNode.children[0]);
@@ -198,9 +192,8 @@ var TSC;
                             // load x register with 2
                             this.setCode("A2");
                             this.setCode("02");
-                            numOpCodes += 19;
                             break;
-                        case "TNotEquals":
+                        case TSC.TokenType.TNotEquals:
                             rootType = TSC.TokenType.TNotEquals;
                             // loads x register with lhs, gives back rhs
                             var addr = this.generateEquals(astNode.children[0]);
@@ -234,7 +227,7 @@ var TSC;
                             this.setCode("A2");
                             this.setCode("02");
                             break;
-                        case "TAddition":
+                        case TSC.TokenType.TAddition:
                             rootType = TSC.TokenType.TAddition;
                             var temp = this.generateAddition(astNode.children[0]);
                             // print what is in accumulator, by storing result (in memory) into y register
@@ -248,11 +241,10 @@ var TSC;
                     }
                     // sys call
                     this.setCode("FF");
-                    numOpCodes += 1;
                     break;
                 // subtree root is var decl
                 case TSC.Production.VarDecl:
-                    this.log.push("Generating op codes for [" + TSC.Production.VarDecl + "]");
+                    this.log.push("Generating op codes for [" + TSC.Production.VarDecl + "] in scope " + this.scopeNodes[this.scopePtr].value.id);
                     // need to make entry in static table for variable
                     var temp = "T" + this.staticId;
                     this.staticMap.set(temp, {
@@ -270,22 +262,23 @@ var TSC;
                     break;
                 // subtree root is assignment
                 case TSC.Production.AssignStmt:
-                    this.log.push("Generating op codes for [" + TSC.Production.AssignStmt + "]");
+                    this.log.push("Generating op codes for [" + TSC.Production.AssignStmt + "] in scope " + this.scopeNodes[this.scopePtr].value.id);
+                    this.log.push("Generating op codes for assigning a " + astNode.children[1].value.type + " to a(n) " + astNode.children[0].value.type);
                     // figure out what is being assigned to it
                     switch (astNode.children[1].value.type) {
-                        case "TDigit":
+                        case TSC.TokenType.TDigit:
                             // load digit as constant into accumulator
                             this.setCode("A9");
                             this.setCode("0" + astNode.children[1].value.value);
                             break;
-                        case "TString":
+                        case TSC.TokenType.TString:
                             // put str in heap and get ptr to it
                             var strPtr = this.allocateStringInHeap(astNode.children[1].value.value);
                             // load into accumulator as constant
                             this.setCode("A9");
                             this.setCode(strPtr);
                             break;
-                        case "TBoolval":
+                        case TSC.TokenType.TBoolval:
                             if (astNode.children[1].value.value == "true") {
                                 // load address of true in heap into accumulator as constant
                                 this.setCode("A9");
@@ -297,7 +290,7 @@ var TSC;
                                 this.setCode((250).toString(16).toUpperCase());
                             }
                             break;
-                        case "TId":
+                        case TSC.TokenType.TId:
                             // look up variable we're assigning to something else in static table, get its temp address
                             // load it into accumulator
                             this.setCode("AD");
@@ -307,14 +300,14 @@ var TSC;
                             this.setCode(addr);
                             this.setCode("00");
                             break;
-                        case "TAddition":
+                        case TSC.TokenType.TAddition:
                             // result ends up in accumulator
                             this.generateAddition(astNode.children[1]);
                             break;
                         //TODO
-                        case "TEquals":
+                        case TSC.TokenType.TEquals:
                             break;
-                        case "TNotEquals":
+                        case TSC.TokenType.TNotEquals:
                             break;
                     }
                     // find temp address of variable we're assigning to
@@ -328,14 +321,15 @@ var TSC;
                     break;
                 // subtree root is while statement
                 case TSC.Production.WhileStmt:
-                    this.log.push("Generating op codes for [" + TSC.Production.WhileStmt + "]");
+                    this.log.push("Generating op codes for [" + TSC.Production.WhileStmt + "] in scope " + this.scopeNodes[this.scopePtr].value.id);
+                    this.log.push("Generating op codes for a while condition on a(n) " + astNode.children[0].value.type);
                     // keep ptr to start of while loop
                     var whileStartPtr = this.opPtr;
                     // evaluate lhs first, which is the boolean result
                     var address;
                     switch (astNode.children[0].value.type) {
                         // if lhs is a boolean value, set zero flag to 1 if true, set zero flag to 0 if false
-                        case "TBoolval":
+                        case TSC.TokenType.TBoolval:
                             // load heap address of true into x register
                             if (astNode.children[0].value.value == "true") {
                                 address = (245).toString(16).toUpperCase();
@@ -355,7 +349,7 @@ var TSC;
                             this.setCode("00");
                             break;
                         // if lhs is a boolean expression equality
-                        case "TEquals":
+                        case TSC.TokenType.TEquals:
                             // get back the address we're comparing to the x register, which is already loaded
                             address = this.generateEquals(astNode.children[0]);
                             // perform comparison of x register to temp address
@@ -365,7 +359,7 @@ var TSC;
                             // if vals are equal, should get 1 in z flag
                             break;
                         // if lhs is boolean expression inequality
-                        case "TNotEquals":
+                        case TSC.TokenType.TNotEquals:
                             // get back the address we're comparing to the x register
                             var addr = this.generateEquals(astNode.children[0]);
                             // perform comparison of x register to temp address
@@ -495,11 +489,12 @@ var TSC;
                     break;
                 // subtree root is if statement
                 case TSC.Production.IfStmt:
-                    this.log.push("Generating op codes for [" + TSC.Production.IfStmt + "]");
+                    this.log.push("Generating op codes for [" + TSC.Production.IfStmt + "] in scope " + this.scopeNodes[this.scopePtr].value.id);
+                    this.log.push("Generating op codes for an if condition on a(n) " + astNode.children[0].value.type);
                     // look at its left and right children
                     switch (astNode.children[0].value.type) {
                         // if lhs is a boolean value, set zero flag to 1 if true, set zero flag to 0 if false
-                        case "TBoolval":
+                        case TSC.TokenType.TBoolval:
                             // load heap address of true into x register
                             if (astNode.children[0].value.value == "true") {
                                 this.setCode("AE");
@@ -518,7 +513,7 @@ var TSC;
                             break;
                         // if lhs is a boolean expression equality 
                         // might be null because equalto isn't stored in my ast with a type
-                        case "TEquals":
+                        case TSC.TokenType.TEquals:
                             // get back the address we're comparing to the x register
                             var addr = this.generateEquals(astNode.children[0]);
                             // perform comparison of x register to temp address
@@ -526,7 +521,7 @@ var TSC;
                             this.setCode(addr);
                             this.setCode("00");
                             break;
-                        case "TNotEquals":
+                        case TSC.TokenType.TNotEquals:
                             // get back the address we're comparing to the x register
                             var addr = this.generateEquals(astNode.children[0]);
                             // perform comparison of x register to temp address
@@ -588,15 +583,6 @@ var TSC;
                     });
                     break;
             }
-            var genCodesArr = [];
-            // Push generated codes into log
-            if (numOpCodes == 0) {
-                return;
-            }
-            for (var i = numOpCodes; i >= 0; i--) {
-                genCodesArr.push(this.generatedCode[this.opPtr - i]);
-            }
-            this.log.push("Generated " + genCodesArr.join(" ") + " for " + rootType);
         };
         /**
          * Sets the op code in the code array as code passed in
@@ -611,21 +597,22 @@ var TSC;
          * @param equalsNode takes in the equals node
          */
         CodeGenerator.prototype.generateEquals = function (equalsNode) {
+            this.log.push("Generating op codes for a boolean expression comparing a(n) " + equalsNode.children[0].value.type + " to a(n) " + equalsNode.children[1].value.type);
             // LHS: load what is in lhs into x register
             switch (equalsNode.children[0].value.type) {
-                case "TDigit":
+                case TSC.TokenType.TDigit:
                     // load digit as constant into x register
                     this.setCode("A2");
                     this.setCode("0" + equalsNode.children[0].value.value);
                     break;
-                case "TString":
+                case TSC.TokenType.TString:
                     // we will compare strings based on what address is in heap
                     // put ptr of string in heap to x register as constant
                     var strPtr = this.allocateStringInHeap(equalsNode.children[0].value.value);
                     this.setCode("A2");
                     this.setCode(strPtr);
                     break;
-                case "TBoolval":
+                case TSC.TokenType.TBoolval:
                     // put ptr of boolean val to x register as constant
                     if (equalsNode.children[0].value.value == "true") {
                         // load address of true 
@@ -638,7 +625,7 @@ var TSC;
                         this.setCode((250).toString(16).toUpperCase());
                     }
                     break;
-                case "TId":
+                case TSC.TokenType.TId:
                     // look up variable in static table, get its temp address
                     // load it into x register 
                     this.setCode("AE");
@@ -648,20 +635,20 @@ var TSC;
                     this.setCode(tempAddr);
                     this.setCode("00");
                     break;
-                case "TAddition":
+                case TSC.TokenType.TAddition:
                     // load result of addition in accumulator (which was stored in static storage) to x register
                     var memAddr = this.generateAddition(equalsNode.children[0]); // get mem addr of result from static storage
                     this.setCode("AE");
                     this.setCode(memAddr);
                     this.setCode("00");
                     break;
-                case "TEquals":
+                case TSC.TokenType.TEquals:
                     // TODO: BOOLEAN HELL!
                     break;
             }
             // RHS: compare to address of what rhs is. actually, just return mem address of rhs
             switch (equalsNode.children[1].value.type) {
-                case "TDigit":
+                case TSC.TokenType.TDigit:
                     // put this value into the accumulator, store it in somewhere
                     // need to make entry in static table for value
                     this.setCode("A9");
@@ -680,7 +667,7 @@ var TSC;
                     // increase the static id
                     this.staticId++;
                     return temp;
-                case "TString":
+                case TSC.TokenType.TString:
                     // we will compare strings based on what address is in heap
                     // perform comparison of x register to this temp address
                     var strPtr = this.allocateStringInHeap(equalsNode.children[1].value.value);
@@ -701,7 +688,7 @@ var TSC;
                     // increase the static id
                     this.staticId++;
                     return temp;
-                case "TBoolval":
+                case TSC.TokenType.TBoolval:
                     // generate address to hold address to true/false
                     if (equalsNode.children[1].value.value == "true") {
                         // compare to address of true 
@@ -746,17 +733,17 @@ var TSC;
                         return temp;
                     }
                     break;
-                case "TId":
+                case TSC.TokenType.TId:
                     // compare x register to address of id
                     var variable = equalsNode.children[1].value.value;
                     var scope = equalsNode.children[1].value.scopeId;
                     var temp = this.findVariableInStaticMap(variable, scope);
                     return temp;
-                case "TAddition":
+                case TSC.TokenType.TAddition:
                     // return result of addition in accumulator (which was stored in static storage)
                     var memAddr = this.generateAddition(equalsNode.children[1]); // get mem addr of result from static storage
                     return memAddr;
-                case "TEquals":
+                case TSC.TokenType.TEquals:
                     // TODO: BOOLEAN HELL!
                     // // we need to determine what lhs is..digit, variable (load whatever stored in mem address), another boolean expr
                     // if another boolean expr, need to generate whole set of opcodes for that boolean expr, then store result of that somewhere
@@ -783,14 +770,14 @@ var TSC;
             });
             this.staticId++;
             switch (additionNode.children[1].value.type) {
-                case "TDigit":
+                case TSC.TokenType.TDigit:
                     this.setCode("A9");
                     this.setCode("0" + additionNode.children[1].value.value);
                     this.setCode("8D");
                     this.setCode(temp);
                     this.setCode("00");
                     break;
-                case "TId":
+                case TSC.TokenType.TId:
                     var variable = additionNode.children[1].value.value;
                     var scope = additionNode.children[1].value.scopeId;
                     var addr = this.findVariableInStaticMap(variable, scope);
@@ -801,7 +788,7 @@ var TSC;
                     this.setCode(temp);
                     this.setCode("00");
                     break;
-                case "TAddition":
+                case TSC.TokenType.TAddition:
                     // well, we're going to have to generate those op codes first ?
                     // generate op codes, which will generate that result in the accumulator
                     // use that result and add it to lhs of current (current is loaded into accumulator)
@@ -812,7 +799,7 @@ var TSC;
             }
             // LHS: can only be a digit
             switch (additionNode.children[0].value.type) {
-                case "TDigit":
+                case TSC.TokenType.TDigit:
                     this.setCode("A9");
                     this.setCode("0" + additionNode.children[0].value.value);
                     break;
