@@ -111,6 +111,26 @@ var TSC;
             return { "tree": tree, "treant": treantTree };
         };
         /**
+         * Returns an array representation of DFS of tree
+         */
+        Tree.prototype.traverseTree = function () {
+            var tree = [];
+            if (this.root != null) {
+                this.DFSTree(this.root, tree);
+            }
+            return tree;
+        };
+        /**
+         * Helper for traverseTree
+         * @param tree array rep of tree so far
+         */
+        Tree.prototype.DFSTree = function (node, tree) {
+            tree.push(node);
+            for (var i = 0; i < node.children.length; i++) {
+                this.DFSTree(node.children[i], tree);
+            }
+        };
+        /**
          * Helper for traverseTreeCST
          */
         Tree.prototype.DFSCST = function (node, level, tree, dash, treantTree) {

@@ -14,6 +14,10 @@ var TSC;
             this.heapStartPtr = 256;
             // pointer representing where we are in op code array
             this.opPtr = 0;
+            // pointer representing what node we're looking at in scope tree
+            // at -1, because our first block will increase the pointer to 0, which is
+            // scope 0 in our tree
+            this.scopePtr = -1;
             this.generatedCode = [];
             this.staticMap = new Map();
             this.jumpMap = new Map();
@@ -38,56 +42,68 @@ var TSC;
             // update start of the heap
             this.heapStartPtr = 245;
         }
-        // traverse the ast in preorder fashion.
-        // based on subtree root, perform certain action
         /**
          * Traverse AST. Generate correct opcodes on every subtree root
+         * Also properly traverse scope tree to make sure we can properly access the correct variables
          * @param analyzeRes the result object from the semantic analyzer, contains the AST and symbol tree
          */
         CodeGenerator.prototype.generateCode = function (analyzeRes) {
             var ast = analyzeRes.ast;
+            var scope = analyzeRes.scopeTree;
+            // dfs of scope tree array rep
+            this.scopeNodes = scope.traverseTree();
+            console.log(scope);
+            console.log(this.scopeNodes);
             this.traverseAST(ast.root); // generate initial op codes
             this.createStaticArea();
             this.backPatch(); // perform backpatching on op codes
             // return generated code
             return this.generatedCode;
         };
+        CodeGenerator.prototype.nextScopeNode = function (scopeNode) {
+        };
         // TODO: define code, static, heap areas. throw error if code goes into heap area, code becomes too big, etc.
         /**
          * Helper to generateCode, performs actual traversing and code generation
-         * @param node AST node
+         * @param astNode AST node
+         * @param scopeNodes array of scope nodes in dfs order
          */
-        CodeGenerator.prototype.traverseAST = function (node) {
+        CodeGenerator.prototype.traverseAST = function (astNode) {
             console.log("Current node: ");
-            console.log(node);
+            console.log(astNode);
             console.log("Static table");
             console.log(this.staticMap);
             console.log("Heap");
             console.log(this.heapMap);
+            // console.log("Current scope node: ");
+            // console.log(scopeNode);
             // Determine what kind of production the node is
-            switch (node.value) {
+            switch (astNode.value) {
                 // subtree root is block
                 case TSC.Production.Block:
+                    // every time we encounter a block, we need to traverse to the next scope node so we can look
+                    // at that scope
+                    this.scopePtr++;
                     // traverse block's children
-                    for (var i = 0; i < node.children.length; i++) {
-                        this.traverseAST(node.children[i]);
+                    for (var i = 0; i < astNode.children.length; i++) {
+                        this.traverseAST(astNode.children[i]);
                     }
                     break;
                 // subtree root is a print statement
                 case TSC.Production.PrintStmt:
                     // determine type of child
-                    switch (node.children[0].value.type) {
+                    switch (astNode.children[0].value.type) {
                         case "TDigit":
                             // load y register with constant of value digit as string
                             this.generatedCode[this.opPtr++] = "A0";
-                            this.generatedCode[this.opPtr++] = "0" + node.children[0].value.value;
+                            this.generatedCode[this.opPtr++] = "0" + astNode.children[0].value.value;
                             // load x regis with 1
                             this.generatedCode[this.opPtr++] = "A2";
                             this.generatedCode[this.opPtr++] = "01";
                             break;
                         case "TString":
                             // put str in heap and get ptr to it
-                            var strPtr = this.allocateStringInHeap(node.children[0].value.value);
+                            var strPtr = this.allocateStringInHeap(astNode.children[0].value.value);
                             // load into y register as constant
                             this.generatedCode[this.opPtr++] = "A0";
                             this.generatedCode[this.opPtr++] = strPtr;
@@ -97,11 +113,11 @@ var TSC;
                             break;
                         case "TBoolval":
                             this.generatedCode[this.opPtr++] = "A0";
-                            if (node.children[0].value.value == "true") {
+                            if (astNode.children[0].value.value == "true") {
                                 // load into y register address of true in heap
                                 this.generatedCode[this.opPtr++] = (245).toString(16).toUpperCase();
                             }
-                            else if (node.children[0].value.value == "false") {
+                            else if (astNode.children[0].value.value == "false") {
                                 // load into y register address of false in heap
                                 this.generatedCode[this.opPtr++] = (250).toString(16).toUpperCase();
                             }
@@ -112,8 +128,8 @@ var TSC;
                         case "TId":
                             // load the variable temporary address into y register
                             this.generatedCode[this.opPtr++] = "AC";
-                            var variable = node.children[0].value.value;
-                            var scope = node.children[0].value.scopeId;
+                            var variable = astNode.children[0].value.value;
+                            var scope = astNode.children[0].value.scopeId;
                             var tempAddr = this.findVariableInStaticMap(variable, scope);
                             this.generatedCode[this.opPtr++] = tempAddr;
                             this.generatedCode[this.opPtr++] = "00";
@@ -132,7 +148,7 @@ var TSC;
                             break;
                         case "TEquals":
                             // loads x register with lhs, gives back rhs
-                            var addr = this.generateEquals(node.children[0]);
+                            var addr = this.generateEquals(astNode.children[0]);
                             // perform comparison of x register to temp address
                             this.generatedCode[this.opPtr++] = "EC";
                             this.generatedCode[this.opPtr++] = addr;
@@ -164,7 +180,7 @@ var TSC;
                             this.generatedCode[this.opPtr++] = "02";
                             break;
                         case "TAddition":
-                            var temp = this.generateAddition(node.children[0]);
+                            var temp = this.generateAddition(astNode.children[0]);
                             // print what is in accumulator, by storing result (in memory) into y register
                             // load y register from memory
                             this.generatedCode[this.opPtr++] = "AC";
@@ -182,10 +198,10 @@ var TSC;
                     // need to make entry in static table for variable
                     var temp = "T" + this.staticId;
                     this.staticMap.set(temp, {
-                        "name": node.children[1].value.value,
-                        "type": node.children[0].value,
+                        "name": astNode.children[1].value.value,
+                        "type": astNode.children[0].value,
                         "at": "",
-                        "scopeId": node.children[1].value.scopeId
+                        "scopeId": astNode.children[1].value.scopeId
                     });
                     // store in accumulator location temp 0, fill in later
                     this.generatedCode[this.opPtr++] = "8D";
@@ -197,26 +213,26 @@ var TSC;
                 // subtree root is assignment
                 case TSC.Production.AssignStmt:
                     // figure out what is being assigned to it
-                    switch (node.children[1].value.type) {
+                    switch (astNode.children[1].value.type) {
                         case "TDigit":
                             // load digit as constant into accumulator
                             this.generatedCode[this.opPtr++] = "A9";
-                            this.generatedCode[this.opPtr++] = "0" + node.children[1].value.value;
+                            this.generatedCode[this.opPtr++] = "0" + astNode.children[1].value.value;
                             break;
                         case "TString":
                             // put str in heap and get ptr to it
-                            var strPtr = this.allocateStringInHeap(node.children[1].value.value);
+                            var strPtr = this.allocateStringInHeap(astNode.children[1].value.value);
                             // load into accumulator as constant
                             this.generatedCode[this.opPtr++] = "A9";
                             this.generatedCode[this.opPtr++] = strPtr;
                             break;
                         case "TBoolval":
-                            if (node.children[1].value.value == "true") {
+                            if (astNode.children[1].value.value == "true") {
                                 // load address of true in heap into accumulator as constant
                                 this.generatedCode[this.opPtr++] = "A9";
                                 this.generatedCode[this.opPtr++] = (245).toString(16).toUpperCase();
                             }
-                            else if (node.children[1].value.value == "false") {
+                            else if (astNode.children[1].value.value == "false") {
                                 // load address of false in heap into accumulator as constant
                                 this.generatedCode[this.opPtr++] = "A9";
                                 this.generatedCode[this.opPtr++] = (250).toString(16).toUpperCase();
@@ -226,21 +242,25 @@ var TSC;
                             // look up variable we're assigning to something else in static table, get its temp address
                             // load it into accumulator
                             this.generatedCode[this.opPtr++] = "AD";
-                            var variable = node.children[1].value.value;
-                            var scope = node.children[1].value.scopeId;
-                            var tempAddr = this.findVariableInStaticMap(variable, scope);
-                            this.generatedCode[this.opPtr++] = tempAddr;
+                            var variable = astNode.children[1].value.value;
+                            var scope = astNode.children[1].value.scopeId;
+                            var addr = this.findVariableInStaticMap(variable, scope);
+                            this.generatedCode[this.opPtr++] = addr;
                             this.generatedCode[this.opPtr++] = "00";
                             break;
                         case "TAddition":
                             // result ends up in accumulator
-                            this.generateAddition(node.children[1]);
+                            this.generateAddition(astNode.children[1]);
                             break;
                     }
                     // find temp address of variable we're assigning to
-                    var variable = node.children[0].value.value;
-                    var scope = node.children[0].value.scopeId;
+                    var variable = astNode.children[0].value.value;
+                    var scope = astNode.children[0].value.scopeId;
+                    console.log(scope);
+                    console.log(variable);
+                    console.log(astNode);
                     var tempAddr = this.findVariableInStaticMap(variable, scope);
+                    console.log("ASSIGNING VALUE TO " + tempAddr);
                     // store whatever is in accumulator to memory
                     this.generatedCode[this.opPtr++] = "8D";
                     this.generatedCode[this.opPtr++] = tempAddr;
@@ -252,11 +272,11 @@ var TSC;
                     var whileStartPtr = this.opPtr;
                     // evaluate lhs first, which is the boolean result
                     var address;
-                    switch (node.children[0].value.type) {
+                    switch (astNode.children[0].value.type) {
                         // if lhs is a boolean value, set zero flag to 1 if true, set zero flag to 0 if false
                         case "TBoolval":
                             // load heap address of true into x register
-                            if (node.children[0].value.value == "true") {
+                            if (astNode.children[0].value.value == "true") {
                                 address = (245).toString(16).toUpperCase();
                                 this.generatedCode[this.opPtr++] = "AE";
                                 this.generatedCode[this.opPtr++] = address;
@@ -276,7 +296,7 @@ var TSC;
                         // if lhs is a boolean expression equality
                         case "TEquals":
                             // get back the address we're comparing to the x register, which is already loaded
-                            address = this.generateEquals(node.children[0]);
+                            address = this.generateEquals(astNode.children[0]);
                             // perform comparison of x register to temp address
                             this.generatedCode[this.opPtr++] = "EC";
                             this.generatedCode[this.opPtr++] = address;
@@ -322,7 +342,7 @@ var TSC;
                     // increase the jump id
                     // now we need to put op codes in to evaluate the block
                     // evaluate the RHS, which is just recursing to generate proper codes
-                    this.traverseAST(node.children[1]);
+                    this.traverseAST(astNode.children[1]);
                     // generate end of while loop codes, which is the unconditional jump to top of loop
                     // load 0 into acc
                     this.generatedCode[this.opPtr++] = "A9";
@@ -375,11 +395,11 @@ var TSC;
                 // subtree root is if statement
                 case TSC.Production.IfStmt:
                     // look at its left and right children
-                    switch (node.children[0].value.type) {
+                    switch (astNode.children[0].value.type) {
                         // if lhs is a boolean value, set zero flag to 1 if true, set zero flag to 0 if false
                         case "TBoolval":
                             // load heap address of true into x register
-                            if (node.children[0].value.value == "true") {
+                            if (astNode.children[0].value.value == "true") {
                                 this.generatedCode[this.opPtr++] = "AE";
                                 this.generatedCode[this.opPtr++] = (245).toString(16).toUpperCase();
                                 this.generatedCode[this.opPtr++] = "00";
@@ -398,7 +418,7 @@ var TSC;
                         // might be null because equalto isn't stored in my ast with a type
                         case "TEquals":
                             // get back the address we're comparing to the x register
-                            var addr = this.generateEquals(node.children[0]);
+                            var addr = this.generateEquals(astNode.children[0]);
                             // perform comparison of x register to temp address
                             this.generatedCode[this.opPtr++] = "EC";
                             this.generatedCode[this.opPtr++] = addr;
@@ -415,7 +435,7 @@ var TSC;
                     // increase the jump id
                     this.jumpId++;
                     // now we need to put op codes in to evaluate the block
-                    this.traverseAST(node.children[1]);
+                    this.traverseAST(astNode.children[1]);
                     // figure out how much to jump based on current opPtr and where the op code for the branch is
                     // + 2 for offset because we use 2 op codes to store branch
                     // store as hex value
@@ -716,13 +736,26 @@ var TSC;
          * @param scope the scope the variable is in
          */
         CodeGenerator.prototype.findVariableInStaticMap = function (variable, scope) {
+            console.log("FINDING " + variable + scope);
             var itr = this.staticMap.entries();
-            for (var i = 0; i < this.staticMap.size; i++) {
-                var staticObject = itr.next();
-                if (staticObject.value[1]["name"] == variable && staticObject.value[1]["scopeId"] == scope) {
-                    // when finding appropriate variable, return its temp address
-                    return staticObject.value[0].toString();
+            while (true) {
+                for (var i = 0; i < this.staticMap.size; i++) {
+                    var staticObject = itr.next();
+                    console.log(staticObject);
+                    if (staticObject.value[1]["name"] == variable && staticObject.value[1]["scopeId"] == scope) {
+                        console.log("FOUND IT");
+                        // when finding appropriate variable, return its temp address
+                        return staticObject.value[0].toString();
+                    }
                 }
+                console.log("CAN'T FIND VARIABLE IN CURRENT SCOPE, LOOK ABOVE" + variable + scope);
+                itr = this.staticMap.entries();
+                // if can't find with that scope id, look in above scopes to see if there, return when it found
+                var currScope = this.scopeNodes[this.scopePtr];
+                // set currScope to its parent
+                currScope = currScope.parent;
+                // set scope id
+                scope = currScope.value.id;
             }
         };
         /**

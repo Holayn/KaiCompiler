@@ -112,6 +112,28 @@ module TSC {
                 // Return array of nodes and tree config
                 return {"tree": tree, "treant": treantTree};
             }
+
+            /**
+             * Returns an array representation of DFS of tree
+             */
+            public traverseTree(){
+                let tree: Array<TreeNode> = [];
+                if(this.root != null){
+                    this.DFSTree(this.root, tree);
+                }
+                return tree;
+            }
+
+            /**
+             * Helper for traverseTree
+             * @param tree array rep of tree so far
+             */
+            public DFSTree(node, tree){
+                tree.push(node);
+                for(var i=0; i<node.children.length; i++){
+                    this.DFSTree(node.children[i], tree);
+                }
+            }
             
             /**
              * Helper for traverseTreeCST
