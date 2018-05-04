@@ -736,6 +736,7 @@ var TSC;
          * @param scope the scope the variable is in
          */
         CodeGenerator.prototype.findVariableInStaticMap = function (variable, scope) {
+            var currScope = this.scopeNodes[this.scopePtr];
             console.log("FINDING " + variable + scope);
             var itr = this.staticMap.entries();
             while (true) {
@@ -751,7 +752,6 @@ var TSC;
                 console.log("CAN'T FIND VARIABLE IN CURRENT SCOPE, LOOK ABOVE" + variable + scope);
                 itr = this.staticMap.entries();
                 // if can't find with that scope id, look in above scopes to see if there, return when it found
-                var currScope = this.scopeNodes[this.scopePtr];
                 // set currScope to its parent
                 currScope = currScope.parent;
                 // set scope id
