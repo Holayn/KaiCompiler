@@ -23,6 +23,7 @@ var TSC;
             this.jumpMap = new Map();
             this.heapMap = new Map();
             this.log = [];
+            this.hasError = false;
             // fill with 00's
             for (var i = 0; i < 256; i++) {
                 this.generatedCode.push("00");
@@ -53,8 +54,6 @@ var TSC;
             var scope = analyzeRes.scopeTree;
             // dfs of scope tree array rep
             this.scopeNodes = scope.traverseTree();
-            console.log(scope);
-            console.log(this.scopeNodes);
             this.traverseAST(ast.root); // generate initial op codes
             this.createStaticArea();
             this.backPatch(); // perform backpatching on op codes
@@ -67,6 +66,9 @@ var TSC;
         CodeGenerator.prototype.getLog = function () {
             return this.log;
         };
+        CodeGenerator.prototype.getError = function () {
+            return this.error;
+        };
         // TODO: define code, static, heap areas. throw error if code goes into heap area, code becomes too big, etc.
         /**
          * Helper to generateCode, performs actual traversing and code generation
@@ -74,14 +76,16 @@ var TSC;
          * @param scopeNodes array of scope nodes in dfs order
          */
         CodeGenerator.prototype.traverseAST = function (astNode) {
-            console.log("Current node: ");
-            console.log(astNode);
-            console.log("Static table");
-            console.log(this.staticMap);
-            console.log("Heap");
-            console.log(this.heapMap);
-            // console.log("Current scope node: ");
-            // console.log(scopeNode);
+            // if error with code generator, do not continue
+            if (this.hasError) {
+                return;
+            }
+            // console.log("Current node: ");
+            // console.log(astNode);
+            // console.log("Static table");
+            // console.log(this.staticMap);
+            // console.log("Heap");
+            // console.log(this.heapMap);
             // Determine what kind of production the node is
             // tracks number of op codes produced
             var numOpCodes = 0;
@@ -587,10 +591,17 @@ var TSC;
         /**
          * Sets the op code in the code array as code passed in
          * Also puts in log what was put
+         * Have check to make sure code fits into 256 bytes
          */
         CodeGenerator.prototype.setCode = function (code) {
             this.generatedCode[this.opPtr++] = code;
             this.log.push("Generating " + code);
+            // if op ptr over size limit or is going into the heap...
+            // if one evals to true, the other will too actually
+            if (this.opPtr >= 256 || this.opPtr >= this.heapStartPtr) {
+                this.hasError = true;
+                this.error = new TSC.Error(TSC.ErrorType.NoMoreCodeMemory, "", 0, 0);
+            }
         };
         /**
          * Generates opcodes for an Equals expression
@@ -833,10 +844,10 @@ var TSC;
             this.staticStartPtr = this.opPtr + 1;
             // need to figure out how many variables we need to store in the static area. for now, size of map.
             var numberOfVariables = this.staticMap.size;
-            // check if runs into heap ptr
+            // check if runs into heap ptr, if it does, no bueno, throw error
             if (this.staticStartPtr + numberOfVariables >= this.heapStartPtr) {
-                console.log("ERROR");
-                // TODO: throw an error
+                this.hasError = true;
+                this.error = new TSC.Error(TSC.ErrorType.NoMoreStackMemory, "", 0, 0);
                 return;
             }
             // Start assigning memory addresses for variables in statics table
@@ -903,7 +914,7 @@ var TSC;
         };
         /**
          * Given a string, put it in the heap and return a pointer to beginning of string
-         * TODO: make sure heap ptr doesn't collide with op ptr
+         * Make sure heap ptr doesn't collide with op ptr
          * @param string the string to store
          * @return hex string of pointer
          */
@@ -911,9 +922,9 @@ var TSC;
             // trim off quotes
             string = string.substring(1, string.length - 1);
             // see if string already exists in heap. if so, return its address
-            console.log("ALLOCATING FOR " + string);
+            // console.log("ALLOCATING FOR " + string);
             if (this.heapMap.has(string)) {
-                console.log("STRING ALREADY IN HEAP");
+                // console.log("STRING ALREADY IN HEAP");
                 return this.heapMap.get(string)["ptr"];
             }
             // first determine length of string.
@@ -929,6 +940,12 @@ var TSC;
             this.heapMap.set(string, {
                 "ptr": strPtr.toString(16).toUpperCase()
             });
+            // check to see if heap ptr doesn't collide with op ptr. if it does,
+            // then throw error
+            if (this.opPtr >= this.heapStartPtr) {
+                this.hasError = true;
+                this.error = new TSC.Error(TSC.ErrorType.NoMoreHeapMemory, "", 0, 0);
+            }
             // return pointer to beginning of string. convert to hex string.
             return strPtr.toString(16).toUpperCase();
         };

@@ -25,6 +25,9 @@ var TSC;
         ErrorType["TypeMismatch"] = "TypeMismatch";
         ErrorType["IncorrectTypeComparison"] = "IncorrectTypeComparison";
         ErrorType["IncorrectIntegerExpression"] = "IncorrectIntegerExpression";
+        ErrorType["NoMoreStackMemory"] = "NoMoreStackMemory";
+        ErrorType["NoMoreHeapMemory"] = "NoMoreHeapMemory";
+        ErrorType["NoMoreCodeMemory"] = "NoMoreCodeMemory";
     })(ErrorType = TSC.ErrorType || (TSC.ErrorType = {}));
     var Error = /** @class */ (function () {
         function Error(tokenType, value, lineNumber, colNumber) {

@@ -657,9 +657,26 @@
 		// Produces op codes from AST
 		function codeGen(analyzeRes, programCounter) {
 			putMessage("\n");
-			putMessage("Performing Code Generation...\n");
+			putMessage("Performing code generation...\n");
             let codeGenerator = new TSC.CodeGenerator();
-            var res = codeGenerator.generateCode(analyzeRes);
+			var res = codeGenerator.generateCode(analyzeRes);
+			// check for error
+			if(codeGenerator.hasError){
+				Materialize.toast('Program ' + programCounter + ': Code generation error!', 4000, 'toastcolor');
+				switch(codeGenerator.getError().ErrorType){
+					case TSC.Error.NoMoreStackMemory:
+						putMessage("Error occurred in code generation: cannot fit program into 256 bytes due to static stack overflow. Please shorten the input program.");
+						break;
+					case TSC.Error.NoMoreHeapMemory:
+						putMessage("Error occurred in code generation: cannot fit program into 256 bytes due to the heap running out of space. Please shorten the input program.");
+						break;
+					case TSC.Error.NoMoreCodeMemory:
+						putMessage("Error occurred in code generation: cannot fit program into 256 bytes. Please shorten the input program.");
+						break;
+				}
+				putMessage("Code generation completed with 1 error(s)...\n");
+				return;
+			}
             // put generated code into box
             var generatedCode = res;
             for(var i=0; i<generatedCode.length; i++){
@@ -675,7 +692,7 @@
 				}
 			}
 			putMessage("\n");
-			putMessage("Code Generation complete!\n");
+			putMessage("Code generation complete!\n");
 		}
 		
     

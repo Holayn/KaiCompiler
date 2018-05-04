@@ -12,7 +12,10 @@ module TSC {
         UndeclaredVariable = "UndeclaredVariable",
         TypeMismatch = "TypeMismatch",
         IncorrectTypeComparison = "IncorrectTypeComparison",
-        IncorrectIntegerExpression = "IncorrectIntegerExpression"
+        IncorrectIntegerExpression = "IncorrectIntegerExpression",
+        NoMoreStackMemory = "NoMoreStackMemory",
+        NoMoreHeapMemory = "NoMoreHeapMemory",
+        NoMoreCodeMemory = "NoMoreCodeMemory"
     }
     export class Error {
         type: ErrorType;
