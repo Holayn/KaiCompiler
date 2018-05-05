@@ -13,7 +13,7 @@
     <link rel="shortcut icon" href="dist/images/code.png">
     <link rel="stylesheet" href="dist/styles/Treant/Treant.css" type="text/css"/>
 </head>
-<body onload="init();">
+<body onload="">
 	<!--Import jQuery before materialize.js-->
 	<script type="text/javascript" src="dist/styles/jquery-3.3.1.min.js"></script>
 	<script type="text/javascript" src="dist/styles/js/materialize.min.js"></script>
@@ -76,6 +76,7 @@
 					<button type="button" id="btnCompile" value="Compile" class="waves-effect waves-light btn-large pulse" onclick="btnCompile_click();"/>Compile</button>
 				</div>
 			</div>	
+			<div class="loader" id="loader" style="visibility: hidden">Loading...</div>
 			<br>
             <hr>
 			<br>
@@ -298,16 +299,8 @@
 	<script type="text/javascript" src="dist/scripts/codeGen.js"></script>
 	<script type="text/javascript">
 
-		new ClipboardJS('.btn');
-	
+		document.getElementById("loader").style.visibility = "hidden";
 		var verboseOn = true;
-		
-		function copyText() {
-			// var copyText = document.getElementById("taCodeOutput");
-			// console.log(copyText);
-			// copyText.select();
-			// document.execCommand('copy');
-		}
 
 		function init() {
             // Clear the log and the CST.
@@ -341,6 +334,8 @@
 				},
 				nodeStructure: {}
 			});
+			// show loader
+			document.getElementById("loader").style.visibility = "visible";
 		}
 		
 		function btnVerbose_click() {
@@ -365,13 +360,19 @@
 	        // "compile" button between the two text areas, above.  
 	        // Note the <input> element's event handler: onclick="btnCompile_click();
             init();
-
-            // Compile the source code
-            compile();
+			// Compile the source code
+			setTimeout(function(){ 
+				compile(); // hide loader. need timeout so it actually shows
+				document.getElementById("loader").style.visibility = "hidden"; 
+				var textarea = document.getElementById('taOutput');
+				textarea.scrollTop = textarea.scrollHeight;
+			}, 10);
+			
+            // compile();
 			
 			// Scroll to bottom of the log
-			var textarea = document.getElementById('taOutput');
-			textarea.scrollTop = textarea.scrollHeight;
+			// var textarea = document.getElementById('taOutput');
+			// textarea.scrollTop = textarea.scrollHeight;
 	    }
     
 	    function putMessage(msg) {
