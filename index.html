@@ -421,15 +421,26 @@
 					]
 				}
 			};
-
+			
+			// used for maintaining compiler status checks at top of page
 			var parseResult;
 			var analyzeRes;
 			var codeGenRes;
+			var changeStatus = true;
+			var parseHadError = false;
+			var lexHadError = false;
+			var lexHadWarning = false;
+			var analyzeHadWarning = false;
+			var analyzeHadError = false;
+			var genHadError = false;
 
             // We're compiling programs in sequence.
             // For every program, lex, parse, perform semantic analysis, etc...
             while(!isLexComplete){
 				lexAnalysis = lexer.lex(prevProgramError);
+				if(lexAnalysis.warnings.length != 0){
+					lexHadWarning = true;
+				}
 				// Attempt to lex . . 
 				// If we get an error, report it
 				// Then, try to lex again by having lexer look for next EOP token, then lexing from there
@@ -443,9 +454,7 @@
 					programCounter++;
 					prevProgramError = true;
 					putMessage("Compilation stopped due to Lexer errors . . .");
-					// change icon
-					document.getElementById("lexerStatus").innerHTML = "clear";
-					document.getElementById("lexerStatus").style = "color: red";
+					lexHadError = true;
 				}
 				// No tokens were found but lex completed, meaning that there is no more input to lex
 				else if(lexAnalysis.tokens.length == 0){
@@ -464,10 +473,22 @@
 					// Do not continue to semantic analysis if parse error
 					if(!parseResult.error){
 						analyzeRes = analyze(parseResult, treantAST, programCounter); // perform semantic analysis on the cst from the parse
+						if(analyzeRes.warnings.length != 0){
+							analyzeHadWarning = true;
+						}
 						// Do not continue to code gen if semantic error
 						if(!analyzeRes.error){
 							codeGenRes = codeGen(analyzeRes, programCounter);
+							if(codeGenRes){
+								genHadError = true;
+							}
 						}
+						else{
+							analyzeHadError = true;
+						}
+					}
+					else{
+						parseHadError = true;
 					}
 					programCounter++;
 				}
@@ -482,58 +503,68 @@
 					document.getElementById("lexerStatus").style = "color: black";
 				}
 			}
-
 			// Code to properly display results of each phase of compiler at top of page
+			document.getElementById("parserStatus").innerHTML = "panorama_fish_eye";
+			document.getElementById("parserStatus").style = "color: black";
+			document.getElementById("saStatus").innerHTML = "panorama_fish_eye";
+			document.getElementById("saStatus").style = "color: black";
+			document.getElementById("cgStatus").innerHTML = "panorama_fish_eye";
+			document.getElementById("cgStatus").style = "color: black";
 
-			if(parseResult == null){
-				document.getElementById("parserStatus").innerHTML = "panorama_fish_eye";
-				document.getElementById("parserStatus").style = "color: black";
-			}
-			else if(!parseResult.error){
-				document.getElementById("parserStatus").innerHTML = "check";
-				document.getElementById("parserStatus").style = "color: green";
+			if(lexHadError){
+				// change icon
+				document.getElementById("lexerStatus").innerHTML = "clear";
+				document.getElementById("lexerStatus").style = "color: red";
+				return;
 			}
 			else{
-				// change icon
+				if(lexHadWarning){
+					document.getElementById("lexerStatus").innerHTML = "check";
+					document.getElementById("lexerStatus").style = "color: gold";
+				}
+				else{
+					document.getElementById("lexerStatus").innerHTML = "check";
+					document.getElementById("lexerStatus").style = "color: green";
+				}
+			}
+			if(parseHadError){
 				document.getElementById("parserStatus").innerHTML = "clear";
 				document.getElementById("parserStatus").style = "color: red";
-			}
-
-
-			if(analyzeRes == null){
-				// change icon
-				document.getElementById("saStatus").innerHTML = "panorama_fish_eye";
-				document.getElementById("saStatus").style = "color: black";
-			}
-			else if(analyzeRes.error){
-				// change icon
-				document.getElementById("saStatus").innerHTML = "clear";
-				document.getElementById("saStatus").style = "color: red";
+				return;
 			}
 			else{
-				if(analyzeRes.warnings.length != 0){
+				if(parseResult != null){
+					document.getElementById("parserStatus").innerHTML = "check";
+					document.getElementById("parserStatus").style = "color: green";
+				}
+			}
+			if(analyzeHadError){
+				document.getElementById("saStatus").innerHTML = "clear";
+				document.getElementById("saStatus").style = "color: red";
+				return;
+			}
+			else{
+				if(analyzeHadWarning){
 					document.getElementById("saStatus").innerHTML = "check";
 					document.getElementById("saStatus").style = "color: gold";
 				}
 				else{
-					document.getElementById("saStatus").innerHTML = "check";
-					document.getElementById("saStatus").style = "color: green";
+					if(analyzeRes != null){
+						document.getElementById("saStatus").innerHTML = "check";
+						document.getElementById("saStatus").style = "color: green";
+					}
 				}
 			}
-			
-			if(codeGenRes != null && !codeGenRes){
-				document.getElementById("cgStatus").innerHTML = "check";
-				document.getElementById("cgStatus").style = "color: green";
-			}
-			else if(codeGenRes == null){
-				// change icon
-				document.getElementById("cgStatus").innerHTML = "panorama_fish_eye";
-				document.getElementById("cgStatus").style = "color: black";
-			}
-			else{
-				// change icon
+			if(genHadError){
 				document.getElementById("cgStatus").innerHTML = "clear";
 				document.getElementById("cgStatus").style = "color: red";
+				return;
+			}
+			else{
+				if(codeGenRes != null){
+					document.getElementById("cgStatus").innerHTML = "check";
+					document.getElementById("cgStatus").style = "color: green";
+				}
 			}
 			
 		}
