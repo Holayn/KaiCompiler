@@ -41,6 +41,12 @@
 			</div>
 		</header>
 		<div class="container">
+			<div class="center-align">
+				<b>Lexer: <i class="material-icons statusIcon" id="lexerStatus" style="color: black">panorama_fish_eye</i></b>
+				<b>Parser: <i class="material-icons statusIcon" id="parserStatus" style="color: black">panorama_fish_eye</i></b>
+				<b>Semantic Analysis: <i class="material-icons statusIcon" id="saStatus" style="color: black">panorama_fish_eye</i></b>
+				<b>Code Generation: <i class="material-icons statusIcon" id="cgStatus" style="color: black">panorama_fish_eye</i></b>
+			</div>
 			<div class="row">
 				<div class="col s6">
 					<div class="card-panel input">
@@ -416,6 +422,10 @@
 				}
 			};
 
+			var parseResult;
+			var analyzeRes;
+			var codeGenRes;
+
             // We're compiling programs in sequence.
             // For every program, lex, parse, perform semantic analysis, etc...
             while(!isLexComplete){
@@ -433,6 +443,9 @@
 					programCounter++;
 					prevProgramError = true;
 					putMessage("Compilation stopped due to Lexer errors . . .");
+					// change icon
+					document.getElementById("lexerStatus").innerHTML = "clear";
+					document.getElementById("lexerStatus").style = "color: red";
 				}
 				// No tokens were found but lex completed, meaning that there is no more input to lex
 				else if(lexAnalysis.tokens.length == 0){
@@ -444,16 +457,19 @@
 					putMessage("Compiling Program " + programCounter + " . . .\n");
 					logLex(lexAnalysis, programCounter);
 					prevProgramError = false;
-					var parseResult = parse(lexAnalysis, treantCST, programCounter);
+					// change icon
+					document.getElementById("lexerStatus").innerHTML = "check";
+					document.getElementById("lexerStatus").style = "color: green";
+					parseResult = parse(lexAnalysis, treantCST, programCounter);
 					// Do not continue to semantic analysis if parse error
 					if(!parseResult.error){
-						var analyzeRes = analyze(parseResult, treantAST, programCounter); // perform semantic analysis on the cst from the parse
+						analyzeRes = analyze(parseResult, treantAST, programCounter); // perform semantic analysis on the cst from the parse
 						// Do not continue to code gen if semantic error
 						if(!analyzeRes.error){
-							codeGen(analyzeRes, programCounter);
+							codeGenRes = codeGen(analyzeRes, programCounter);
 						}
 					}
-                    programCounter++;
+					programCounter++;
 				}
 				if(lexAnalysis.complete){
 					isLexComplete = true;
@@ -461,8 +477,65 @@
 				// If the user tried to compile without typing any code besides comments, throw error
 				if(!programDetected){
 					putMessage("Why are you trying to compile zero code? Cheese and crackers, you dimwit. Go eat a sock.");
+					// change icon
+					document.getElementById("lexerStatus").innerHTML = "panorama_fish_eye";
+					document.getElementById("lexerStatus").style = "color: black";
 				}
-            }
+			}
+
+			// Code to properly display results of each phase of compiler at top of page
+
+			if(parseResult == null){
+				document.getElementById("parserStatus").innerHTML = "panorama_fish_eye";
+				document.getElementById("parserStatus").style = "color: black";
+			}
+			else if(!parseResult.error){
+				document.getElementById("parserStatus").innerHTML = "check";
+				document.getElementById("parserStatus").style = "color: green";
+			}
+			else{
+				// change icon
+				document.getElementById("parserStatus").innerHTML = "clear";
+				document.getElementById("parserStatus").style = "color: red";
+			}
+
+
+			if(analyzeRes == null){
+				// change icon
+				document.getElementById("saStatus").innerHTML = "panorama_fish_eye";
+				document.getElementById("saStatus").style = "color: black";
+			}
+			else if(analyzeRes.error){
+				// change icon
+				document.getElementById("saStatus").innerHTML = "clear";
+				document.getElementById("saStatus").style = "color: red";
+			}
+			else{
+				if(analyzeRes.warnings.length != 0){
+					document.getElementById("saStatus").innerHTML = "check";
+					document.getElementById("saStatus").style = "color: gold";
+				}
+				else{
+					document.getElementById("saStatus").innerHTML = "check";
+					document.getElementById("saStatus").style = "color: green";
+				}
+			}
+			
+			if(codeGenRes != null && !codeGenRes){
+				document.getElementById("cgStatus").innerHTML = "check";
+				document.getElementById("cgStatus").style = "color: green";
+			}
+			else if(codeGenRes == null){
+				// change icon
+				document.getElementById("cgStatus").innerHTML = "panorama_fish_eye";
+				document.getElementById("cgStatus").style = "color: black";
+			}
+			else{
+				// change icon
+				document.getElementById("cgStatus").innerHTML = "clear";
+				document.getElementById("cgStatus").style = "color: red";
+			}
+			
 		}
 		
 		// Fills log with messages from lexer
@@ -702,7 +775,7 @@
 						break;
 				}
 				putMessage("Code generation completed with 1 error(s)...\n");
-				return;
+				return codeGenerator.hasError;
 			}
             // put generated code into box
 			var generatedCode = res;
@@ -723,6 +796,7 @@
 			putMessage("\n");
 			putMessage("Code generation completed with 0 error(s)...\n");
 			putMessage("-------------------------");
+			return codeGenerator.hasError;
 		}
 		
     

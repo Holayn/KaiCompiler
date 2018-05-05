@@ -163,3 +163,8 @@ https://projects.lukehaas.me/css-loaders/
 	}
   }
   
+
+  .statusIcon {
+	position: relative;
+    top: 6px;
+  }
