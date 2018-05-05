@@ -103,6 +103,24 @@ var TSC;
                 case "Tien Boolean Hell":
                     document.getElementById("taSourceCode").value = "/* Thanks Tien. Assuming you get past Boolean Hell\n- there is a boolean being compared to\n- a string which will cause a type error */\n{\n    int a\n    a = 4\n    boolean b\n    b = true\n    boolean c\n    string d\n    d = \"there is no spoon\"\n    c = (d != \"there is a spoon\")\n    if(c == (false != (b == (true == (a == 3+1))))) {\n        print((b != d))\n    }\n}$";
                     break;
+                case "Infinite Loop and Max Memory":
+                    document.getElementById("taSourceCode").value = "/* This code segment uses the max\n- allotted memory 256 bytes \n- Also this is an infinite loop. Credit: Tien */\n{\n    int a\n    a = 1\n\n    if(\"a\" == \"a\") {\n        a = 2\n        print(\"a now is two\")\n    }\n\n    if(a != 1) {\n        a = 3\n        print(\" a now is three\")\n    }\n\n    if(a == 1) {\n        a = 3\n        print(\"this does not print\")\n    }\n    \n    while true {\n        print(\" this will always be true hahahahahahaha\")\n    }\n    \n    if false {\n        print(\"this\")\n    }\n} $";
+                    break;
+                case "Boolean Expressions":
+                    document.getElementById("taSourceCode").value = "/* Boolean Expr Printing: This test case\n- demonstrates the compiler's ability to\n- generate code for computing the result\n- of a BooeleanExpr and printing the result\n- Result: falsefalsetruetruetruetruefalsefalsefalsetrue \n- Credit: Tien */\n{\n    boolean a\n    a = false\n    print((a == true))\n    print((true == a))\n    print((a == false))\n    print((false == a))\n    print((a != true))\n    print((true != a))\n    print((a != false))\n    print((false != a))\n    print(a)\n    if (a == false) {\n        a = true\n    }\n    print(a)\n}$";
+                    break;
+                case "Variable Addition":
+                    document.getElementById("taSourceCode").value = "/*\nDemonstrates compiler's ability to generate code that properly handles variable addition\nCredit: Tien\n*/\n{\n    int a\n    a = 1\n    int b\n    b = 1\n    b = 1 + a\n    while (2 + a != 3 + b) {\n        a = 1 + a\n        print(\"int a is \")\n        print(a)\n        print(\" \")\n    }\n    print(\"int b is \")\n    print(b)\n}$";
+                    break;
+                case "Addition Checking and Long Addition":
+                    document.getElementById("taSourceCode").value = "/* This statement shows that addition\n- checking and printing are both valid\n- options that can be performed. Credit: Tien\n- Result: 666addition checkfalse*/\n{\n    int a\n    while (a != 3) {\n        print(1 + 2 + 3)\n        a = 1 + a\n    }\n    if (1+1+1+1+1 == 2+3) {\n        print(\"addition check\")\n    }\n    if (1+5+3 != 8) {\n        print(false)\n    }\n} $";
+                    break;
+                case "Boolean Hell":
+                    document.getElementById("taSourceCode").value = "/* This test case is included because it completely messed\n- up my AST with boolean hell and keeping track of boolexpr\n- may it serve as a good benchmark for those who come after \n- CREDIT: TIEN */\n{\n    int a\n    a = 0\n    boolean b\n    b = false\n    boolean c\n    c = true\n    while(((a!=9) == (\"test\" != \"alan\")) == ((5==5) != (b == c))) {\n        print(\"a\")\n        string d\n        d = \"yes\"\n        print(d)\n        {\n            int a\n            a = 5\n        }\n    }\n}$";
+                    break;
+                case "Max Memory":
+                    document.getElementById("taSourceCode").value = "/* Valid code but can't fit into 256 bytes */\n{\n    int a\n    int b\n    int c\n    int d\n    a = 2\n    {\n        b = 5\n        print(b)\n        a = 1 + a\n        {\n            print(a)\n            a = 5\n        }\n        if(a == b) {\n            print(\"wowza\")\n        }\n        int d\n        d = 5\n        {\n            string d\n            d = \"hey\"\n            print(d)\n            d = \"sap\"\n            print(d)\n        }\n        print(d)\n    }\n    c = 4\n    print(c)\n    while (c != 7) {\n        c = 1 + 1 + 1 + c\n        print(c)\n    }\n    c = 9 + c\n    print(c)\n}$";
+                    break;
             }
             document.getElementById("taOutput").value = "Inserted Program: " + testcase.innerHTML;
         };

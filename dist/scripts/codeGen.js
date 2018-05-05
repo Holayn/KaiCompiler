@@ -56,6 +56,10 @@ var TSC;
             // dfs of scope tree array rep
             this.scopeNodes = scope.traverseTree();
             this.traverseAST(ast.root); // generate initial op codes
+            // if error, do not continue
+            if (this.hasError) {
+                return;
+            }
             this.createStaticArea();
             this.backPatch(); // perform backpatching on op codes
             // return generated code

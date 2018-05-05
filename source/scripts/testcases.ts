@@ -397,6 +397,167 @@ a = 4 + false
     }
 }$`;
                 break;
+                case "Infinite Loop and Max Memory":
+                (<HTMLInputElement>document.getElementById("taSourceCode")).value = `/* This code segment uses the max
+- allotted memory 256 bytes 
+- Also this is an infinite loop. Credit: Tien */
+{
+    int a
+    a = 1
+
+    if("a" == "a") {
+        a = 2
+        print("a now is two")
+    }
+
+    if(a != 1) {
+        a = 3
+        print(" a now is three")
+    }
+
+    if(a == 1) {
+        a = 3
+        print("this does not print")
+    }
+    
+    while true {
+        print(" this will always be true hahahahahahaha")
+    }
+    
+    if false {
+        print("this")
+    }
+} $`;
+                break;
+                case "Boolean Expressions":
+                (<HTMLInputElement>document.getElementById("taSourceCode")).value = `/* Boolean Expr Printing: This test case
+- demonstrates the compiler's ability to
+- generate code for computing the result
+- of a BooeleanExpr and printing the result
+- Result: falsefalsetruetruetruetruefalsefalsefalsetrue 
+- Credit: Tien */
+{
+    boolean a
+    a = false
+    print((a == true))
+    print((true == a))
+    print((a == false))
+    print((false == a))
+    print((a != true))
+    print((true != a))
+    print((a != false))
+    print((false != a))
+    print(a)
+    if (a == false) {
+        a = true
+    }
+    print(a)
+}$`;
+                break;
+                case "Variable Addition":
+                (<HTMLInputElement>document.getElementById("taSourceCode")).value = `/*
+Demonstrates compiler's ability to generate code that properly handles variable addition
+Credit: Tien
+*/
+{
+    int a
+    a = 1
+    int b
+    b = 1
+    b = 1 + a
+    while (2 + a != 3 + b) {
+        a = 1 + a
+        print("int a is ")
+        print(a)
+        print(" ")
+    }
+    print("int b is ")
+    print(b)
+}$`;
+                break;
+                case "Addition Checking and Long Addition":
+                (<HTMLInputElement>document.getElementById("taSourceCode")).value = `/* This statement shows that addition
+- checking and printing are both valid
+- options that can be performed. Credit: Tien
+- Result: 666addition checkfalse*/
+{
+    int a
+    while (a != 3) {
+        print(1 + 2 + 3)
+        a = 1 + a
+    }
+    if (1+1+1+1+1 == 2+3) {
+        print("addition check")
+    }
+    if (1+5+3 != 8) {
+        print(false)
+    }
+} $`;
+                break;
+                case "Boolean Hell":
+                (<HTMLInputElement>document.getElementById("taSourceCode")).value = `/* This test case is included because it completely messed
+- up my AST with boolean hell and keeping track of boolexpr
+- may it serve as a good benchmark for those who come after 
+- CREDIT: TIEN */
+{
+    int a
+    a = 0
+    boolean b
+    b = false
+    boolean c
+    c = true
+    while(((a!=9) == ("test" != "alan")) == ((5==5) != (b == c))) {
+        print("a")
+        string d
+        d = "yes"
+        print(d)
+        {
+            int a
+            a = 5
+        }
+    }
+}$`;
+                break;
+                case "Max Memory":
+                (<HTMLInputElement>document.getElementById("taSourceCode")).value = `/* Valid code but can't fit into 256 bytes */
+{
+    int a
+    int b
+    int c
+    int d
+    a = 2
+    {
+        b = 5
+        print(b)
+        a = 1 + a
+        {
+            print(a)
+            a = 5
+        }
+        if(a == b) {
+            print("wowza")
+        }
+        int d
+        d = 5
+        {
+            string d
+            d = "hey"
+            print(d)
+            d = "sap"
+            print(d)
+        }
+        print(d)
+    }
+    c = 4
+    print(c)
+    while (c != 7) {
+        c = 1 + 1 + 1 + c
+        print(c)
+    }
+    c = 9 + c
+    print(c)
+}$`;
+                break;
             }
             (<HTMLInputElement>document.getElementById("taOutput")).value = "Inserted Program: " + testcase.innerHTML;
         }

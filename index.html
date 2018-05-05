@@ -181,7 +181,11 @@
                                 <a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Crazy One Liner (Lex Pass)</a>
                                 <a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Crazy One Liner Pt. 2 Thx Tien</a>
                                 <a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">WhileStatement</a>
-                                <a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">IfStatement</a>
+								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">IfStatement</a>
+								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Infinite Loop and Max Memory</a>
+								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Boolean Expressions</a>
+								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Variable Addition</a>
+								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Addition Checking and Long Addition</a>
 							</div>
 						</div>
 					</li>
@@ -231,6 +235,15 @@
 								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Incorrect Integer Expression</a>
 								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Tien Test</a>
 								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Tien Boolean Hell</a>
+							</div>
+						</div>
+					</li>
+					<li>
+						<div class="collapsible-header"><i class="material-icons">new_releases</i>Code Gen Error Cases</div>
+						<div class="collapsible-body">
+							<div class="collection">
+								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Boolean Hell</a>
+								<a href="#!" onclick="TSC.Testcases.load(this);" class="collection-item modal-action modal-close">Max Memory</a>
 							</div>
 						</div>
 					</li>
@@ -472,22 +485,22 @@
 			}
 			for(var i=0; i<lexAnalysis.errors.length; i++){
 				if(lexAnalysis.errors[i].type == TSC.ErrorType.InvalidToken){
-					M.toast({html: 'Program ' + programCounter + ': Lex error! - ' + lexAnalysis.warnings[i].type, classes: 'toastcolor'});
+					M.toast({html: 'Program ' + programCounter + ': Lex error! - ' + lexAnalysis.errors[i].type, classes: 'toastcolor'});
 					// Materialize.toast('Program ' + programCounter + ': Lex error! - ' + lexAnalysis.errors[i].type, 4000, 'toastcolor');
 					putMessage("LEXER -> | ERROR: Unrecognized or Invalid Token [ " + lexAnalysis.errors[i].value + " ] on line " + lexAnalysis.errors[i].lineNumber + " col " + lexAnalysis.errors[i].colNumber);
 				}
 				else if(lexAnalysis.errors[i].type == TSC.ErrorType.MissingCommentEnd){
-					M.toast({html: 'Program ' + programCounter + ': Lex error! - ' + lexAnalysis.warnings[i].type, classes: 'toastcolor'});
+					M.toast({html: 'Program ' + programCounter + ': Lex error! - ' + lexAnalysis.errors[i].type, classes: 'toastcolor'});
 					// Materialize.toast('Program ' + programCounter + ': Lex error! - ' + lexAnalysis.errors[i].type, 4000, 'toastcolor');
 					putMessage("LEXER -> | ERROR: Missing ending comment brace (*/) for comment starting on line  " + lexAnalysis.errors[i].lineNumber + " col " + lexAnalysis.errors[i].colNumber);
 				}
 				else if(lexAnalysis.errors[i].type == TSC.ErrorType.InvalidCharacterInString){
-					M.toast({html: 'Program ' + programCounter + ': Lex error! - ' + lexAnalysis.warnings[i].type, classes: 'toastcolor'});
+					M.toast({html: 'Program ' + programCounter + ': Lex error! - ' + lexAnalysis.errors[i].type, classes: 'toastcolor'});
 					// Materialize.toast('Program ' + programCounter + ': Lex error! - ' + lexAnalysis.errors[i].type, 4000, 'toastcolor');
 					putMessage("LEXER -> | ERROR: Invalid character in String [ " + lexAnalysis.errors[i].value + " ] on line " + lexAnalysis.errors[i].lineNumber + " col " + lexAnalysis.errors[i].colNumber);
 				}
 				else if(lexAnalysis.errors[i].type == TSC.ErrorType.MissingStringEndQuote){
-					M.toast({html: 'Program ' + programCounter + ': Lex error! - ' + lexAnalysis.warnings[i].type, classes: 'toastcolor'});
+					M.toast({html: 'Program ' + programCounter + ': Lex error! - ' + lexAnalysis.errors[i].type, classes: 'toastcolor'});
 					// Materialize.toast('Program ' + programCounter + ': Lex error! - ' + lexAnalysis.errors[i].type, 4000, 'toastcolor');
 					putMessage("LEXER -> | ERROR: Missing ending quote for String literal starting on line  " + lexAnalysis.errors[i].lineNumber + " col " + lexAnalysis.errors[i].colNumber);
 				}
@@ -592,27 +605,27 @@
 				var errorMsg = res.errors[0];
 				switch(errorMsg.type){
 					case TSC.ErrorType.DuplicateVariable:
-						M.toast({html: 'Program ' + programCounter + ': Semantic error! - ' + warningMsg.type, classes: 'toastcolor'});
+						M.toast({html: 'Program ' + programCounter + ': Semantic error! - ' + errorMsg.type, classes: 'toastcolor'});
 						// Materialize.toast('Program ' + programCounter + ': Semantic error! - ' + errorMsg.type, 4000, 'toastcolor');
 						putMessage("S.ANALYZE -> | ERROR - Variable [" + errorMsg.value.value + "] on line " + errorMsg.lineNumber + " col " + errorMsg.colNumber + " has already been declared in current scope at line " + errorMsg.firstDeclareLine + " col " + errorMsg.firstDeclareCol);
 						break;
 					case TSC.ErrorType.UndeclaredVariable:
-						M.toast({html: 'Program ' + programCounter + ': Semantic error! - ' + warningMsg.type, classes: 'toastcolor'});
+						M.toast({html: 'Program ' + programCounter + ': Semantic error! - ' + errorMsg.type, classes: 'toastcolor'});
 						// Materialize.toast('Program ' + programCounter + ': Semantic error! - ' + errorMsg.type, 4000, 'toastcolor');
 						putMessage("S.ANALYZE -> | ERROR - Variable [" + errorMsg.value.value + "] on line " + errorMsg.lineNumber + " col " + errorMsg.colNumber + " has not been previously declared.");
 						break;
 					case TSC.ErrorType.TypeMismatch:
-						M.toast({html: 'Program ' + programCounter + ': Semantic error! - ' + warningMsg.type, classes: 'toastcolor'});
+						M.toast({html: 'Program ' + programCounter + ': Semantic error! - ' + errorMsg.type, classes: 'toastcolor'});
 						// Materialize.toast('Program ' + programCounter + ': Semantic error! - ' + errorMsg.type, 4000, 'toastcolor');	
 						putMessage("S.ANALYZE -> | ERROR - The variable [" + errorMsg.value.value + "] declared on line " + errorMsg.lineNumber + " col " + errorMsg.colNumber + " is of type " + errorMsg.idType.value + " and does not match the assignment type of " + errorMsg.targetType);
 						break;
 					case TSC.ErrorType.IncorrectTypeComparison:
-						M.toast({html: 'Program ' + programCounter + ': Semantic error! - ' + warningMsg.type, classes: 'toastcolor'});
+						M.toast({html: 'Program ' + programCounter + ': Semantic error! - ' + errorMsg.type, classes: 'toastcolor'});
 						// Materialize.toast('Program ' + programCounter + ': Semantic error! - ' + errorMsg.type, 4000, 'toastcolor');
 						putMessage("S.ANALYZE -> | ERROR - The [" + errorMsg.value + "] on line " + errorMsg.lineNumber + " col " + errorMsg.colNumber + " is of type " + errorMsg.idType + " and is incompatibly compared to a type of " + errorMsg.targetType);
 						break;
 					case TSC.ErrorType.IncorrectIntegerExpression:
-						M.toast({html: 'Program ' + programCounter + ': Semantic error! - ' + warningMsg.type, classes: 'toastcolor'});
+						M.toast({html: 'Program ' + programCounter + ': Semantic error! - ' + errorMsg.type, classes: 'toastcolor'});
 						// Materialize.toast('Program ' + programCounter + ': Semantic error! - ' + errorMsg.type, 4000, 'toastcolor');
 						putMessage("S.ANALYZE -> | ERROR - The [" + errorMsg.value + "] on line " + errorMsg.lineNumber + " col " + errorMsg.colNumber + " is of type " + errorMsg.targetType + " which cannot be added to digits of type " + TSC.VariableType.Int);
 						break;
@@ -669,22 +682,22 @@
 			var res = codeGenerator.generateCode(analyzeRes);
 			// check for error
 			if(codeGenerator.hasError){
-				switch(codeGenerator.getError().ErrorType){
-					case TSC.Error.NoMoreStackMemory:
+				switch(codeGenerator.getError().type){
+					case TSC.ErrorType.NoMoreStackMemory:
 						M.toast({html: 'Program ' + programCounter + ': Code generation error! - NoMoreStackMemory', classes: 'toastcolor'});
 						putMessage("Error occurred in code generation: cannot fit program into 256 bytes due to static stack overflow. Please shorten the input program.");
 						break;
-					case TSC.Error.NoMoreHeapMemory:
+					case TSC.ErrorType.NoMoreHeapMemory:
 						M.toast({html: 'Program ' + programCounter + ': Code generation error! - NoMoreHeapMemory', classes: 'toastcolor'});
 						putMessage("Error occurred in code generation: cannot fit program into 256 bytes due to the heap running out of space. Please shorten the input program.");
 						break;
-					case TSC.Error.NoMoreCodeMemory:
+					case TSC.ErrorType.NoMoreCodeMemory:
 						M.toast({html: 'Program ' + programCounter + ': Code generation error! - NoMoreCodeMemory', classes: 'toastcolor'});
 						putMessage("Error occurred in code generation: cannot fit program into 256 bytes. Please shorten the input program.");
 						break;
-					case TSC.Error.NestedBoolean:
+					case TSC.ErrorType.NestedBoolean:
 						M.toast({html: 'Program ' + programCounter + ': Code generation error! - NestedBoolean', classes: 'toastcolor'});
-						putMessage("Error occurred in code generation: cannot fit program into 256 bytes. Please shorten the input program.");
+						putMessage("Error occurred in code generation: nested boolean expressions are not supported. Please no.");
 						break;
 				}
 				putMessage("Code generation completed with 1 error(s)...\n");
