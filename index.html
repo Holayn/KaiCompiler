@@ -113,11 +113,12 @@
 					</div>
 				</div>
 				<div class="col s6">
-					<div class="card-panel log">
+					<div class="card-panel log" style="overflow-y: scroll">
 						<h5 class="light">Symbol Table</h5>
 						<table id="symbolTable" class="striped">
 							<thead>
 								<tr>
+									<th>Program</th>
 									<th>Key</th>
 									<th>Type</th>
 									<th>Scope</th>
@@ -614,21 +615,24 @@
 				for(var i=0; i<symbols.length; i++){
 					var table = document.getElementById("symbolTable");
 					var row = table.insertRow(-1);
-					var key = row.insertCell(0);
+					var program = row.insertCell(0);
+					program.innerHTML = programCounter;
+					var key = row.insertCell(1);
 					key.innerHTML = symbols[i].key;
-					var type = row.insertCell(1);
+					var type = row.insertCell(2);
 					type.innerHTML = symbols[i].type;
-					var scope = row.insertCell(2);
+					var scope = row.insertCell(3);
 					scope.innerHTML = symbols[i].scope;
-					var scopeLevel = row.insertCell(3);
+					var scopeLevel = row.insertCell(4);
 					scopeLevel.innerHTML = symbols[i].scopeLevel;
-					var lineNumber = row.insertCell(4);
+					var lineNumber = row.insertCell(5);
 					lineNumber.innerHTML = symbols[i].line;
-					var colNumber = row.insertCell(5);
+					var colNumber = row.insertCell(6);
 					colNumber.innerHTML = symbols[i].col;
 				}
 				// Fill out scope tree
 				var scopeTreeArr = semanticAnalyzer.printScopeTree(res.scopeTree.root);
+				document.getElementById("taScope").value += "Program " + programCounter + "\n";
 				// Display scope tree in scope tree field
 				for(var i=0; i<scopeTreeArr.length; i++){
 					document.getElementById("taScope").value += scopeTreeArr[i] + "\n";
