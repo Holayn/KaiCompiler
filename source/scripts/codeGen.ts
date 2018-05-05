@@ -799,19 +799,20 @@ module TSC {
                     // need to make entry in static table for value
                     this.setCode("A9");
                     this.setCode(strPtr);
-                    var temp = "T" + this.staticId;
-                    this.staticMap.set(temp, {
-                        "name": equalsNode.children[1].value.value,
-                        "type": equalsNode.children[1].value.type,
-                        "at": "",
-                        "scopeId": ""
-                    })
+                    // var temp = "T" + this.staticId;
+                    // this.staticMap.set(temp, {
+                    //     "name": equalsNode.children[1].value.value,
+                    //     "type": equalsNode.children[1].value.type,
+                    //     "at": "",
+                    //     "scopeId": ""
+                    // });
+                    // // increase the static id
+                    // this.staticId++;
+                    var temp = "FF";
                     // store in accumulator location temp, fill in later
                     this.setCode("8D");
                     this.setCode(temp);
                     this.setCode("00");
-                    // increase the static id
-                    this.staticId++;
                     return temp;
                 case TSC.TokenType.TBoolval:
                     // generate address to hold address to true/false
