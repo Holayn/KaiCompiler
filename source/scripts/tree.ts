@@ -90,11 +90,11 @@ module TSC {
             /**
              * Prints the tree in dfs for CST display
              */
-            public traverseTreeCST(treantTree){
+            public traverseTreeCST(treantTree, programCounter){
                 let tree: Array<String> = [];
                 let level: number = 0;
                 if(this.root != null){
-                    this.DFSCST(this.root, level, tree, "", treantTree['nodeStructure'].children);
+                    this.DFSCST(this.root, level, tree, "", treantTree['nodeStructure'].children, programCounter);
                 }
                 // Return array of nodes and tree config
                 return {"tree": tree, "treant": treantTree};
@@ -103,11 +103,11 @@ module TSC {
             /**
              * Prints the tree in dfs for AST display
              */
-            public traverseTreeAST(treantTree){
+            public traverseTreeAST(treantTree, programCounter){
                 let tree: Array<String> = [];
                 let level: number = 0;
                 if(this.root != null){
-                    this.DFSAST(this.root, level, tree, "", treantTree['nodeStructure'].children);
+                    this.DFSAST(this.root, level, tree, "", treantTree['nodeStructure'].children, programCounter);
                 }
                 // Return array of nodes and tree config
                 return {"tree": tree, "treant": treantTree};
@@ -138,7 +138,7 @@ module TSC {
             /**
              * Helper for traverseTreeCST
              */
-            private DFSCST(node, level, tree, dash, treantTree){
+            private DFSCST(node, level, tree, dash, treantTree, programCounter){
                 let child = {};
                 if(node.value instanceof Token){
                     tree.push(dash + "[" + node.value.value + "]")
@@ -151,11 +151,16 @@ module TSC {
                     treantTree.push(child);
                 }
                 else{
-                    tree.push(dash + "<" + node.value + ">")
+                    var nodeValue = node.value;
+                    // if node value is Program, put what program number it is
+                    if(nodeValue == "Program"){
+                        nodeValue = nodeValue + "" + programCounter;
+                    }
+                    tree.push(dash + "<" + nodeValue + ">")
                     // Add new node to children array passed
                     // Pass reference to new children array to next call
                     child = {
-                        text: { name: "<" + node.value + ">" },
+                        text: { name: "<" + nodeValue + ">" },
                         children: []
                     }
                     treantTree.push(child);
@@ -163,29 +168,39 @@ module TSC {
                 for(var i=0; i<node.children.length; i++){
                     // to next call of DFS, increase level, pass the tree array, increase the dash by one dash, and pass
                     // the reference to the next children array
-                    this.DFSCST(node.children[i], level + 1, tree, dash + "-", child['children']);
+                    this.DFSCST(node.children[i], level + 1, tree, dash + "-", child['children'], programCounter);
                 }
             }
 
             /**
              * Helper for traverseTreeAST
              */
-            private DFSAST(node, level, tree, dash, treantTree){
+            private DFSAST(node, level, tree, dash, treantTree, programCounter){
                 let child = {};
                 // Check if null to find appropriate value to place in tree
                 // Add new node to children array passed
                 // Pass reference to new children array to next call
                 if(node.value.value != null){
-                    tree.push(dash + node.value.value);
+                    var nodeValue = node.value.value;
+                    // if node value is Block, put what program number it is
+                    if(nodeValue == "Block" && level == 0){
+                        nodeValue = "Block" + "(Program" + programCounter + ")";
+                    }
+                    tree.push(dash + nodeValue);
                     child = {
-                        text: { name: node.value.value + " " },
+                        text: { name: nodeValue + " " },
                         children: []
                     }
                 }
                 else{
-                    tree.push(dash + node.value);
+                    var nodeValue = node.value;
+                    // if node value is Block, put what program number it is
+                    if(nodeValue == "Block" && level == 0){
+                        nodeValue = "Block" + "(Program" + programCounter + ")";
+                    }
+                    tree.push(dash + nodeValue);
                     child = {
-                        text: { name: node.value + " " },
+                        text: { name: nodeValue + " " },
                         children: []
                     }
                 }
@@ -193,7 +208,7 @@ module TSC {
                 for(var i=0; i<node.children.length; i++){
                     // to next call of DFS, increase level, pass the tree array, increase the dash by one dash, and pass
                     // the reference to the next children array
-                    this.DFSAST(node.children[i], level + 1, tree, dash + "-", child['children']);
+                    this.DFSAST(node.children[i], level + 1, tree, dash + "-", child['children'], programCounter);
                 }
             }
         }

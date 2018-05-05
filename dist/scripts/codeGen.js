@@ -69,7 +69,6 @@ var TSC;
         CodeGenerator.prototype.getError = function () {
             return this.error;
         };
-        // TODO: define code, static, heap areas. throw error if code goes into heap area, code becomes too big, etc.
         /**
          * Helper to generateCode, performs actual traversing and code generation
          * @param astNode AST node
@@ -308,7 +307,6 @@ var TSC;
                             // result ends up in accumulator
                             this.generateAddition(astNode.children[1]);
                             break;
-                        //TODO
                         case TSC.TokenType.TEquals:
                             // get back the address we're comparing to the x register, which is already loaded
                             address = this.generateEquals(astNode.children[1]);

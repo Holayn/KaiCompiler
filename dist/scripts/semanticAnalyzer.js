@@ -435,21 +435,25 @@ var TSC;
          * @param arr array of arrays that represent tree
          * @param level level of the tree we're currently at
          */
-        SemanticAnalyzer.prototype.printScopeTree = function (node, arr, level) {
+        SemanticAnalyzer.prototype.printScopeTree = function (node) {
+            var tree = [];
+            var level = 0;
+            if (node != null) {
+                this.printScopeTreeHelper(node, level, tree, "");
+            }
+            return tree;
+        };
+        SemanticAnalyzer.prototype.printScopeTreeHelper = function (node, level, tree, dash) {
             console.log(node);
-            // add level
-            if (arr.length == level) {
-                arr.push([]);
-            }
-            // add vars to array
+            // generate string with all vars
+            var varsString = "";
             for (var key in node.value.table) {
-                arr[level].push(key + " " + node.value.table[key]);
+                varsString += node.value.table[key].value.value + " " + key + " | ";
             }
-            // traverse children
+            tree.push(dash + " | [Scope " + node.value.id + "]: " + varsString);
             for (var i = 0; i < node.children.length; i++) {
-                node.children[i].printScopeTree();
+                this.printScopeTreeHelper(node.children[i], level + 1, tree, dash + "-");
             }
-            return arr;
         };
         return SemanticAnalyzer;
     }());

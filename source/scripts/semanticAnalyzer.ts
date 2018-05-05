@@ -460,21 +460,26 @@ module TSC {
          * @param arr array of arrays that represent tree
          * @param level level of the tree we're currently at
          */
-        public printScopeTree(node, arr, level){
+        public printScopeTree(node){
+            let tree: Array<String> = [];
+            let level: number = 0;
+            if(node != null){
+                this.printScopeTreeHelper(node, level, tree, "");
+            }
+            return tree;
+        }
+
+        private printScopeTreeHelper(node, level, tree, dash){
             console.log(node);
-            // add level
-            if(arr.length == level){
-                arr.push([]);
-            }
-            // add vars to array
+            // generate string with all vars
+            var varsString = "";
             for(var key in node.value.table){
-                arr[level].push(key + " " + node.value.table[key]);
+                varsString += node.value.table[key].value.value + " " + key + " | ";
             }
-            // traverse children
+            tree.push(dash + " | [Scope " + node.value.id + "]: " + varsString);
             for(var i=0; i<node.children.length; i++){
-                node.children[i].printScopeTree();
+                this.printScopeTreeHelper(node.children[i], level + 1, tree, dash + "-");
             }
-            return arr;
         }
     }
 }
