@@ -47,15 +47,12 @@
 						<h5 class="light">Editor</h5>
 						<textarea class="lined" id="taSourceCode" autofocus></textarea>
 						<br>
-						<div class="fixed-action-btn horizontal click-to-toggle togglebutton">
+						<!-- <div class="fixed-action-btn horizontal click-to-toggle togglebutton"> -->
+						<div class="fixed-action-btn click-to-toggle togglebutton">
 							<a class="btn-floating btn blue lighten-2">
 								<i class="material-icons">navigate_next</i>
 							</a>
-							<ul style="left: 0">
-								<!-- <li><a class="btn-floating red"><i class="material-icons">insert_chart</i></a></li>
-								<li><a class="btn-floating yellow darken-1"><i class="material-icons">format_quote</i></a></li>
-								<li><a class="btn-floating green"><i class="material-icons">publish</i></a></li>
-								<li><a class="btn-floating blue"><i class="material-icons">attach_file</i></a></li> -->
+							<ul style="left: 0; top: 65%; width: 100%">
 								<li>
 									<a href="#grammarModal" class="waves-effect waves-light blue lighten-3 btn-floating modal-trigger subfloatgrammar"/>Language Grammar</a>
 								</li>
@@ -81,11 +78,14 @@
 			</div>	
 			<br>
             <hr>
-            <br>
+			<br>
             <div class="card-panel">
 				<!-- <button data-clipboard-target="#taCodeOutput" onclick="copyText()" type="button" class="waves-effect waves-light btn">Copy</button> -->
                 <textarea id="taCodeOutput" readonly></textarea>
-            </div>
+			</div>
+			<div class="center-align">
+				<a href="https://github.com/Holayn/KaiOS" target="_blank" class="waves-effect waves-light btn-small"/>OS</a>
+			</div>
 			<br>
 			<div class="row">
 				<div class="col s6">
@@ -446,7 +446,7 @@
 				}
 				// If the user tried to compile without typing any code besides comments, throw error
 				if(!programDetected){
-					putMessage("Why are you trying to compile zero code? Cheese and crackers you dimwit go eat a sock.");
+					putMessage("Why are you trying to compile zero code? Cheese and crackers, you dimwit. Go eat a sock.");
 				}
             }
 		}
@@ -463,7 +463,8 @@
 			// Print any warnings and errors
 			for(var i=0; i<lexAnalysis.warnings.length; i++){
 				if(lexAnalysis.warnings[i].type == TSC.WarningType.MissingEOP){
-					Materialize.toast('Program ' + programCounter + ': Lex warning! - ' + lexAnalysis.warnings[i].type, 4000, 'toastcolor');
+					M.toast({html: 'Program ' + programCounter + ': Lex warning! - ' + lexAnalysis.warnings[i].type, classes: 'toastcolor'});
+					// Materialize.toast('Program ' + programCounter + ': Lex warning! - ' + lexAnalysis.warnings[i].type, 4000, 'toastcolor');
 					putMessage("LEXER -> | WARNING: No EOP [$] detected at end-of-file. Adding to end-of-file...");
 					// Insert an EOP into the tokens array
 					lexAnalysis.tokens.push(new TSC.Token(TSC.TokenType.TEop, "$", lexAnalysis.line, lexAnalysis.col));
@@ -471,19 +472,23 @@
 			}
 			for(var i=0; i<lexAnalysis.errors.length; i++){
 				if(lexAnalysis.errors[i].type == TSC.ErrorType.InvalidToken){
-					Materialize.toast('Program ' + programCounter + ': Lex error! - ' + lexAnalysis.errors[i].type, 4000, 'toastcolor');
+					M.toast({html: 'Program ' + programCounter + ': Lex error! - ' + lexAnalysis.warnings[i].type, classes: 'toastcolor'});
+					// Materialize.toast('Program ' + programCounter + ': Lex error! - ' + lexAnalysis.errors[i].type, 4000, 'toastcolor');
 					putMessage("LEXER -> | ERROR: Unrecognized or Invalid Token [ " + lexAnalysis.errors[i].value + " ] on line " + lexAnalysis.errors[i].lineNumber + " col " + lexAnalysis.errors[i].colNumber);
 				}
 				else if(lexAnalysis.errors[i].type == TSC.ErrorType.MissingCommentEnd){
-					Materialize.toast('Program ' + programCounter + ': Lex error! - ' + lexAnalysis.errors[i].type, 4000, 'toastcolor');
+					M.toast({html: 'Program ' + programCounter + ': Lex error! - ' + lexAnalysis.warnings[i].type, classes: 'toastcolor'});
+					// Materialize.toast('Program ' + programCounter + ': Lex error! - ' + lexAnalysis.errors[i].type, 4000, 'toastcolor');
 					putMessage("LEXER -> | ERROR: Missing ending comment brace (*/) for comment starting on line  " + lexAnalysis.errors[i].lineNumber + " col " + lexAnalysis.errors[i].colNumber);
 				}
 				else if(lexAnalysis.errors[i].type == TSC.ErrorType.InvalidCharacterInString){
-					Materialize.toast('Program ' + programCounter + ': Lex error! - ' + lexAnalysis.errors[i].type, 4000, 'toastcolor');
+					M.toast({html: 'Program ' + programCounter + ': Lex error! - ' + lexAnalysis.warnings[i].type, classes: 'toastcolor'});
+					// Materialize.toast('Program ' + programCounter + ': Lex error! - ' + lexAnalysis.errors[i].type, 4000, 'toastcolor');
 					putMessage("LEXER -> | ERROR: Invalid character in String [ " + lexAnalysis.errors[i].value + " ] on line " + lexAnalysis.errors[i].lineNumber + " col " + lexAnalysis.errors[i].colNumber);
 				}
 				else if(lexAnalysis.errors[i].type == TSC.ErrorType.MissingStringEndQuote){
-					Materialize.toast('Program ' + programCounter + ': Lex error! - ' + lexAnalysis.errors[i].type, 4000, 'toastcolor');
+					M.toast({html: 'Program ' + programCounter + ': Lex error! - ' + lexAnalysis.warnings[i].type, classes: 'toastcolor'});
+					// Materialize.toast('Program ' + programCounter + ': Lex error! - ' + lexAnalysis.errors[i].type, 4000, 'toastcolor');
 					putMessage("LEXER -> | ERROR: Missing ending quote for String literal starting on line  " + lexAnalysis.errors[i].lineNumber + " col " + lexAnalysis.errors[i].colNumber);
 				}
 			}
@@ -513,7 +518,8 @@
                 putMessage("Parse failed due to error.");
 				putMessage("CST generation failed due to parse error.");
 				putMessage("Compilation stopped due to parser error . . .");
-				Materialize.toast('Program ' + programCounter + ': Parse error!', 4000, 'toastcolor');
+				M.toast({html: 'Program ' + programCounter + ': Parse error!', classes: 'toastcolor'});
+				// Materialize.toast('Program ' + programCounter + ': Parse error!', 4000, 'toastcolor');
 			}
 			else{
 				putMessage("\n");
@@ -557,19 +563,23 @@
 					var warningMsg = res.warnings[i];
 					switch(warningMsg.type){
 						case TSC.WarningType.UninitializedVariable:
-							Materialize.toast('Program ' + programCounter + ': Semantic warning! - ' + warningMsg.type, 4000, 'toastcolor');	
+							M.toast({html: 'Program ' + programCounter + ': Semantic warning! - ' + warningMsg.type, classes: 'toastcolor'});
+							// Materialize.toast('Program ' + programCounter + ': Semantic warning! - ' + warningMsg.type, 4000, 'toastcolor');	
 							putMessage("S.ANALYZE -> | WARNING - Variable [" + warningMsg.value + "] on line " + warningMsg.lineNumber + " col " + warningMsg.colNumber + " has been declared but is not initialized properly.");
 							break;
 						case TSC.WarningType.UnusedVariable:
-							Materialize.toast('Program ' + programCounter + ': Semantic warning! - ' + warningMsg.type, 4000, 'toastcolor');
+							M.toast({html: 'Program ' + programCounter + ': Semantic warning! - ' + warningMsg.type, classes: 'toastcolor'});
+							// Materialize.toast('Program ' + programCounter + ': Semantic warning! - ' + warningMsg.type, 4000, 'toastcolor');
 							putMessage("S.ANALYZE -> | WARNING - Variable [" + warningMsg.value + "] on line " + warningMsg.lineNumber + " col " + warningMsg.colNumber + " has been initialized but is not used.");
 							break;
 						case TSC.WarningType.UsedUninitialized:
-							Materialize.toast('Program ' + programCounter + ': Semantic warning! - ' + warningMsg.type, 4000, 'toastcolor');
+							M.toast({html: 'Program ' + programCounter + ': Semantic warning! - ' + warningMsg.type, classes: 'toastcolor'});
+							// Materialize.toast('Program ' + programCounter + ': Semantic warning! - ' + warningMsg.type, 4000, 'toastcolor');
 							putMessage("S.ANALYZE -> | WARNING - Variable [" + warningMsg.value + "] on line " + warningMsg.lineNumber + " col " + warningMsg.colNumber + " has been used but is not initialized.");
 							break;
 						case TSC.WarningType.UsedBeforeInit:
-							Materialize.toast('Program ' + programCounter + ': Semantic warning! - ' + warningMsg.type, 4000, 'toastcolor');
+							M.toast({html: 'Program ' + programCounter + ': Semantic warning! - ' + warningMsg.type, classes: 'toastcolor'});
+							// Materialize.toast('Program ' + programCounter + ': Semantic warning! - ' + warningMsg.type, 4000, 'toastcolor');
 							putMessage("S.ANALYZE -> | WARNING - Variable [" + warningMsg.value + "] on line " + warningMsg.lineNumber + " col " + warningMsg.colNumber + " has been used before being initialized.");
 							break;
 					}
@@ -582,28 +592,32 @@
 				var errorMsg = res.errors[0];
 				switch(errorMsg.type){
 					case TSC.ErrorType.DuplicateVariable:
-						Materialize.toast('Program ' + programCounter + ': Semantic error! - ' + errorMsg.type, 4000, 'toastcolor');
+						M.toast({html: 'Program ' + programCounter + ': Semantic error! - ' + warningMsg.type, classes: 'toastcolor'});
+						// Materialize.toast('Program ' + programCounter + ': Semantic error! - ' + errorMsg.type, 4000, 'toastcolor');
 						putMessage("S.ANALYZE -> | ERROR - Variable [" + errorMsg.value.value + "] on line " + errorMsg.lineNumber + " col " + errorMsg.colNumber + " has already been declared in current scope at line " + errorMsg.firstDeclareLine + " col " + errorMsg.firstDeclareCol);
 						break;
 					case TSC.ErrorType.UndeclaredVariable:
-						Materialize.toast('Program ' + programCounter + ': Semantic error! - ' + errorMsg.type, 4000, 'toastcolor');
+						M.toast({html: 'Program ' + programCounter + ': Semantic error! - ' + warningMsg.type, classes: 'toastcolor'});
+						// Materialize.toast('Program ' + programCounter + ': Semantic error! - ' + errorMsg.type, 4000, 'toastcolor');
 						putMessage("S.ANALYZE -> | ERROR - Variable [" + errorMsg.value.value + "] on line " + errorMsg.lineNumber + " col " + errorMsg.colNumber + " has not been previously declared.");
 						break;
 					case TSC.ErrorType.TypeMismatch:
-						Materialize.toast('Program ' + programCounter + ': Semantic error! - ' + errorMsg.type, 4000, 'toastcolor');	
+						M.toast({html: 'Program ' + programCounter + ': Semantic error! - ' + warningMsg.type, classes: 'toastcolor'});
+						// Materialize.toast('Program ' + programCounter + ': Semantic error! - ' + errorMsg.type, 4000, 'toastcolor');	
 						putMessage("S.ANALYZE -> | ERROR - The variable [" + errorMsg.value.value + "] declared on line " + errorMsg.lineNumber + " col " + errorMsg.colNumber + " is of type " + errorMsg.idType.value + " and does not match the assignment type of " + errorMsg.targetType);
 						break;
 					case TSC.ErrorType.IncorrectTypeComparison:
-						Materialize.toast('Program ' + programCounter + ': Semantic error! - ' + errorMsg.type, 4000, 'toastcolor');
+						M.toast({html: 'Program ' + programCounter + ': Semantic error! - ' + warningMsg.type, classes: 'toastcolor'});
+						// Materialize.toast('Program ' + programCounter + ': Semantic error! - ' + errorMsg.type, 4000, 'toastcolor');
 						putMessage("S.ANALYZE -> | ERROR - The [" + errorMsg.value + "] on line " + errorMsg.lineNumber + " col " + errorMsg.colNumber + " is of type " + errorMsg.idType + " and is incompatibly compared to a type of " + errorMsg.targetType);
 						break;
 					case TSC.ErrorType.IncorrectIntegerExpression:
-						Materialize.toast('Program ' + programCounter + ': Semantic error! - ' + errorMsg.type, 4000, 'toastcolor');
+						M.toast({html: 'Program ' + programCounter + ': Semantic error! - ' + warningMsg.type, classes: 'toastcolor'});
+						// Materialize.toast('Program ' + programCounter + ': Semantic error! - ' + errorMsg.type, 4000, 'toastcolor');
 						putMessage("S.ANALYZE -> | ERROR - The [" + errorMsg.value + "] on line " + errorMsg.lineNumber + " col " + errorMsg.colNumber + " is of type " + errorMsg.targetType + " which cannot be added to digits of type " + TSC.VariableType.Int);
 						break;
 				}
 				// }
-				Materialize.toast('Program ' + programCounter + ': Semantic error!', 4000, 'toastcolor');
 				putMessage("\n");
 				putMessage("Semantic Analysis failed due to error.");
 				putMessage("Symbol table not produced due to semantic error.");
@@ -655,15 +669,21 @@
 			var res = codeGenerator.generateCode(analyzeRes);
 			// check for error
 			if(codeGenerator.hasError){
-				Materialize.toast('Program ' + programCounter + ': Code generation error!', 4000, 'toastcolor');
 				switch(codeGenerator.getError().ErrorType){
 					case TSC.Error.NoMoreStackMemory:
+						M.toast({html: 'Program ' + programCounter + ': Code generation error! - NoMoreStackMemory', classes: 'toastcolor'});
 						putMessage("Error occurred in code generation: cannot fit program into 256 bytes due to static stack overflow. Please shorten the input program.");
 						break;
 					case TSC.Error.NoMoreHeapMemory:
+						M.toast({html: 'Program ' + programCounter + ': Code generation error! - NoMoreHeapMemory', classes: 'toastcolor'});
 						putMessage("Error occurred in code generation: cannot fit program into 256 bytes due to the heap running out of space. Please shorten the input program.");
 						break;
 					case TSC.Error.NoMoreCodeMemory:
+						M.toast({html: 'Program ' + programCounter + ': Code generation error! - NoMoreCodeMemory', classes: 'toastcolor'});
+						putMessage("Error occurred in code generation: cannot fit program into 256 bytes. Please shorten the input program.");
+						break;
+					case TSC.Error.NestedBoolean:
+						M.toast({html: 'Program ' + programCounter + ': Code generation error! - NestedBoolean', classes: 'toastcolor'});
 						putMessage("Error occurred in code generation: cannot fit program into 256 bytes. Please shorten the input program.");
 						break;
 				}
@@ -695,6 +715,18 @@
 	</script>
 	<!-- https://stackoverflow.com/questions/6637341/use-tab-to-indent-in-textarea with my own edits -->
 	<script type="text/javascript">
+		$(document).ready(function(){
+			$('.fixed-action-btn').floatingActionButton({
+				hoverEnabled: false,
+				direction: 'left'
+			});
+		});
+		$(document).ready(function(){
+			$('.tabs').tabs();
+		});
+		$(document).ready(function(){
+			$('.collapsible').collapsible();
+		});
 		// hacking this so code input is focused, for some reason HTML5 autofocus on textarea not working for me...
 		setTimeout(function(){ document.getElementById("taSourceCode").focus() }, 10);
 		$(document).delegate('#taSourceCode', 'keydown', function(e) {

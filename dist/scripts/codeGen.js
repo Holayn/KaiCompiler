@@ -31,18 +31,20 @@ var TSC;
             // load accumulator with 0
             this.setCode("A9");
             this.setCode("00");
+            // we're gonna leave the very last address at FF to be a byte
+            // that will act as temporary storage
             // front load accumulator with "true" and "false"
-            this.generatedCode[254] = "e".charCodeAt(0).toString(16).toUpperCase();
-            this.generatedCode[253] = "s".charCodeAt(0).toString(16).toUpperCase();
-            this.generatedCode[252] = "l".charCodeAt(0).toString(16).toUpperCase();
-            this.generatedCode[251] = "a".charCodeAt(0).toString(16).toUpperCase();
-            this.generatedCode[250] = "f".charCodeAt(0).toString(16).toUpperCase();
-            this.generatedCode[248] = "e".charCodeAt(0).toString(16).toUpperCase();
-            this.generatedCode[247] = "u".charCodeAt(0).toString(16).toUpperCase();
-            this.generatedCode[246] = "r".charCodeAt(0).toString(16).toUpperCase();
-            this.generatedCode[245] = "t".charCodeAt(0).toString(16).toUpperCase();
+            this.generatedCode[254 - 1] = "e".charCodeAt(0).toString(16).toUpperCase();
+            this.generatedCode[253 - 1] = "s".charCodeAt(0).toString(16).toUpperCase();
+            this.generatedCode[252 - 1] = "l".charCodeAt(0).toString(16).toUpperCase();
+            this.generatedCode[251 - 1] = "a".charCodeAt(0).toString(16).toUpperCase();
+            this.generatedCode[250 - 1] = "f".charCodeAt(0).toString(16).toUpperCase();
+            this.generatedCode[248 - 1] = "e".charCodeAt(0).toString(16).toUpperCase();
+            this.generatedCode[247 - 1] = "u".charCodeAt(0).toString(16).toUpperCase();
+            this.generatedCode[246 - 1] = "r".charCodeAt(0).toString(16).toUpperCase();
+            this.generatedCode[245 - 1] = "t".charCodeAt(0).toString(16).toUpperCase();
             // update start of the heap
-            this.heapStartPtr = 245;
+            this.heapStartPtr = 245 - 1 - 1;
         }
         /**
          * Traverse AST. Generate correct opcodes on every subtree root
@@ -130,11 +132,11 @@ var TSC;
                             this.setCode("A0");
                             if (astNode.children[0].value.value == "true") {
                                 // load into y register address of true in heap
-                                this.setCode((245).toString(16).toUpperCase());
+                                this.setCode((245 - 1).toString(16).toUpperCase());
                             }
                             else if (astNode.children[0].value.value == "false") {
                                 // load into y register address of false in heap
-                                this.setCode((250).toString(16).toUpperCase());
+                                this.setCode((250 - 1).toString(16).toUpperCase());
                             }
                             // load x regis with 2
                             this.setCode("A2");
@@ -176,7 +178,7 @@ var TSC;
                             this.setCode("0A");
                             // load y with true
                             this.setCode("A0");
-                            this.setCode((245).toString(16).toUpperCase());
+                            this.setCode((245 - 1).toString(16).toUpperCase());
                             // set x register to address, compare same address to x register to set z to zero
                             // load 1 into acc, set x to 0, stores acc in some address
                             // compares that address and x register, branches if unequal
@@ -191,7 +193,7 @@ var TSC;
                             this.setCode("02");
                             // load y with false
                             this.setCode("A0");
-                            this.setCode((250).toString(16).toUpperCase());
+                            this.setCode((250 - 1).toString(16).toUpperCase());
                             // load x register with 2
                             this.setCode("A2");
                             this.setCode("02");
@@ -210,7 +212,7 @@ var TSC;
                             this.setCode("0A");
                             // load y with false
                             this.setCode("A0");
-                            this.setCode((250).toString(16).toUpperCase());
+                            this.setCode((250 - 1).toString(16).toUpperCase());
                             // set x register to address, compare same address to x register to set z to zero
                             // load 1 into acc, set x to 0, stores acc in some address
                             // compares that address and x register, branches if unequal
@@ -225,7 +227,7 @@ var TSC;
                             this.setCode("02");
                             // load y with true
                             this.setCode("A0");
-                            this.setCode((245).toString(16).toUpperCase());
+                            this.setCode((245 - 1).toString(16).toUpperCase());
                             // load x register with 2
                             this.setCode("A2");
                             this.setCode("02");
@@ -285,12 +287,12 @@ var TSC;
                             if (astNode.children[1].value.value == "true") {
                                 // load address of true in heap into accumulator as constant
                                 this.setCode("A9");
-                                this.setCode((245).toString(16).toUpperCase());
+                                this.setCode((245 - 1).toString(16).toUpperCase());
                             }
                             else if (astNode.children[1].value.value == "false") {
                                 // load address of false in heap into accumulator as constant
                                 this.setCode("A9");
-                                this.setCode((250).toString(16).toUpperCase());
+                                this.setCode((250 - 1).toString(16).toUpperCase());
                             }
                             break;
                         case TSC.TokenType.TId:
@@ -317,12 +319,12 @@ var TSC;
                             // if vals are equal, should get 1 in z flag
                             // generate code to store address of true/false in accumulator
                             this.setCode("A9");
-                            this.setCode((250).toString(16).toUpperCase());
+                            this.setCode((250 - 1).toString(16).toUpperCase());
                             // branch if vals are unequal
                             this.setCode("D0");
                             this.setCode("02");
                             this.setCode("A9");
-                            this.setCode((245).toString(16).toUpperCase());
+                            this.setCode((245 - 1).toString(16).toUpperCase());
                             break;
                         case TSC.TokenType.TNotEquals:
                             // get back the address we're comparing to the x register
@@ -345,14 +347,16 @@ var TSC;
                             this.setCode("00");
                             // store acc in an address
                             // store acc in new address so we can compare its value with x register
-                            var temp = "T" + this.staticId;
-                            this.staticMap.set(temp, {
-                                "name": "",
-                                "type": "",
-                                "at": "",
-                                "scopeId": ""
-                            });
-                            this.staticId++;
+                            // var temp = "T" + this.staticId;
+                            // this.staticMap.set(temp, {
+                            //     "name":"",
+                            //     "type": "",
+                            //     "at": "",
+                            //     "scopeId": ""
+                            // });
+                            // this.staticId++;
+                            // put x register into our temp address
+                            var temp = "FF";
                             this.setCode("8D");
                             this.setCode(temp);
                             this.setCode("00");
@@ -362,12 +366,12 @@ var TSC;
                             this.setCode("00");
                             // generate code to store address of true/false in accumulator
                             this.setCode("A9");
-                            this.setCode((250).toString(16).toUpperCase());
+                            this.setCode((250 - 1).toString(16).toUpperCase());
                             // branch if vals are equal
                             this.setCode("D0");
                             this.setCode("02");
                             this.setCode("A9");
-                            this.setCode((245).toString(16).toUpperCase());
+                            this.setCode((245 - 1).toString(16).toUpperCase());
                             break;
                     }
                     // find temp address of variable we're assigning to
@@ -392,20 +396,20 @@ var TSC;
                         case TSC.TokenType.TBoolval:
                             // load heap address of true into x register
                             if (astNode.children[0].value.value == "true") {
-                                address = (245).toString(16).toUpperCase();
+                                address = (245 - 1).toString(16).toUpperCase();
                                 this.setCode("AE");
                                 this.setCode(address);
                                 this.setCode("00");
                             }
                             else {
-                                address = (250).toString(16).toUpperCase();
+                                address = (250 - 1).toString(16).toUpperCase();
                                 this.setCode("AE");
                                 this.setCode(address);
                                 this.setCode("00");
                             }
                             // compare to address of true. we need to set z flag if not equal later
                             this.setCode("EC");
-                            this.setCode((245).toString(16).toUpperCase());
+                            this.setCode((245 - 1).toString(16).toUpperCase());
                             this.setCode("00");
                             break;
                         // if lhs is a boolean expression equality
@@ -440,14 +444,16 @@ var TSC;
                             this.setCode("00");
                             // store acc in an address
                             // store acc in new address so we can compare its value with x register
-                            var temp = "T" + this.staticId;
-                            this.staticMap.set(temp, {
-                                "name": "",
-                                "type": "",
-                                "at": "",
-                                "scopeId": ""
-                            });
-                            this.staticId++;
+                            // var temp = "T" + this.staticId;
+                            // this.staticMap.set(temp, {
+                            //     "name":"",
+                            //     "type": "",
+                            //     "at": "",
+                            //     "scopeId": ""
+                            // });
+                            // this.staticId++;
+                            // put acc into our temp address
+                            var temp = "FF";
                             this.setCode("8D");
                             this.setCode(temp);
                             this.setCode("00");
@@ -471,14 +477,16 @@ var TSC;
                     this.setCode("A2");
                     this.setCode("00");
                     // store acc in new address so we can compare its value with x register
-                    var temp = "T" + this.staticId;
-                    this.staticMap.set(temp, {
-                        "name": "",
-                        "type": "",
-                        "at": "",
-                        "scopeId": ""
-                    });
-                    this.staticId++;
+                    // var temp = "T" + this.staticId;
+                    // this.staticMap.set(temp, {
+                    //     "name":"",
+                    //     "type": "",
+                    //     "at": "",
+                    //     "scopeId": ""
+                    // });
+                    // this.staticId++;
+                    // put x register into our temp address
+                    var temp = "FF";
                     this.setCode("8D");
                     this.setCode(temp);
                     this.setCode("00");
@@ -503,14 +511,16 @@ var TSC;
                     this.setCode("A9");
                     this.setCode("00");
                     // store 0 value in accumulator to some new address in memory
-                    var uncond = "T" + this.staticId;
-                    this.staticMap.set(uncond, {
-                        "name": "",
-                        "type": "",
-                        "at": "",
-                        "scopeId": ""
-                    });
-                    this.staticId++;
+                    // var uncond = "T" + this.staticId;
+                    // this.staticMap.set(uncond, {
+                    //     "name":"",
+                    //     "type": "",
+                    //     "at": "",
+                    //     "scopeId": ""
+                    // });
+                    // this.staticId++;
+                    // put acc into our temp address
+                    var uncond = "FF";
                     this.setCode("8D");
                     this.setCode(uncond);
                     this.setCode("00");
@@ -558,17 +568,17 @@ var TSC;
                             // load heap address of true into x register
                             if (astNode.children[0].value.value == "true") {
                                 this.setCode("AE");
-                                this.setCode((245).toString(16).toUpperCase());
+                                this.setCode((245 - 1).toString(16).toUpperCase());
                                 this.setCode("00");
                             }
                             else {
                                 this.setCode("AE");
-                                this.setCode((250).toString(16).toUpperCase());
+                                this.setCode((250 - 1).toString(16).toUpperCase());
                                 this.setCode("00");
                             }
                             // compare to address of true
                             this.setCode("EC");
-                            this.setCode((245).toString(16).toUpperCase());
+                            this.setCode((245 - 1).toString(16).toUpperCase());
                             this.setCode("00");
                             break;
                         // if lhs is a boolean expression equality 
@@ -602,14 +612,16 @@ var TSC;
                             this.setCode("00");
                             // store acc in an address
                             // store acc in new address so we can compare its value with x register
-                            var temp = "T" + this.staticId;
-                            this.staticMap.set(temp, {
-                                "name": "",
-                                "type": "",
-                                "at": "",
-                                "scopeId": ""
-                            });
-                            this.staticId++;
+                            // var temp = "T" + this.staticId;
+                            // this.staticMap.set(temp, {
+                            //     "name":"",
+                            //     "type": "",
+                            //     "at": "",
+                            //     "scopeId": ""
+                            // });
+                            // this.staticId++;
+                            // put acc into our temp address
+                            var temp = "FF";
                             this.setCode("8D");
                             this.setCode(temp);
                             this.setCode("00");
@@ -684,12 +696,12 @@ var TSC;
                     if (equalsNode.children[0].value.value == "true") {
                         // load address of true 
                         this.setCode("A2");
-                        this.setCode((245).toString(16).toUpperCase());
+                        this.setCode((245 - 1).toString(16).toUpperCase());
                     }
                     else if (equalsNode.children[0].value.value == "false") {
                         // load address of false
                         this.setCode("A2");
-                        this.setCode((250).toString(16).toUpperCase());
+                        this.setCode((250 - 1).toString(16).toUpperCase());
                     }
                     break;
                 case TSC.TokenType.TId:
@@ -729,19 +741,20 @@ var TSC;
                     // need to make entry in static table for value
                     this.setCode("A9");
                     this.setCode("0" + equalsNode.children[1].value.value);
-                    var temp = "T" + this.staticId;
-                    this.staticMap.set(temp, {
-                        "name": equalsNode.children[1].value.value,
-                        "type": equalsNode.children[1].value.type,
-                        "at": "",
-                        "scopeId": ""
-                    });
+                    // var temp = "T" + this.staticId;
+                    // this.staticMap.set(temp, {
+                    //     "name": equalsNode.children[1].value.value,
+                    //     "type": equalsNode.children[1].value.type,
+                    //     "at": "",
+                    //     "scopeId": ""
+                    // });
+                    // this.staticId++;
+                    // put acc into our temp address
+                    var temp = "FF";
                     // store in accumulator location temp, fill in later
                     this.setCode("8D");
                     this.setCode(temp);
                     this.setCode("00");
-                    // increase the static id
-                    this.staticId++;
                     return temp;
                 case TSC.TokenType.TString:
                     // we will compare strings based on what address is in heap
@@ -771,20 +784,22 @@ var TSC;
                         // need to store address of true into memory
                         // need to make entry in static table for value
                         this.setCode("A9");
-                        this.setCode((245).toString(16).toUpperCase());
-                        var temp = "T" + this.staticId;
-                        this.staticMap.set(temp, {
-                            "name": equalsNode.children[1].value.value,
-                            "type": equalsNode.children[1].value.type,
-                            "at": "",
-                            "scopeId": ""
-                        });
+                        this.setCode((245 - 1).toString(16).toUpperCase());
+                        // var temp = "T" + this.staticId;
+                        // this.staticMap.set(temp, {
+                        //     "name": equalsNode.children[1].value.value,
+                        //     "type": equalsNode.children[1].value.type,
+                        //     "at": "",
+                        //     "scopeId": ""
+                        // })
+                        // // increase the static id
+                        // this.staticId++;
+                        // put acc into our temp address
+                        var temp = "FF";
                         // store in accumulator location temp, fill in later
                         this.setCode("8D");
                         this.setCode(temp);
                         this.setCode("00");
-                        // increase the static id
-                        this.staticId++;
                         return temp;
                     }
                     else if (equalsNode.children[1].value.value == "false") {
@@ -792,14 +807,16 @@ var TSC;
                         // need to store address of false into memory
                         // need to make entry in static table for value
                         this.setCode("A9");
-                        this.setCode((250).toString(16).toUpperCase());
-                        var temp = "T" + this.staticId;
-                        this.staticMap.set(temp, {
-                            "name": equalsNode.children[1].value.value,
-                            "type": equalsNode.children[1].value.type,
-                            "at": "",
-                            "scopeId": ""
-                        });
+                        this.setCode((250 - 1).toString(16).toUpperCase());
+                        // var temp = "T" + this.staticId;
+                        // this.staticMap.set(temp, {
+                        //     "name": equalsNode.children[1].value.value,
+                        //     "type": equalsNode.children[1].value.type,
+                        //     "at": "",
+                        //     "scopeId": ""
+                        // });
+                        // put acc into our temp address
+                        var temp = "FF";
                         // store in accumulator location temp, fill in later
                         this.setCode("8D");
                         this.setCode(temp);
@@ -846,14 +863,16 @@ var TSC;
          */
         CodeGenerator.prototype.generateAddition = function (additionNode) {
             // RHS: load whatever it is into some new address in static memory
-            var temp = "T" + this.staticId;
-            this.staticMap.set(temp, {
-                "name": additionNode.children[1].value.value,
-                "type": additionNode.children[1].value.type,
-                "at": "",
-                "scopeId": ""
-            });
-            this.staticId++;
+            // var temp = "T" + this.staticId;
+            // this.staticMap.set(temp, {
+            //     "name": additionNode.children[1].value.value,
+            //     "type": additionNode.children[1].value.type,
+            //     "at": "",
+            //     "scopeId": ""
+            // });
+            // this.staticId++;
+            // put acc into our temp address
+            var temp = "FF";
             switch (additionNode.children[1].value.type) {
                 case TSC.TokenType.TDigit:
                     this.setCode("A9");
@@ -893,15 +912,17 @@ var TSC;
             this.setCode("6D");
             this.setCode(temp);
             this.setCode("00");
-            // store acc in memory
-            var temp = "T" + this.staticId;
-            this.staticMap.set(temp, {
-                "name": "",
-                "type": "",
-                "at": "",
-                "scopeId": ""
-            });
-            this.staticId++;
+            // // store acc in memory
+            // var temp = "T" + this.staticId;
+            // this.staticMap.set(temp, {
+            //     "name":"",
+            //     "type": "",
+            //     "at": "",
+            //     "scopeId": ""
+            // });
+            // this.staticId++;
+            // put acc into our temp address
+            var temp = "FF";
             this.setCode("8D");
             this.setCode(temp);
             this.setCode("00");

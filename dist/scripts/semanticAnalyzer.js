@@ -444,7 +444,6 @@ var TSC;
             return tree;
         };
         SemanticAnalyzer.prototype.printScopeTreeHelper = function (node, level, tree, dash) {
-            console.log(node);
             // generate string with all vars
             var varsString = "";
             for (var key in node.value.table) {

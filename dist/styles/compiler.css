@@ -39,14 +39,17 @@ main {
 	text-align: center !important;
 	transform: none !important;
 	padding-top: 9px;
+	right: 0px !important;
 }
 .subfloatgrammar {
 	width: 175px !important;
 	border-radius: 5px !important;
+	text-align: center;
 }
 .subfloattest {
 	width: 150px !important;
 	border-radius: 5px !important;
+	text-align: center;
 }
 .verbose {
 	bottom: 5px !important;
@@ -83,3 +86,9 @@ main {
 	height: 150px;
 }
 textarea, input, button { outline: none; }
+.fixed-action-btn {
+	/* right: 0px !important; */
+	/* position: relative !important;
+	text-align: center !important;
+	transform: none !important; */
+}
