@@ -181,3 +181,49 @@ https://projects.lukehaas.me/css-loaders/
 	font-size: 12px;
 	cursor: default;
 }
+
+
+.background {
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+
+@-webkit-keyframes rotate {
+  from {-webkit-transform:rotate(0deg);}
+  to {  -webkit-transform:rotate(360deg);}
+}
+
+@-moz-keyframes rotate {
+  from {-moz-transform:rotate(0deg);}
+  to {  -moz-transform:rotate(360deg);}
+}
+
+/* https://stackoverflow.com/questions/7309110/css3-transition-on-a-background-image */
+.background:after {
+  content : "";
+  display: block;
+  position: absolute;
+	/* top: -20px; */
+	top: 10vh;
+  left: 0;
+  /* width: 100%;
+  height: 100%; */
+  width: 2000px;
+  height: 2000px;
+  /* margin-left: 5%; */
+  /* margin-right: 20%; */
+  min-height: 1500px;
+  opacity : 0.035;
+  z-index: -1;
+  background: #909193 url('../images/spiral.jpg');
+  background-size: cover;
+  -webkit-animation-name: rotate;
+  -webkit-animation-duration:300s;
+  -webkit-animation-iteration-count:infinite;
+  -webkit-animation-timing-function:linear;
+  -moz-animation-name: rotate;
+  -moz-animation-duration:200s;
+  -moz-animation-iteration-count:infinite;
+  -moz-animation-timing-function:linear;
+}
