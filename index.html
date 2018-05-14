@@ -86,9 +86,7 @@
 			<br>
             <hr>
 			<br>
-            <div class="card-panel">
-				<!-- <button data-clipboard-target="#taCodeOutput" onclick="copyText()" type="button" class="waves-effect waves-light btn">Copy</button> -->
-                <textarea id="taCodeOutput" readonly></textarea>
+            <div class="card-panel" id="codeOutput">
 			</div>
 			<div class="center-align">
 				<a href="https://github.com/Holayn/KaiOS" target="_blank" class="waves-effect waves-light btn-small"/>OS</a>
@@ -306,14 +304,16 @@
 	<script type="text/javascript">
 
 		document.getElementById("loader").style.visibility = "hidden";
-		var verboseOn = true;
+        var verboseOn = true;
+        new ClipboardJS('.btn-small');
 
 		function init() {
             // Clear the log and the CST.
 			document.getElementById("taOutput").value = "";
 			document.getElementById("taCST").value = "";
 			document.getElementById("taAST").value = "";
-			document.getElementById("taCodeOutput").innerHTML = "";
+            // document.getElementById("taCodeOutput").innerHTML = "";
+            document.getElementById("codeOutput").innerHTML = "";
 			document.getElementById("taScope").value = "";
 			// Clear symbol table
 			var table = document.getElementById("symbolTable");
@@ -807,17 +807,22 @@
 				}
 				putMessage("Code generation completed with 1 error(s)...\n");
 				return codeGenerator.hasError;
-			}
+            }
+            document.getElementById("codeOutput").innerHTML += `
+                <button data-clipboard-target='#taCodeOutput` + programCounter + `' type='button' class='waves-effect waves-light btn-small'>Copy</button>
+                <br>
+                Program ` + programCounter + `:\n
+                <textarea class='taCodeOutput' id='taCodeOutput` + programCounter + `' readonly></textarea>
+            `;
             // put generated code into box
 			var generatedCode = res;
-			document.getElementById("taCodeOutput").innerHTML += "Program " + programCounter + ":\n";
             for(var i=0; i<generatedCode.length; i++){
-                document.getElementById("taCodeOutput").innerHTML += generatedCode[i];
+                document.getElementById("taCodeOutput" + programCounter).innerHTML += generatedCode[i];
                 if(i != generatedCode.length-1){
-                    document.getElementById("taCodeOutput").innerHTML += " ";
+                    document.getElementById("taCodeOutput" + programCounter).innerHTML += " ";
                 }
 			}
-			document.getElementById("taCodeOutput").innerHTML += "\n";
+			document.getElementById("taCodeOutput" + programCounter).innerHTML += "\n";
 			// put code gen log messages into log box
 			if(verboseOn){
 				for(var i=0; i<codeGenerator.getLog().length; i++){

@@ -168,3 +168,16 @@ https://projects.lukehaas.me/css-loaders/
 	position: relative;
     top: 6px;
   }
+
+#codeOutput {
+	font-family: "Courier";
+}
+
+.taCodeOutput {
+	font-family: "Courier";
+	border-color: white;
+	resize: none;
+	height: 75px;
+	font-size: 12px;
+	cursor: default;
+}
