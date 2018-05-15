@@ -2,6 +2,7 @@ Kompailer
 =====================
 
 This is my Compiler written in TypeScript with frontend HTML.
+Compiles custom language (see grammar) to modified set of 6502 op codes.
 See http://www.labouseur.com/courses/compilers/ for details.
 
 Setup TypeScript/Gulp
